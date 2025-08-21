@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/store/useAppStore";
 import { useToast } from "@/hooks/use-toast";
+import { safeToLocaleDateString } from "@/lib/dateUtils";
 
 interface HomePageProps {
   onNavigate: (path: string) => void;
@@ -159,7 +160,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
               </div>
               <CardDescription className="text-white/70">
                 {lastCheckIn 
-                  ? `Último registro: ${lastCheckIn.timestamp.toLocaleDateString('es-ES')}`
+                  ? `Último registro: ${safeToLocaleDateString(lastCheckIn.timestamp, 'es-ES')}`
                   : 'No hay registros recientes'
                 }
               </CardDescription>
