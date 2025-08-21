@@ -54,6 +54,15 @@ export function HomePage({ onNavigate }: HomePageProps) {
   };
   
   const lastCheckIn = getLastCheckIn();
+  
+  // Debug logging to understand the lastCheckIn object structure
+  console.log('lastCheckIn:', lastCheckIn);
+  if (lastCheckIn) {
+    console.log('lastCheckIn.timestamp:', lastCheckIn.timestamp);
+    console.log('lastCheckIn.timestamp type:', typeof lastCheckIn.timestamp);
+    console.log('lastCheckIn.timestamp instanceof Date:', lastCheckIn.timestamp instanceof Date);
+  }
+  
   const timeFormatter = new Intl.DateTimeFormat('es-ES', {
     hour: '2-digit',
     minute: '2-digit'
