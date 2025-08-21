@@ -11,6 +11,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { useNativeFeatures } from "@/hooks/useNativeFeatures";
 
 interface EmergencyButtonProps {
   isDiscreetMode?: boolean;
@@ -19,30 +21,41 @@ interface EmergencyButtonProps {
 
 export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: EmergencyButtonProps) {
   const [isPressed, setIsPressed] = useState(false);
+  const { isNative, openExternalApp } = useNativeFeatures();
   
-  const handleEmergencyPress = () => {
+  const handleEmergencyPress = async () => {
     setIsPressed(true);
-    // Haptic feedback simulation
-    if (navigator.vibrate) {
-      navigator.vibrate([100, 50, 100]);
+    
+    // Native haptic feedback
+    try {
+      if (isNative) {
+        await Haptics.impact({ style: ImpactStyle.Heavy });
+      } else {
+        // Fallback for web
+        if (navigator.vibrate) {
+          navigator.vibrate([100, 50, 100]);
+        }
+      }
+    } catch (error) {
+      console.error('Haptic feedback error:', error);
     }
+    
     setTimeout(() => setIsPressed(false), 200);
   };
 
-  const handleCall112 = () => {
+  const handleCall112 = async () => {
     onEmergencyAction('call');
-    // In a real app, this would open the phone dialer
+    
     if (confirm("¿Deseas llamar al 112? Se abrirá tu aplicación de teléfono.")) {
-      window.open('tel:112');
+      await openExternalApp('tel:112');
     }
   };
 
-  const handleContactTrusted = () => {
+  const handleContactTrusted = async () => {
     onEmergencyAction('whatsapp');
-    // In a real app, this would send to trusted contacts via WhatsApp/SMS
+    
     const message = encodeURIComponent("Necesito ayuda. Estoy en riesgo. Este es un aviso automático de Refugi.");
-    // Simulating WhatsApp link (would use actual contact number)
-    window.open(`https://wa.me/?text=${message}`);
+    await openExternalApp(`https://wa.me/?text=${message}`);
   };
 
   if (isDiscreetMode) {

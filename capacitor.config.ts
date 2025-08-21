@@ -1,0 +1,31 @@
+import { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'app.lovable.577d0e94408d4f2cbc50c0e9fa87b30e',
+  appName: 'refuge-aid-app',
+  webDir: 'dist',
+  server: {
+    url: 'https://577d0e94-408d-4f2c-bc50-c0e9fa87b30e.lovableproject.com?forceHideBadge=true',
+    cleartext: true
+  },
+  plugins: {
+    LocalNotifications: {
+      smallIcon: "ic_stat_icon_config_sample",
+      iconColor: "#488AFF",
+      sound: "beep.wav",
+    },
+    Haptics: {
+      vibrateOnTap: true
+    }
+  },
+  ios: {
+    contentInset: 'automatic',
+    backgroundColor: '#ffffff'
+  },
+  android: {
+    backgroundColor: '#ffffff',
+    allowMixedContent: true
+  }
+};
+
+export default config;
