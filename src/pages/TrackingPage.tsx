@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useAppStore, type CheckIn } from "@/store/useAppStore";
 import { useToast } from "@/hooks/use-toast";
+import { ensureDate, safeToDateString, safeToLocaleTimeString, safeToLocaleDateString, safeGetTime } from "@/lib/dateUtils";
 
 export function TrackingPage() {
   const { checkIns, addCheckIn, settings } = useAppStore();
@@ -96,7 +97,7 @@ export function TrackingPage() {
   const getCheckInForDate = (date: Date) => {
     const dateStr = date.toDateString();
     return checkIns.find(checkIn => 
-      checkIn.timestamp.toDateString() === dateStr
+      safeToDateString(checkIn.timestamp) === dateStr
     );
   };
   
@@ -187,7 +188,7 @@ export function TrackingPage() {
                 <div>
                   <div className="font-semibold">Estado registrado hoy</div>
                   <div className="text-sm text-muted-foreground">
-                    {todayCheckIn.timestamp.toLocaleTimeString('es-ES', {
+                    {safeToLocaleTimeString(todayCheckIn.timestamp, 'es-ES', {
                       hour: '2-digit',
                       minute: '2-digit'
                     })}
@@ -279,7 +280,7 @@ export function TrackingPage() {
           <CardContent>
             <div className="space-y-3">
               {checkIns
-                .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+                .sort((a, b) => safeGetTime(b.timestamp) - safeGetTime(a.timestamp))
                 .slice(0, 5)
                 .map((checkIn, index) => (
                   <div key={index} className="flex items-center justify-between py-2">
@@ -290,7 +291,7 @@ export function TrackingPage() {
                       <div>
                         <div className="font-medium">{getStatusLabel(checkIn.status)}</div>
                         <div className="text-sm text-muted-foreground">
-                          {checkIn.timestamp.toLocaleDateString('es-ES', {
+                          {safeToLocaleDateString(checkIn.timestamp, 'es-ES', {
                             day: '2-digit',
                             month: '2-digit',
                             hour: '2-digit',
