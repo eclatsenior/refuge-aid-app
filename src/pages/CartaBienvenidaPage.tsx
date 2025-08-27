@@ -42,10 +42,15 @@ const tourSteps = [
 
 export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
   const handleNext = () => {
     if (currentStep < tourSteps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentStep(currentStep + 1);
+        setIsTransitioning(false);
+      }, 150);
     } else {
       handleContinue();
     }
@@ -53,7 +58,11 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
 
   const handlePrev = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentStep(currentStep - 1);
+        setIsTransitioning(false);
+      }, 150);
     }
   };
 
@@ -68,12 +77,39 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
   return (
     <div className="min-h-screen bg-gradient-hero flex flex-col p-4">
       {/* Header */}
-      <header className="text-center pt-8 pb-6">
+      <header className="text-center pt-8 pb-4">
         <div className="h-12 w-12 rounded-full bg-gradient-primary mx-auto mb-3 flex items-center justify-center shadow-elegant">
           <Heart className="h-6 w-6 text-white" />
         </div>
         <h1 className="text-xl font-bold text-foreground">Carta de Bienvenida</h1>
       </header>
+
+      {/* Navigation - Moved to top */}
+      <div className="flex justify-between items-center pb-4 animate-fade-in">
+        <Button
+          onClick={handlePrev}
+          variant="ghost"
+          size="sm"
+          disabled={currentStep === 0}
+          className="flex items-center gap-1 hover-scale transition-all duration-200"
+        >
+          <ChevronLeft size={16} />
+          Anterior
+        </Button>
+
+        <span className="text-xs text-muted-foreground pulse">
+          {currentStep + 1} de {tourSteps.length}
+        </span>
+
+        <Button
+          onClick={handleNext}
+          size="sm"
+          className="flex items-center gap-1 hover-scale transition-all duration-200"
+        >
+          {isLastStep ? 'Continuar' : 'Siguiente'}
+          {!isLastStep && <ChevronRight size={16} />}
+        </Button>
+      </div>
 
       {/* Progress indicator */}
       <div className="flex justify-center mb-6 animate-fade-in">
@@ -98,20 +134,28 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center">
-        <Card className="bg-card/95 backdrop-blur-sm border-white/20 shadow-elegant mx-auto w-full max-w-md animate-fade-in">
+      <div className="flex-1 flex flex-col justify-center pb-20">
+        <Card className={`bg-card/95 backdrop-blur-sm border-white/20 shadow-elegant mx-auto w-full max-w-md transition-all duration-300 ${
+          isTransitioning ? 'animate-fade-out scale-95' : 'animate-fade-in animate-scale-in'
+        }`}>
           <CardContent className="p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-center text-foreground animate-scale-in">
+            <h2 className={`text-lg font-semibold text-center text-foreground transition-all duration-300 ${
+              isTransitioning ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0 animate-scale-in'
+            }`}>
               {currentTourStep.title}
             </h2>
             
-            <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className={`space-y-4 transition-all duration-300 ${
+              isTransitioning ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0 animate-fade-in'
+            }`} style={{ animationDelay: isTransitioning ? '0s' : '0.1s' }}>
               <p className="text-sm leading-relaxed text-muted-foreground text-center">
                 {currentTourStep.content}
               </p>
               
               {currentTourStep.highlight && (
-                <div className="bg-primary/10 p-4 rounded-lg border border-primary/20 animate-scale-in" style={{ animationDelay: '0.4s' }}>
+                <div className={`bg-primary/10 p-4 rounded-lg border border-primary/20 transition-all duration-300 ${
+                  isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100 animate-scale-in'
+                }`} style={{ animationDelay: isTransitioning ? '0s' : '0.2s' }}>
                   <p className="text-sm font-medium text-center text-primary">
                     "{currentTourStep.highlight}"
                   </p>
@@ -120,7 +164,9 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
             </div>
 
             {isLastStep && (
-              <div className="text-center pt-2 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+              <div className={`text-center pt-2 transition-all duration-300 ${
+                isTransitioning ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0 animate-fade-in'
+              }`} style={{ animationDelay: isTransitioning ? '0s' : '0.3s' }}>
                 <p className="text-sm font-medium">
                   Firma,<br />
                   <span className="text-primary">Nosotras.</span>
@@ -129,33 +175,6 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
             )}
           </CardContent>
         </Card>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex justify-between items-center pt-6 pb-8 animate-fade-in" style={{ animationDelay: '0.8s' }}>
-        <Button
-          onClick={handlePrev}
-          variant="ghost"
-          size="sm"
-          disabled={currentStep === 0}
-          className="flex items-center gap-1 hover-scale transition-all duration-200"
-        >
-          <ChevronLeft size={16} />
-          Anterior
-        </Button>
-
-        <span className="text-xs text-muted-foreground pulse">
-          {currentStep + 1} de {tourSteps.length}
-        </span>
-
-        <Button
-          onClick={handleNext}
-          size="sm"
-          className="flex items-center gap-1 hover-scale transition-all duration-200"
-        >
-          {isLastStep ? 'Continuar' : 'Siguiente'}
-          {!isLastStep && <ChevronRight size={16} />}
-        </Button>
       </div>
     </div>
   );
