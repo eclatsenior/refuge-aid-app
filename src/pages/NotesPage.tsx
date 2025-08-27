@@ -17,7 +17,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const { 
     notes, addNote, updateNote, deleteNote, toggleVaultStatus, 
     toggleTherapyFlag, quickDeleteNote, settings, showDecoyScreen, 
-    activateDecoyScreen, deactivateDecoyScreen, isVaultLocked 
+    activateDecoyScreen, deactivateDecoyScreen, isVaultLocked, unlockVault 
   } = useAppStore();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,6 +28,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const [isVaultMode, setIsVaultMode] = useState(false);
   const [deleteConfirmWord, setDeleteConfirmWord] = useState("");
   const [showQuickDelete, setShowQuickDelete] = useState<string | null>(null);
+  const [vaultPassword, setVaultPassword] = useState("");
 
   const filteredNotes = notes
     .filter(note => {
@@ -49,6 +50,90 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   
   const vaultNotes = filteredNotes.filter(note => note.isSafeVault);
   const regularNotes = filteredNotes.filter(note => !note.isSafeVault);
+
+  const handleUnlockVault = () => {
+    if (unlockVault(vaultPassword)) {
+      setVaultPassword("");
+      toast({
+        title: "Caja Fuerte desbloqueada",
+        description: "Ya puedes acceder a tus memorias protegidas"
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Ingresa una contraseña para continuar",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Show vault unlock screen when vault is locked
+  if (isVaultLocked && !showDecoyScreen) {
+    return (
+      <div className="min-h-screen bg-background p-4 pb-20 flex flex-col justify-center">
+        <div className="max-w-md mx-auto w-full">
+          <div className="text-center mb-8">
+            <div className="h-16 w-16 rounded-full bg-gradient-primary mx-auto mb-4 flex items-center justify-center shadow-elegant animate-pulse">
+              <Lock className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold mb-2">Caja Fuerte Protegida</h1>
+            <p className="text-muted-foreground">
+              Ingresa tu contraseña para acceder a tus memorias más importantes
+            </p>
+          </div>
+
+          <Card className="bg-card/95 backdrop-blur-sm border-primary/20 shadow-elegant">
+            <CardContent className="p-6 space-y-6">
+              <div className="space-y-2">
+                <label htmlFor="vault-password" className="text-sm font-medium">
+                  Contraseña de la Caja Fuerte
+                </label>
+                <Input
+                  id="vault-password"
+                  type="password"
+                  placeholder="Ingresa cualquier contraseña..."
+                  value={vaultPassword}
+                  onChange={(e) => setVaultPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleUnlockVault();
+                    }
+                  }}
+                  className="text-center"
+                />
+              </div>
+              
+              <Button 
+                onClick={handleUnlockVault}
+                className="w-full gap-2 animate-scale-in"
+                disabled={!vaultPassword.trim()}
+              >
+                <Vault size={16} />
+                Desbloquear Caja Fuerte
+              </Button>
+
+              <div className="text-center">
+                <Button
+                  variant="ghost"
+                  onClick={() => onNavigate('/')}
+                  className="text-muted-foreground gap-2"
+                >
+                  <ArrowLeft size={16} />
+                  Volver al inicio
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="text-center mt-6">
+            <p className="text-xs text-muted-foreground">
+              🔒 Tus memorias están protegidas y encriptadas
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleCreateNote = (isVault = false) => {
     setIsEditing(true);
@@ -177,7 +262,6 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     }
   };
 
-  // Shake detection or 5-tap to activate decoy screen
   const handleEmergencyHide = () => {
     activateDecoyScreen();
     toast({

@@ -95,6 +95,7 @@ interface AppState {
   
   // Privacy & Security
   toggleVaultLock: () => void;
+  unlockVault: (password: string) => boolean;
   activateDecoyScreen: () => void;
   deactivateDecoyScreen: () => void;
 }
@@ -121,7 +122,7 @@ export const useAppStore = create<AppState>()(
       checkIns: [],
       sudsRecords: [],
       settings: defaultSettings,
-      isVaultLocked: false,
+      isVaultLocked: true,
       showDecoyScreen: false,
       
       // Auth actions
@@ -161,10 +162,7 @@ export const useAppStore = create<AppState>()(
               ...note,
               id: crypto.randomUUID(),
               createdAt: new Date(),
-              updatedAt: new Date(),
-              isSafeVault: false,
-              forTherapy: false,
-              tags: []
+              updatedAt: new Date()
             }
           ]
         })),
@@ -259,6 +257,15 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           isVaultLocked: !state.isVaultLocked
         })),
+      
+      unlockVault: (password) => {
+        // Por ahora acepta cualquier contraseña, en una app real sería más seguro
+        if (password.length > 0) {
+          set({ isVaultLocked: false });
+          return true;
+        }
+        return false;
+      },
       
       activateDecoyScreen: () =>
         set({ showDecoyScreen: true }),
