@@ -8,14 +8,14 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Dark modern background inspired by examples */
-    --background: 220 25% 8%; /* Dark blue-gray base */
+    /* Lighter modern background */
+    --background: 220 15% 18%; /* Lighter blue-gray base */
     --foreground: 0 0% 95%; /* Light text */
 
-    --card: 220 20% 12%; /* Slightly lighter dark cards */
+    --card: 220 12% 22%; /* Lighter cards */
     --card-foreground: 0 0% 95%;
 
-    --popover: 220 20% 10%;
+    --popover: 220 15% 20%;
     --popover-foreground: 0 0% 95%;
 
     /* Vibrant accent colors from examples */
@@ -33,11 +33,11 @@ All colors MUST be HSL.
     --orange: 25 90% 60%; /* Vibrant orange */
     --orange-foreground: 0 0% 98%;
 
-    --secondary: 220 20% 15%;
+    --secondary: 220 15% 25%;
     --secondary-foreground: 0 0% 90%;
 
-    --muted: 220 15% 20%;
-    --muted-foreground: 0 0% 70%;
+    --muted: 220 12% 28%;
+    --muted-foreground: 0 0% 75%;
 
     --accent: 280 85% 70%;
     --accent-foreground: 0 0% 98%;
@@ -45,8 +45,8 @@ All colors MUST be HSL.
     --destructive: 0 84% 65%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 15% 25%;
-    --input: 220 15% 18%;
+    --border: 220 12% 35%;
+    --input: 220 12% 25%;
     --ring: 280 85% 70%;
 
     /* Emergency colors with dark theme */
@@ -57,12 +57,12 @@ All colors MUST be HSL.
     --warning: 38 90% 60%;
     --warning-foreground: 0 0% 98%;
 
-    /* Dark gradients with vibrant accents */
+    /* Lighter gradients with vibrant accents */
     --gradient-primary: linear-gradient(135deg, hsl(280 85% 70%), hsl(290 90% 75%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(280 50% 15%) 30%, hsl(190 50% 15%) 70%, hsl(160 50% 15%) 100%);
-    --gradient-calm: linear-gradient(180deg, hsl(220 25% 10%), hsl(280 20% 12%));
-    --gradient-card: linear-gradient(135deg, hsl(220 20% 12% / 0.9), hsl(280 15% 15% / 0.8));
-    --gradient-dark: linear-gradient(135deg, hsl(220 25% 8%), hsl(220 20% 12%));
+    --gradient-hero: linear-gradient(135deg, hsl(220 15% 18%) 0%, hsl(280 30% 20%) 30%, hsl(190 30% 20%) 70%, hsl(160 30% 20%) 100%);
+    --gradient-calm: linear-gradient(180deg, hsl(220 15% 20%), hsl(280 15% 22%));
+    --gradient-card: linear-gradient(135deg, hsl(220 12% 22% / 0.9), hsl(280 10% 25% / 0.8));
+    --gradient-dark: linear-gradient(135deg, hsl(220 15% 18%), hsl(220 12% 22%));
 
     /* Glowing shadows for dark theme */
     --shadow-emergency: 0 10px 30px -10px hsl(0 84% 65% / 0.4);
