@@ -8,15 +8,15 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Lighter modern background */
-    --background: 220 15% 18%; /* Lighter blue-gray base */
-    --foreground: 0 0% 95%; /* Light text */
+    /* Much lighter modern background */
+    --background: 220 12% 28%; /* Much lighter blue-gray base */
+    --foreground: 0 0% 98%; /* Very light text */
 
-    --card: 220 12% 22%; /* Lighter cards */
-    --card-foreground: 0 0% 95%;
+    --card: 220 10% 35%; /* Much lighter cards */
+    --card-foreground: 0 0% 98%;
 
-    --popover: 220 15% 20%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 220 12% 32%;
+    --popover-foreground: 0 0% 98%;
 
     /* Vibrant accent colors from examples */
     --primary: 280 85% 70%; /* Bright purple */
@@ -33,11 +33,11 @@ All colors MUST be HSL.
     --orange: 25 90% 60%; /* Vibrant orange */
     --orange-foreground: 0 0% 98%;
 
-    --secondary: 220 15% 25%;
-    --secondary-foreground: 0 0% 90%;
+    --secondary: 220 12% 38%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 220 12% 28%;
-    --muted-foreground: 0 0% 75%;
+    --muted: 220 10% 42%;
+    --muted-foreground: 0 0% 85%;
 
     --accent: 280 85% 70%;
     --accent-foreground: 0 0% 98%;
@@ -45,8 +45,8 @@ All colors MUST be HSL.
     --destructive: 0 84% 65%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 12% 35%;
-    --input: 220 12% 25%;
+    --border: 220 10% 45%;
+    --input: 220 10% 38%;
     --ring: 280 85% 70%;
 
     /* Emergency colors with dark theme */
@@ -57,12 +57,12 @@ All colors MUST be HSL.
     --warning: 38 90% 60%;
     --warning-foreground: 0 0% 98%;
 
-    /* Lighter gradients with vibrant accents */
+    /* Much lighter gradients with vibrant accents */
     --gradient-primary: linear-gradient(135deg, hsl(280 85% 70%), hsl(290 90% 75%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 15% 18%) 0%, hsl(280 30% 20%) 30%, hsl(190 30% 20%) 70%, hsl(160 30% 20%) 100%);
-    --gradient-calm: linear-gradient(180deg, hsl(220 15% 20%), hsl(280 15% 22%));
-    --gradient-card: linear-gradient(135deg, hsl(220 12% 22% / 0.9), hsl(280 10% 25% / 0.8));
-    --gradient-dark: linear-gradient(135deg, hsl(220 15% 18%), hsl(220 12% 22%));
+    --gradient-hero: linear-gradient(135deg, hsl(220 12% 28%) 0%, hsl(280 25% 32%) 30%, hsl(190 25% 32%) 70%, hsl(160 25% 32%) 100%);
+    --gradient-calm: linear-gradient(180deg, hsl(220 12% 30%), hsl(280 12% 35%));
+    --gradient-card: linear-gradient(135deg, hsl(220 10% 35% / 0.9), hsl(280 8% 38% / 0.8));
+    --gradient-dark: linear-gradient(135deg, hsl(220 12% 28%), hsl(220 10% 35%));
 
     /* Glowing shadows for dark theme */
     --shadow-emergency: 0 10px 30px -10px hsl(0 84% 65% / 0.4);
