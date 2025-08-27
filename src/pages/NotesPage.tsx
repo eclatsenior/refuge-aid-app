@@ -67,74 +67,6 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     }
   };
 
-  // Show vault unlock screen when vault is locked
-  if (isVaultLocked && !showDecoyScreen) {
-    return (
-      <div className="min-h-screen bg-background p-4 pb-20 flex flex-col justify-center">
-        <div className="max-w-md mx-auto w-full">
-          <div className="text-center mb-8">
-            <div className="h-16 w-16 rounded-full bg-gradient-primary mx-auto mb-4 flex items-center justify-center shadow-elegant animate-pulse">
-              <Lock className="h-8 w-8 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold mb-2">Caja Fuerte Protegida</h1>
-            <p className="text-muted-foreground">
-              Ingresa tu contraseña para acceder a tus memorias más importantes
-            </p>
-          </div>
-
-          <Card className="bg-card/95 backdrop-blur-sm border-primary/20 shadow-elegant">
-            <CardContent className="p-6 space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="vault-password" className="text-sm font-medium">
-                  Contraseña de la Caja Fuerte
-                </label>
-                <Input
-                  id="vault-password"
-                  type="password"
-                  placeholder="Ingresa cualquier contraseña..."
-                  value={vaultPassword}
-                  onChange={(e) => setVaultPassword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleUnlockVault();
-                    }
-                  }}
-                  className="text-center"
-                />
-              </div>
-              
-              <Button 
-                onClick={handleUnlockVault}
-                className="w-full gap-2 animate-scale-in"
-                disabled={!vaultPassword.trim()}
-              >
-                <Vault size={16} />
-                Desbloquear Caja Fuerte
-              </Button>
-
-              <div className="text-center">
-                <Button
-                  variant="ghost"
-                  onClick={() => onNavigate('/')}
-                  className="text-muted-foreground gap-2"
-                >
-                  <ArrowLeft size={16} />
-                  Volver al inicio
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="text-center mt-6">
-            <p className="text-xs text-muted-foreground">
-              🔒 Tus memorias están protegidas y encriptadas
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const handleCreateNote = (isVault = false) => {
     setIsEditing(true);
     setEditingId(null);
@@ -461,7 +393,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
       ) : (
         <div className="space-y-8">
           {/* Caja Fuerte Section */}
-          {vaultNotes.length > 0 && (
+          {vaultNotes.length > 0 || (vaultNotes.length === 0 && isVaultLocked) ? (
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Vault className="h-5 w-5 text-primary" />
@@ -470,118 +402,160 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
                   {vaultNotes.length}
                 </Badge>
               </div>
-              <div className="grid gap-4">
-                {vaultNotes.map((note) => (
-                  <Card key={note.id} className="border-primary/20 bg-primary/5 hover:shadow-soft transition-shadow">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <CardTitle className="text-lg line-clamp-2 flex-1">
-                          {note.title}
-                        </CardTitle>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <Badge variant="secondary" className="gap-1 bg-primary/20 text-primary">
-                            <Vault size={12} />
-                            Caja Fuerte
-                          </Badge>
-                          {note.forTherapy && (
-                            <Badge variant="secondary" className="gap-1 bg-mint/20 text-mint">
-                              <Heart size={12} />
-                              Terapia
-                            </Badge>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleStar(note.id)}
-                            className={note.isStarred ? 'text-warning' : 'text-muted-foreground'}
-                          >
-                            {note.isStarred ? <Star size={16} className="fill-current" /> : <StarOff size={16} />}
-                          </Button>
-                        </div>
+              
+              {isVaultLocked ? (
+                <Card className="border-primary/20 bg-primary/5">
+                  <CardContent className="p-6 text-center space-y-4">
+                    <div className="flex justify-center">
+                      <div className="h-12 w-12 rounded-full bg-gradient-primary flex items-center justify-center shadow-elegant animate-pulse">
+                        <Lock className="h-6 w-6 text-white" />
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                        {note.content || "Sin contenido"}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Caja Fuerte Protegida</h3>
+                      <p className="text-muted-foreground text-sm mb-4">
+                        Ingresa tu contraseña para acceder a tus memorias más sensibles
                       </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          {formatDate(note.updatedAt)}
-                        </span>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleTherapyFlag(note.id)}
-                            className="gap-2"
-                          >
-                            <Heart size={14} />
-                            {note.forTherapy ? 'Quitar de' : 'Para'} terapia
-                          </Button>
-                          {note.forTherapy && (
+                    </div>
+                    <div className="space-y-3 max-w-xs mx-auto">
+                      <Input
+                        type="password"
+                        placeholder="Contraseña de la Caja Fuerte..."
+                        value={vaultPassword}
+                        onChange={(e) => setVaultPassword(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleUnlockVault();
+                          }
+                        }}
+                        className="text-center"
+                      />
+                      <Button 
+                        onClick={handleUnlockVault}
+                        size="sm"
+                        className="gap-2"
+                        disabled={!vaultPassword.trim()}
+                      >
+                        <Vault size={14} />
+                        Desbloquear
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid gap-4">
+                  {vaultNotes.map((note) => (
+                    <Card key={note.id} className="border-primary/20 bg-primary/5 hover:shadow-soft transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <CardTitle className="text-lg line-clamp-2 flex-1">
+                            {note.title}
+                          </CardTitle>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Badge variant="secondary" className="gap-1 bg-primary/20 text-primary">
+                              <Vault size={12} />
+                              Caja Fuerte
+                            </Badge>
+                            {note.forTherapy && (
+                              <Badge variant="secondary" className="gap-1 bg-mint/20 text-mint">
+                                <Heart size={12} />
+                                Terapia
+                              </Badge>
+                            )}
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleExportForTherapy(note)}
+                              onClick={() => toggleStar(note.id)}
+                              className={note.isStarred ? 'text-warning' : 'text-muted-foreground'}
+                            >
+                              {note.isStarred ? <Star size={16} className="fill-current" /> : <StarOff size={16} />}
+                            </Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                          {note.content || "Sin contenido"}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">
+                            {formatDate(note.updatedAt)}
+                          </span>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleTherapyFlag(note.id)}
                               className="gap-2"
                             >
-                              <Download size={14} />
-                              Exportar
+                              <Heart size={14} />
+                              {note.forTherapy ? 'Quitar de' : 'Para'} terapia
                             </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditNote(note)}
-                            className="gap-2"
-                          >
-                            <Edit size={14} />
-                            Editar
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
+                            {note.forTherapy && (
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="gap-2 text-destructive hover:text-destructive"
+                                onClick={() => handleExportForTherapy(note)}
+                                className="gap-2"
                               >
-                                <AlertTriangle size={14} />
-                                Borrar rápido
+                                <Download size={14} />
+                                Exportar
                               </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Borrado rápido de memoria</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Esta acción no se puede deshacer. Escribe <strong>BORRAR</strong> para confirmar.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <Input
-                                placeholder="Escribe BORRAR para confirmar"
-                                value={deleteConfirmWord}
-                                onChange={(e) => setDeleteConfirmWord(e.target.value)}
-                              />
-                              <AlertDialogFooter>
-                                <AlertDialogCancel onClick={() => setDeleteConfirmWord("")}>
-                                  Cancelar
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleQuickDelete(note.id)}
-                                  className="bg-destructive hover:bg-destructive/90"
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditNote(note)}
+                              className="gap-2"
+                            >
+                              <Edit size={14} />
+                              Editar
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="gap-2 text-destructive hover:text-destructive"
                                 >
-                                  Eliminar permanentemente
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                                  <AlertTriangle size={14} />
+                                  Borrar rápido
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Borrado rápido de memoria</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Esta acción no se puede deshacer. Escribe <strong>BORRAR</strong> para confirmar.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <Input
+                                  placeholder="Escribe BORRAR para confirmar"
+                                  value={deleteConfirmWord}
+                                  onChange={(e) => setDeleteConfirmWord(e.target.value)}
+                                />
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel onClick={() => setDeleteConfirmWord("")}>
+                                    Cancelar
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleQuickDelete(note.id)}
+                                    className="bg-destructive hover:bg-destructive/90"
+                                  >
+                                    Eliminar permanentemente
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          ) : null}
 
           {/* Regular Notes Section */}
           {regularNotes.length > 0 && (
