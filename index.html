@@ -1,31 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Refugi - Apoyo Seguro 24/7</title>
-    <meta name="description" content="Aplicación segura de apoyo para víctimas de violencia doméstica. Botón de emergencia, recursos y herramientas de calma disponibles 24/7." />
-    <meta name="author" content="Refugi" />
-    <meta name="theme-color" content="#4F46E5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Refugio - Tu Espacio Seguro</title>
+    <meta name="description" content="Tu espacio seguro de cuidado emocional. Camino terapéutico, diario caja fuerte y apoyo disponible 24/7." />
+    <meta name="author" content="Refugio" />
+    <meta name="theme-color" content="#1a1a2e" />
     
     <!-- PWA Configuration -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Refugi" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Refugio" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
 
-    <meta property="og:title" content="Refugi - Apoyo Seguro 24/7" />
-    <meta property="og:description" content="Aplicación segura de apoyo para víctimas de violencia doméstica" />
+    <meta property="og:title" content="Refugio - Tu Espacio Seguro" />
+    <meta property="og:description" content="Tu espacio seguro de cuidado emocional y apoyo" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    
+    <!-- Preload critical resources for offline -->
+    <link rel="preload" href="/icon-192.png" as="image" />
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Registrar Service Worker para funcionamiento offline
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+              console.log('SW registered: ', registration);
+            }, function(registrationError) {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+
+      // Evitar zoom en inputs en iOS
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        document.addEventListener('touchstart', function(event) {
+          if (event.touches.length > 1) {
+            event.preventDefault();
+          }
+        }, { passive: false });
+      }
+    </script>
   </body>
 </html>
