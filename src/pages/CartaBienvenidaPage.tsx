@@ -76,18 +76,22 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
       </header>
 
       {/* Progress indicator */}
-      <div className="flex justify-center mb-6">
+      <div className="flex justify-center mb-6 animate-fade-in">
         <div className="flex space-x-2">
           {tourSteps.map((_, index) => (
             <div
               key={index}
-              className={`h-2 w-8 rounded-full transition-colors ${
+              className={`h-2 w-8 rounded-full transition-all duration-500 hover-scale ${
                 index === currentStep 
-                  ? 'bg-primary' 
+                  ? 'bg-primary shadow-glow' 
                   : index < currentStep 
                     ? 'bg-primary/60' 
                     : 'bg-muted'
               }`}
+              style={{ 
+                animationDelay: `${index * 0.1}s`,
+                transform: index === currentStep ? 'scale(1.2)' : 'scale(1)'
+              }}
             />
           ))}
         </div>
@@ -95,19 +99,19 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
 
       {/* Content */}
       <div className="flex-1 flex flex-col justify-center">
-        <Card className="bg-card/95 backdrop-blur-sm border-white/20 shadow-elegant mx-auto w-full max-w-md">
+        <Card className="bg-card/95 backdrop-blur-sm border-white/20 shadow-elegant mx-auto w-full max-w-md animate-fade-in">
           <CardContent className="p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-center text-foreground">
+            <h2 className="text-lg font-semibold text-center text-foreground animate-scale-in">
               {currentTourStep.title}
             </h2>
             
-            <div className="space-y-4">
+            <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <p className="text-sm leading-relaxed text-muted-foreground text-center">
                 {currentTourStep.content}
               </p>
               
               {currentTourStep.highlight && (
-                <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
+                <div className="bg-primary/10 p-4 rounded-lg border border-primary/20 animate-scale-in" style={{ animationDelay: '0.4s' }}>
                   <p className="text-sm font-medium text-center text-primary">
                     "{currentTourStep.highlight}"
                   </p>
@@ -116,7 +120,7 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
             </div>
 
             {isLastStep && (
-              <div className="text-center pt-2">
+              <div className="text-center pt-2 animate-fade-in" style={{ animationDelay: '0.6s' }}>
                 <p className="text-sm font-medium">
                   Firma,<br />
                   <span className="text-primary">Nosotras.</span>
@@ -128,26 +132,26 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between items-center pt-6 pb-8">
+      <div className="flex justify-between items-center pt-6 pb-8 animate-fade-in" style={{ animationDelay: '0.8s' }}>
         <Button
           onClick={handlePrev}
           variant="ghost"
           size="sm"
           disabled={currentStep === 0}
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 hover-scale transition-all duration-200"
         >
           <ChevronLeft size={16} />
           Anterior
         </Button>
 
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-muted-foreground pulse">
           {currentStep + 1} de {tourSteps.length}
         </span>
 
         <Button
           onClick={handleNext}
           size="sm"
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 hover-scale transition-all duration-200"
         >
           {isLastStep ? 'Continuar' : 'Siguiente'}
           {!isLastStep && <ChevronRight size={16} />}

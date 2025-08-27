@@ -7,7 +7,6 @@ const navigationItems = [
   { icon: Calendar, label: "Seguimiento", path: "/seguimiento" },
   { icon: NotebookPen, label: "Notas", path: "/notas" },
   { icon: Shield, label: "Camino", path: "/camino" },
-  { icon: Heart, label: "Calma", path: "/calma" },
   { icon: MapPin, label: "Recursos", path: "/recursos" },
 ];
 
