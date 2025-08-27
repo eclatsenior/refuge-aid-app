@@ -29,6 +29,19 @@ export default {
 					foreground: 'hsl(var(--primary-foreground))',
 					glow: 'hsl(var(--primary-glow))'
 				},
+				// Modern UI colors inspired by reference
+				coral: {
+					DEFAULT: 'hsl(var(--coral))',
+					foreground: 'hsl(var(--coral-foreground))'
+				},
+				cyan: {
+					DEFAULT: 'hsl(var(--cyan))',
+					foreground: 'hsl(var(--cyan-foreground))'
+				},
+				mint: {
+					DEFAULT: 'hsl(var(--mint))',
+					foreground: 'hsl(var(--mint-foreground))'
+				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
@@ -80,12 +93,14 @@ export default {
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-hero': 'var(--gradient-hero)',
-				'gradient-calm': 'var(--gradient-calm)'
+				'gradient-calm': 'var(--gradient-calm)',
+				'gradient-card': 'var(--gradient-card)'
 			},
 			boxShadow: {
 				'emergency': 'var(--shadow-emergency)',
 				'primary': 'var(--shadow-primary)',
-				'soft': 'var(--shadow-soft)'
+				'soft': 'var(--shadow-soft)',
+				'glow': 'var(--shadow-glow)'
 			},
 			transitionTimingFunction: {
 				'smooth': 'var(--transition-smooth)',

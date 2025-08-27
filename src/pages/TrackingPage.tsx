@@ -126,50 +126,59 @@ export function TrackingPage() {
       </header>
       
       {!todayCheckIn && (
-        <Card className="mb-6 border-primary/20 bg-primary/5">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Heart className="h-5 w-5 text-primary" />
+        <Card className="mb-8 bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
+          <CardHeader className="pb-6">
+            <CardTitle className="text-xl flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                <Heart className="h-5 w-5 text-primary" />
+              </div>
               ¿Cómo te sientes hoy?
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Registra tu estado actual para mantener un seguimiento de tu bienestar
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-3">
+            <div className="grid gap-6">
               <Button
                 onClick={() => handleCheckIn('ok')}
-                className="h-14 justify-start gap-3 bg-safe hover:bg-safe/90 text-safe-foreground"
+                className="h-20 justify-start gap-6 bg-mint/10 hover:bg-mint/20 text-mint border-mint/20 rounded-2xl shadow-soft relative overflow-hidden group"
+                variant="outline"
               >
-                <CheckCircle size={20} />
+                <div className="h-14 w-14 rounded-full bg-gradient-to-br from-mint to-mint/80 flex items-center justify-center shadow-lg">
+                  <CheckCircle size={24} className="text-white" />
+                </div>
                 <div className="text-left">
-                  <div className="font-semibold">Me siento bien</div>
-                  <div className="text-xs opacity-90">Estable, segura, tranquila</div>
+                  <div className="font-bold text-lg text-foreground">Me siento bien</div>
+                  <div className="text-sm text-muted-foreground">Estable, segura, tranquila</div>
                 </div>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleCheckIn('anxious')}
-                className="h-14 justify-start gap-3 border-warning/30 hover:bg-warning/10"
+                className="h-20 justify-start gap-6 bg-coral/10 hover:bg-coral/20 text-coral border-coral/20 rounded-2xl shadow-soft relative overflow-hidden group"
               >
-                <Clock size={20} className="text-warning" />
+                <div className="h-14 w-14 rounded-full bg-gradient-to-br from-coral to-coral/80 flex items-center justify-center shadow-lg">
+                  <Clock size={24} className="text-white" />
+                </div>
                 <div className="text-left">
-                  <div className="font-semibold">Algo ansiosa</div>
-                  <div className="text-xs text-muted-foreground">Intranquila, preocupada</div>
+                  <div className="font-bold text-lg text-foreground">Algo ansiosa</div>
+                  <div className="text-sm text-muted-foreground">Intranquila, preocupada</div>
                 </div>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleCheckIn('alert')}
-                className="h-14 justify-start gap-3 border-emergency/30 hover:bg-emergency/10"
+                className="h-20 justify-start gap-6 bg-emergency/10 hover:bg-emergency/20 text-emergency border-emergency/20 rounded-2xl shadow-soft relative overflow-hidden group"
               >
-                <AlertCircle size={20} className="text-emergency" />
+                <div className="h-14 w-14 rounded-full bg-gradient-to-br from-emergency to-emergency/80 flex items-center justify-center shadow-lg">
+                  <AlertCircle size={24} className="text-white" />
+                </div>
                 <div className="text-left">
-                  <div className="font-semibold">No me siento segura</div>
-                  <div className="text-xs text-muted-foreground">Alerta, en riesgo, necesito apoyo</div>
+                  <div className="font-bold text-lg text-foreground">No me siento segura</div>
+                  <div className="text-sm text-muted-foreground">Alerta, en riesgo, necesito apoyo</div>
                 </div>
               </Button>
             </div>
@@ -178,15 +187,23 @@ export function TrackingPage() {
       )}
       
       {todayCheckIn && (
-        <Card className="mb-6">
+        <Card className="mb-8 bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-full ${getStatusColor(todayCheckIn.status)}`}>
-                  {getStatusIcon(todayCheckIn.status)}
+              <div className="flex items-center gap-4">
+                <div className={`h-14 w-14 rounded-full flex items-center justify-center shadow-lg ${
+                  todayCheckIn.status === 'ok' ? 'bg-gradient-to-br from-mint to-mint/80' :
+                  todayCheckIn.status === 'anxious' ? 'bg-gradient-to-br from-coral to-coral/80' :
+                  'bg-gradient-to-br from-emergency to-emergency/80'
+                }`}>
+                  <div className="text-white">
+                    {todayCheckIn.status === 'ok' ? <CheckCircle size={24} /> :
+                     todayCheckIn.status === 'anxious' ? <Clock size={24} /> :
+                     <AlertCircle size={24} />}
+                  </div>
                 </div>
                 <div>
-                  <div className="font-semibold">Estado registrado hoy</div>
+                  <div className="font-bold text-lg text-foreground">Estado registrado hoy</div>
                   <div className="text-sm text-muted-foreground">
                     {safeToLocaleTimeString(todayCheckIn.timestamp, 'es-ES', {
                       hour: '2-digit',
@@ -195,7 +212,11 @@ export function TrackingPage() {
                   </div>
                 </div>
               </div>
-              <Badge className={getStatusColor(todayCheckIn.status)}>
+              <Badge className={`${
+                todayCheckIn.status === 'ok' ? 'bg-mint/20 text-mint border-mint/30' :
+                todayCheckIn.status === 'anxious' ? 'bg-coral/20 text-coral border-coral/30' :
+                'bg-emergency/20 text-emergency border-emergency/30'
+              }`}>
                 {getStatusLabel(todayCheckIn.status)}
               </Badge>
             </div>
@@ -203,66 +224,82 @@ export function TrackingPage() {
         </Card>
       )}
       
-      <Card className="mb-6">
+      <Card className="mb-8 bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+          <CardTitle className="text-xl flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-cyan/20 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-cyan" />
+            </div>
             Resumen Semanal
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-base">
             Últimos 7 días - {stats.okCount + stats.anxiousCount + stats.alertCount} de {stats.totalDays} días registrados
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-safe">{stats.okCount}</div>
-              <div className="text-xs text-muted-foreground">Días estables</div>
+          <div className="grid grid-cols-3 gap-6 text-center">
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-12 w-12 rounded-full bg-mint/20 flex items-center justify-center">
+                <div className="text-2xl font-bold text-mint">{stats.okCount}</div>
+              </div>
+              <div className="text-sm text-muted-foreground font-medium">Días estables</div>
             </div>
-            <div>
-              <div className="text-2xl font-bold text-warning">{stats.anxiousCount}</div>
-              <div className="text-xs text-muted-foreground">Días ansiosos</div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-12 w-12 rounded-full bg-coral/20 flex items-center justify-center">
+                <div className="text-2xl font-bold text-coral">{stats.anxiousCount}</div>
+              </div>
+              <div className="text-sm text-muted-foreground font-medium">Días ansiosos</div>
             </div>
-            <div>
-              <div className="text-2xl font-bold text-emergency">{stats.alertCount}</div>
-              <div className="text-xs text-muted-foreground">Días de alerta</div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-12 w-12 rounded-full bg-emergency/20 flex items-center justify-center">
+                <div className="text-2xl font-bold text-emergency">{stats.alertCount}</div>
+              </div>
+              <div className="text-sm text-muted-foreground font-medium">Días de alerta</div>
             </div>
           </div>
         </CardContent>
       </Card>
       
-      <Card>
+      <Card className="bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+          <CardTitle className="text-xl flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-primary" />
+            </div>
             Últimos 7 días
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-3">
             {last7Days.map((date, index) => {
               const checkIn = getCheckInForDate(date);
               const isToday = date.toDateString() === new Date().toDateString();
               
               return (
                 <div key={index} className="text-center">
-                  <div className="text-xs text-muted-foreground mb-2">
+                  <div className="text-xs text-muted-foreground mb-2 font-medium">
                     {date.toLocaleDateString('es-ES', { weekday: 'short' })}
                   </div>
-                  <div className="text-xs mb-2">
+                  <div className="text-sm mb-3 font-semibold">
                     {date.getDate()}
                   </div>
-                  <div className={`w-8 h-8 mx-auto rounded-full border-2 flex items-center justify-center ${
-                    isToday ? 'border-primary' : 'border-border'
+                  <div className={`w-10 h-10 mx-auto rounded-full border-2 flex items-center justify-center shadow-sm ${
+                    isToday ? 'border-primary ring-2 ring-primary/20' : 'border-border'
                   } ${
                     checkIn 
-                      ? getStatusColor(checkIn.status)
-                      : 'bg-muted'
+                      ? checkIn.status === 'ok' ? 'bg-gradient-to-br from-mint to-mint/80' :
+                        checkIn.status === 'anxious' ? 'bg-gradient-to-br from-coral to-coral/80' :
+                        'bg-gradient-to-br from-emergency to-emergency/80'
+                      : 'bg-muted/50'
                   }`}>
                     {checkIn ? (
-                      getStatusIcon(checkIn.status)
+                      <div className="text-white">
+                        {checkIn.status === 'ok' ? <CheckCircle className="h-4 w-4" /> :
+                         checkIn.status === 'anxious' ? <Clock className="h-4 w-4" /> :
+                         <AlertCircle className="h-4 w-4" />}
+                      </div>
                     ) : (
-                      <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />
+                      <div className="w-3 h-3 rounded-full bg-muted-foreground/30" />
                     )}
                   </div>
                 </div>
@@ -273,23 +310,31 @@ export function TrackingPage() {
       </Card>
       
       {checkIns.length > 0 && (
-        <Card className="mt-6">
+        <Card className="mt-8 bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
           <CardHeader>
-            <CardTitle className="text-lg">Historial Reciente</CardTitle>
+            <CardTitle className="text-xl">Historial Reciente</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {checkIns
                 .sort((a, b) => safeGetTime(b.timestamp) - safeGetTime(a.timestamp))
                 .slice(0, 5)
                 .map((checkIn, index) => (
-                  <div key={index} className="flex items-center justify-between py-2">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-1 rounded ${getStatusColor(checkIn.status)}`}>
-                        {getStatusIcon(checkIn.status)}
+                  <div key={index} className="flex items-center justify-between py-3 border-b border-border/30 last:border-b-0">
+                    <div className="flex items-center gap-4">
+                      <div className={`h-10 w-10 rounded-full flex items-center justify-center shadow-sm ${
+                        checkIn.status === 'ok' ? 'bg-gradient-to-br from-mint to-mint/80' :
+                        checkIn.status === 'anxious' ? 'bg-gradient-to-br from-coral to-coral/80' :
+                        'bg-gradient-to-br from-emergency to-emergency/80'
+                      }`}>
+                        <div className="text-white">
+                          {checkIn.status === 'ok' ? <CheckCircle className="h-4 w-4" /> :
+                           checkIn.status === 'anxious' ? <Clock className="h-4 w-4" /> :
+                           <AlertCircle className="h-4 w-4" />}
+                        </div>
                       </div>
                       <div>
-                        <div className="font-medium">{getStatusLabel(checkIn.status)}</div>
+                        <div className="font-semibold text-foreground">{getStatusLabel(checkIn.status)}</div>
                         <div className="text-sm text-muted-foreground">
                           {safeToLocaleDateString(checkIn.timestamp, 'es-ES', {
                             day: '2-digit',

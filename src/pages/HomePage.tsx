@@ -154,20 +154,26 @@ export function HomePage({ onNavigate }: HomePageProps) {
         </div>
         
         <div className="grid gap-4">
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white">
+          <Card className="bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Estado de Seguridad</CardTitle>
+                <CardTitle className="text-lg text-foreground">Estado de Seguridad</CardTitle>
                 <Badge 
                   variant={lastCheckIn?.status === 'ok' ? 'default' : 'destructive'}
-                  className="bg-white/20 text-white border-white/30"
+                  className={`${
+                    lastCheckIn?.status === 'ok' 
+                      ? 'bg-mint/20 text-mint-foreground border-mint/30' 
+                      : lastCheckIn?.status === 'anxious' 
+                        ? 'bg-coral/20 text-coral-foreground border-coral/30'
+                        : 'bg-warning/20 text-warning-foreground border-warning/30'
+                  }`}
                 >
                   {lastCheckIn?.status === 'ok' ? 'Seguro' : 
                    lastCheckIn?.status === 'anxious' ? 'Ansiedad' : 
                    lastCheckIn?.status === 'alert' ? 'Alerta' : 'Sin registro'}
                 </Badge>
               </div>
-              <CardDescription className="text-white/70">
+              <CardDescription className="text-muted-foreground">
                 {lastCheckIn 
                   ? `Último registro: ${safeToLocaleDateString(lastCheckIn.timestamp, 'es-ES')}`
                   : 'No hay registros recientes'
@@ -179,20 +185,20 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 onClick={() => onNavigate('/seguimiento')}
                 variant="secondary"
                 size="sm"
-                className="w-full"
+                className="w-full bg-primary/10 hover:bg-primary/20 text-primary border-primary/20"
               >
                 Registrar estado actual
               </Button>
             </CardContent>
           </Card>
           
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white">
+          <Card className="bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
-                <Shield size={20} />
-                <CardTitle className="text-lg">Red de Apoyo</CardTitle>
+                <Shield size={20} className="text-primary" />
+                <CardTitle className="text-lg text-foreground">Red de Apoyo</CardTitle>
               </div>
-              <CardDescription className="text-white/70">
+              <CardDescription className="text-muted-foreground">
                 {trustedContacts.length > 0 
                   ? `${trustedContacts.length} contactos de confianza configurados`
                   : 'Configura tus contactos de emergencia'
@@ -204,7 +210,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 onClick={() => onNavigate('/ajustes')}
                 variant="secondary"
                 size="sm"
-                className="w-full"
+                className="w-full bg-cyan/10 hover:bg-cyan/20 text-cyan border-cyan/20"
               >
                 {trustedContacts.length > 0 ? 'Gestionar contactos' : 'Añadir contactos'}
               </Button>

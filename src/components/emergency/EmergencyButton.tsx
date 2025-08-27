@@ -60,12 +60,14 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
 
   if (isDiscreetMode) {
     return (
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm bg-gradient-card shadow-soft border-white/10">
         <CardContent className="p-6">
           <div className="flex items-center gap-3">
-            <Shield className="h-8 w-8 text-primary" />
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Shield className="h-6 w-6 text-primary" />
+            </div>
             <div>
-              <h3 className="font-semibold">Modo Privado</h3>
+              <h3 className="font-semibold text-foreground">Modo Privado</h3>
               <p className="text-sm text-muted-foreground">Acceso seguro activado</p>
             </div>
           </div>
@@ -81,42 +83,47 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
           <Button
             size="lg"
             className={cn(
-              "h-32 w-32 rounded-full text-xl font-bold shadow-emergency",
-              "bg-emergency hover:bg-emergency/90 text-emergency-foreground",
-              "transform transition-transform active:scale-95",
-              "focus:outline-none focus:ring-4 focus:ring-emergency focus:ring-offset-4",
+              "h-40 w-40 rounded-full text-xl font-bold shadow-glow relative overflow-hidden",
+              "bg-gradient-to-br from-coral via-emergency to-coral/80",
+              "hover:from-coral/90 hover:via-emergency/90 hover:to-coral/70",
+              "text-white border-4 border-white/20",
+              "transform transition-all duration-300 active:scale-95",
+              "focus:outline-none focus:ring-4 focus:ring-coral/30 focus:ring-offset-4",
+              "before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity",
               isPressed && "scale-95"
             )}
             onClick={handleEmergencyPress}
             aria-label="Botón de emergencia - pulsa para obtener ayuda inmediata"
           >
-            <div className="flex flex-col items-center gap-2">
-              <AlertTriangle size={32} />
-              <span>AYUDA</span>
+            <div className="flex flex-col items-center gap-3 relative z-10">
+              <AlertTriangle size={36} className="drop-shadow-sm" />
+              <span className="text-lg font-bold tracking-wide drop-shadow-sm">AYUDA</span>
             </div>
           </Button>
         </SheetTrigger>
         
-        <SheetContent side="bottom" className="h-auto">
+        <SheetContent side="bottom" className="h-auto bg-gradient-card backdrop-blur-sm border-t border-white/20">
           <SheetHeader>
-            <SheetTitle className="text-center text-lg font-bold text-emergency">
+            <SheetTitle className="text-center text-xl font-bold text-foreground">
               ¿Necesitas ayuda inmediata?
             </SheetTitle>
-            <SheetDescription className="text-center">
+            <SheetDescription className="text-center text-muted-foreground">
               Elige la opción más segura para tu situación actual
             </SheetDescription>
           </SheetHeader>
           
-          <div className="flex flex-col gap-4 mt-6 pb-6">
+          <div className="flex flex-col gap-4 mt-8 pb-8">
             <Button
               size="lg"
               variant="outline"
               onClick={handleCall112}
-              className="h-16 text-left justify-start gap-4 border-emergency/20 hover:bg-emergency/10"
+              className="h-20 text-left justify-start gap-4 bg-emergency/5 border-emergency/20 hover:bg-emergency/10 hover:border-emergency/30 rounded-2xl shadow-soft"
             >
-              <Phone className="h-6 w-6 text-emergency" />
+              <div className="h-12 w-12 rounded-full bg-emergency/20 flex items-center justify-center">
+                <Phone className="h-6 w-6 text-emergency" />
+              </div>
               <div>
-                <div className="font-semibold">Llamar al 112</div>
+                <div className="font-bold text-lg text-foreground">Llamar al 112</div>
                 <div className="text-sm text-muted-foreground">Emergencias - Policía, Ambulancia</div>
               </div>
             </Button>
@@ -125,11 +132,13 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
               size="lg"
               variant="outline"
               onClick={handleContactTrusted}
-              className="h-16 text-left justify-start gap-4 border-primary/20 hover:bg-primary/10"
+              className="h-20 text-left justify-start gap-4 bg-cyan/5 border-cyan/20 hover:bg-cyan/10 hover:border-cyan/30 rounded-2xl shadow-soft"
             >
-              <MessageSquare className="h-6 w-6 text-primary" />
+              <div className="h-12 w-12 rounded-full bg-cyan/20 flex items-center justify-center">
+                <MessageSquare className="h-6 w-6 text-cyan" />
+              </div>
               <div>
-                <div className="font-semibold">Avisar contactos de confianza</div>
+                <div className="font-bold text-lg text-foreground">Avisar contactos de confianza</div>
                 <div className="text-sm text-muted-foreground">Envía alerta por WhatsApp/SMS</div>
               </div>
             </Button>
