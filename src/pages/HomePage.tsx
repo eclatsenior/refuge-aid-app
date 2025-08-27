@@ -117,7 +117,14 @@ export function HomePage({ onNavigate }: HomePageProps) {
     <div className="min-h-screen bg-gradient-dark p-4 pb-20">
       <header className="flex justify-between items-center mb-8 pt-2">
         <div className="text-foreground">
-          <h1 className="text-2xl font-bold drop-shadow-lg">Refugi</h1>
+          <div className="flex items-center gap-3">
+            <img 
+              src="/lovable-uploads/ab59b871-ef85-416f-b9a7-a56d51de5d43.png" 
+              alt="Refugi Logo" 
+              className="w-8 h-8 object-contain"
+            />
+            <h1 className="text-2xl font-bold drop-shadow-lg">Refugi</h1>
+          </div>
           <p className="text-muted-foreground text-sm drop-shadow-sm">
             {timeFormatter.format(currentTime)} - {currentTime.toLocaleDateString('es-ES', { 
               weekday: 'long' 
