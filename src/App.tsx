@@ -11,6 +11,8 @@ import { TrackingPage } from "@/pages/TrackingPage";
 import { NotesPage } from "@/pages/NotesPage";
 import { CalmPage } from "@/pages/CalmPage";
 import { ResourcesPage } from "@/pages/ResourcesPage";
+import { CaminoTerapeuticoPage } from "@/pages/CaminoTerapeuticoPage";
+import { CartaBienvenidaPage } from "@/pages/CartaBienvenidaPage";
 import { useAppStore } from "@/store/useAppStore";
 
 const queryClient = new QueryClient();
@@ -19,20 +21,32 @@ const App = () => {
   const [currentPath, setCurrentPath] = useState("/");
   const { settings } = useAppStore();
   
+  // Check if user has seen manifesto
+  const manifestoSeen = localStorage.getItem('manifesto_seen') === 'true';
+  
   const handleNavigate = (path: string) => {
     setCurrentPath(path);
   };
   
   const renderCurrentPage = () => {
+    // Show welcome letter if not seen yet
+    if (!manifestoSeen) {
+      return <CartaBienvenidaPage onNavigate={handleNavigate} />;
+    }
+    
     switch (currentPath) {
       case "/seguimiento":
         return <TrackingPage />;
       case "/notas":
         return <NotesPage onNavigate={handleNavigate} />;
+      case "/camino":
+        return <CaminoTerapeuticoPage onNavigate={handleNavigate} />;
       case "/calma":
         return <CalmPage />;
       case "/recursos":
         return <ResourcesPage />;
+      case "/carta":
+        return <CartaBienvenidaPage onNavigate={handleNavigate} />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }

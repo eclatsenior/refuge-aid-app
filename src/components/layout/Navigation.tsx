@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Home, Calendar, NotebookPen, Heart, MapPin, Settings } from "lucide-react";
+import { Home, Calendar, NotebookPen, Heart, MapPin, Settings, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigationItems = [
   { icon: Home, label: "Inicio", path: "/" },
   { icon: Calendar, label: "Seguimiento", path: "/seguimiento" },
   { icon: NotebookPen, label: "Notas", path: "/notas" },
+  { icon: Shield, label: "Camino", path: "/camino" },
   { icon: Heart, label: "Calma", path: "/calma" },
   { icon: MapPin, label: "Recursos", path: "/recursos" },
 ];
