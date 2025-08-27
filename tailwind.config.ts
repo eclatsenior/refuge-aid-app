@@ -29,7 +29,7 @@ export default {
 					foreground: 'hsl(var(--primary-foreground))',
 					glow: 'hsl(var(--primary-glow))'
 				},
-				// Modern UI colors inspired by reference
+				// Vibrant UI colors from dark examples
 				coral: {
 					DEFAULT: 'hsl(var(--coral))',
 					foreground: 'hsl(var(--coral-foreground))'
@@ -41,6 +41,10 @@ export default {
 				mint: {
 					DEFAULT: 'hsl(var(--mint))',
 					foreground: 'hsl(var(--mint-foreground))'
+				},
+				orange: {
+					DEFAULT: 'hsl(var(--orange))',
+					foreground: 'hsl(var(--orange-foreground))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -94,11 +98,15 @@ export default {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-hero': 'var(--gradient-hero)',
 				'gradient-calm': 'var(--gradient-calm)',
-				'gradient-card': 'var(--gradient-card)'
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-dark': 'var(--gradient-dark)'
 			},
 			boxShadow: {
 				'emergency': 'var(--shadow-emergency)',
 				'primary': 'var(--shadow-primary)',
+				'coral': 'var(--shadow-coral)',
+				'cyan': 'var(--shadow-cyan)',
+				'mint': 'var(--shadow-mint)',
 				'soft': 'var(--shadow-soft)',
 				'glow': 'var(--shadow-glow)'
 			},

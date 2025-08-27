@@ -73,7 +73,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
       <div className="min-h-screen bg-background p-4 pb-20">
         <header className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold">Mis Notas</h1>
+            <h1 className="text-2xl font-bold text-foreground">Mis Notas</h1>
             <p className="text-muted-foreground">
               {currentTime.toLocaleDateString('es-ES', { 
                 weekday: 'long', 
@@ -87,7 +87,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             variant="ghost"
             size="sm"
             onClick={toggleDiscreetMode}
-            className="gap-2"
+            className="gap-2 border border-border/50"
           >
             <Eye size={16} />
             Mostrar
@@ -100,7 +100,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             onEmergencyAction={handleEmergencyAction}
           />
           
-          <Card>
+          <Card className="bg-card/90 border-border/50">
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">
                 Tienes acceso seguro a todas tus funciones. 
@@ -114,11 +114,11 @@ export function HomePage({ onNavigate }: HomePageProps) {
   }
   
   return (
-    <div className="min-h-screen bg-gradient-hero p-4 pb-20">
+    <div className="min-h-screen bg-gradient-dark p-4 pb-20">
       <header className="flex justify-between items-center mb-8 pt-2">
-        <div className="text-white">
-          <h1 className="text-2xl font-bold">Refugi</h1>
-          <p className="text-white/80 text-sm">
+        <div className="text-foreground">
+          <h1 className="text-2xl font-bold drop-shadow-lg">Refugi</h1>
+          <p className="text-muted-foreground text-sm drop-shadow-sm">
             {timeFormatter.format(currentTime)} - {currentTime.toLocaleDateString('es-ES', { 
               weekday: 'long' 
             })}
@@ -130,7 +130,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             variant="ghost"
             size="sm"
             onClick={toggleDiscreetMode}
-            className="text-white hover:bg-white/20 gap-2"
+            className="text-foreground hover:bg-secondary/50 gap-2 border border-border/50"
           >
             <EyeOff size={16} />
             Discreto
@@ -139,7 +139,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             variant="ghost"
             size="sm"
             onClick={() => onNavigate('/ajustes')}
-            className="text-white hover:bg-white/20"
+            className="text-foreground hover:bg-secondary/50 border border-border/50"
           >
             <Settings size={20} />
           </Button>
@@ -154,7 +154,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
         </div>
         
         <div className="grid gap-4">
-          <Card className="bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
+          <Card className="bg-card/90 backdrop-blur-sm border-border/50 shadow-mint">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg text-foreground">Estado de Seguridad</CardTitle>
@@ -185,17 +185,17 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 onClick={() => onNavigate('/seguimiento')}
                 variant="secondary"
                 size="sm"
-                className="w-full bg-primary/10 hover:bg-primary/20 text-primary border-primary/20"
+                className="w-full bg-mint/20 hover:bg-mint/30 text-mint-foreground border-mint/30 shadow-mint"
               >
                 Registrar estado actual
               </Button>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
+          <Card className="bg-card/90 backdrop-blur-sm border-border/50 shadow-cyan">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
-                <Shield size={20} className="text-primary" />
+                <Shield size={20} className="text-cyan" />
                 <CardTitle className="text-lg text-foreground">Red de Apoyo</CardTitle>
               </div>
               <CardDescription className="text-muted-foreground">
@@ -210,7 +210,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 onClick={() => onNavigate('/ajustes')}
                 variant="secondary"
                 size="sm"
-                className="w-full bg-cyan/10 hover:bg-cyan/20 text-cyan border-cyan/20"
+                className="w-full bg-cyan/20 hover:bg-cyan/30 text-cyan-foreground border-cyan/30 shadow-cyan"
               >
                 {trustedContacts.length > 0 ? 'Gestionar contactos' : 'Añadir contactos'}
               </Button>
