@@ -58,7 +58,7 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
   };
 
   const handleContinue = () => {
-    localStorage.setItem('manifesto_seen', 'true');
+    sessionStorage.setItem('manifesto_seen', 'true');
     onNavigate('/');
   };
 

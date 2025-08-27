@@ -22,7 +22,7 @@ const App = () => {
   const { settings } = useAppStore();
   
   // Check if user has seen manifesto
-  const manifestoSeen = localStorage.getItem('manifesto_seen') === 'true';
+  const manifestoSeen = sessionStorage.getItem('manifesto_seen') === 'true';
   
   const handleNavigate = (path: string) => {
     setCurrentPath(path);
