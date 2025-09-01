@@ -35,7 +35,7 @@ const routes: Route[] = [
     description: 'Baja la intensidad y regresa al ahora.',
     duration: '15-20 min',
     icon: <Heart className="h-6 w-6" />,
-    color: 'mint',
+    color: 'blue',
     modules: [
       {
         id: 'breathing',
@@ -103,7 +103,7 @@ const routes: Route[] = [
     description: 'Anclajes cuando te desconectas.',
     duration: '10-15 min',
     icon: <Shield className="h-6 w-6" />,
-    color: 'cyan',
+    color: 'gray-gradient',
     modules: [
       {
         id: 'grounding-intensive',
@@ -137,7 +137,7 @@ const routes: Route[] = [
     description: 'Plan de seguridad y apoyo.',
     duration: '20-30 min',
     icon: <Shield className="h-6 w-6" />,
-    color: 'emergency',
+    color: 'purple',
     modules: [
       {
         id: 'safety-plan',
@@ -171,7 +171,7 @@ const routes: Route[] = [
     description: 'Calma a través del sentido del olfato.',
     duration: '5-10 min',
     icon: <Flower className="h-6 w-6" />,
-    color: 'primary',
+    color: 'green',
     modules: [
       {
         id: 'library',
@@ -241,11 +241,11 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
 
   const getColorClasses = (color: string) => {
     const colorMap: { [key: string]: string } = {
-      'mint': 'bg-mint/10 border-mint/20 text-mint hover:bg-mint/20',
+      'blue': 'bg-blue-500/10 border-blue-500/20 text-blue-600 hover:bg-blue-500/20',
       'coral': 'bg-coral/10 border-coral/20 text-coral hover:bg-coral/20',
-      'cyan': 'bg-cyan/10 border-cyan/20 text-cyan hover:bg-cyan/20',
-      'emergency': 'bg-emergency/10 border-emergency/20 text-emergency hover:bg-emergency/20',
-      'primary': 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/20'
+      'gray-gradient': 'bg-gradient-to-r from-gray-400/10 to-gray-600/10 border-gray-500/20 text-gray-700 hover:from-gray-400/20 hover:to-gray-600/20',
+      'purple': 'bg-purple-500/10 border-purple-500/20 text-purple-600 hover:bg-purple-500/20',
+      'green': 'bg-green-500/10 border-green-500/20 text-green-600 hover:bg-green-500/20'
     };
     return colorMap[color] || 'bg-muted/10 border-muted/20 text-muted-foreground hover:bg-muted/20';
   };
@@ -386,10 +386,11 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4 flex-1">
                       <div className={`h-14 w-14 rounded-full flex items-center justify-center shadow-sm ${
-                        route.color === 'mint' ? 'bg-gradient-to-br from-mint to-mint/80' :
+                        route.color === 'blue' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
                         route.color === 'coral' ? 'bg-gradient-to-br from-coral to-coral/80' :
-                        route.color === 'cyan' ? 'bg-gradient-to-br from-cyan to-cyan/80' :
-                        route.color === 'emergency' ? 'bg-gradient-to-br from-emergency to-emergency/80' :
+                        route.color === 'gray-gradient' ? 'bg-gradient-to-br from-gray-400 to-gray-600' :
+                        route.color === 'purple' ? 'bg-gradient-to-br from-purple-500 to-purple-600' :
+                        route.color === 'green' ? 'bg-gradient-to-br from-green-500 to-green-600' :
                         'bg-gradient-to-br from-primary to-primary/80'
                       }`}>
                         <div className="text-white">
