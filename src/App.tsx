@@ -29,11 +29,6 @@ const App = () => {
   };
   
   const renderCurrentPage = () => {
-    // Show welcome letter if not seen yet
-    if (!manifestoSeen) {
-      return <CartaBienvenidaPage onNavigate={handleNavigate} />;
-    }
-    
     switch (currentPath) {
       case "/seguimiento":
         return <TrackingPage />;
@@ -46,7 +41,7 @@ const App = () => {
       case "/recursos":
         return <ResourcesPage />;
       case "/carta":
-        return <CartaBienvenidaPage onNavigate={handleNavigate} />;
+        return <CartaBienvenidaPage onNavigate={handleNavigate} isOverlay={false} />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
@@ -62,6 +57,14 @@ const App = () => {
             onNavigate={handleNavigate}
             isDiscreetMode={settings.isDiscreetMode}
           />
+          {/* Welcome letter overlay */}
+          {!manifestoSeen && (
+            <CartaBienvenidaPage 
+              onNavigate={handleNavigate} 
+              isOverlay={true}
+              onClose={() => sessionStorage.setItem('manifesto_seen', 'true')}
+            />
+          )}
         </div>
         <Toaster />
         <Sonner />

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, ChevronLeft, ChevronRight, X } from "lucide-react";
 
 interface CartaBienvenidaPageProps {
   onNavigate: (path: string) => void;
+  isOverlay?: boolean;
+  onClose?: () => void;
 }
 
 const tourSteps = [
@@ -40,7 +42,7 @@ const tourSteps = [
   }
 ];
 
-export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
+export function CartaBienvenidaPage({ onNavigate, isOverlay = false, onClose }: CartaBienvenidaPageProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
@@ -68,16 +70,42 @@ export function CartaBienvenidaPage({ onNavigate }: CartaBienvenidaPageProps) {
 
   const handleContinue = () => {
     sessionStorage.setItem('manifesto_seen', 'true');
-    onNavigate('/');
+    if (isOverlay && onClose) {
+      onClose();
+    } else {
+      onNavigate('/');
+    }
+  };
+
+  const handleSkip = () => {
+    sessionStorage.setItem('manifesto_seen', 'true');
+    if (onClose) {
+      onClose();
+    }
   };
 
   const currentTourStep = tourSteps[currentStep];
   const isLastStep = currentStep === tourSteps.length - 1;
 
+  const containerClass = isOverlay 
+    ? "fixed inset-0 z-50 bg-gradient-hero/95 backdrop-blur-sm flex flex-col p-4"
+    : "min-h-screen bg-gradient-hero flex flex-col p-4";
+
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col p-4">
+    <div className={containerClass}>
       {/* Header */}
-      <header className="text-center pt-8 pb-4">
+      <header className="text-center pt-8 pb-4 relative">
+        {isOverlay && (
+          <Button
+            onClick={handleSkip}
+            variant="ghost"
+            size="sm"
+            className="absolute top-4 right-4 flex items-center gap-1 text-muted-foreground hover:text-foreground"
+          >
+            <X size={16} />
+            Saltar
+          </Button>
+        )}
         <div className="h-12 w-12 rounded-full bg-gradient-primary mx-auto mb-3 flex items-center justify-center shadow-elegant">
           <Heart className="h-6 w-6 text-white" />
         </div>
