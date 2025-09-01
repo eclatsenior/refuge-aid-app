@@ -40,6 +40,10 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
       console.error('Haptic feedback error:', error);
     }
     
+    // Llamada automática al 112
+    onEmergencyAction('call');
+    await openExternalApp('tel:112');
+    
     setTimeout(() => setIsPressed(false), 200);
   };
 
@@ -109,29 +113,14 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
         <SheetContent side="bottom" className="h-auto bg-gradient-card backdrop-blur-sm border-t border-white/20">
           <SheetHeader>
             <SheetTitle className="text-center text-xl font-bold text-foreground">
-              ¿Necesitas ayuda inmediata?
+              Llamada al 112 iniciada
             </SheetTitle>
             <SheetDescription className="text-center text-muted-foreground">
-              Elige la opción más segura para tu situación actual
+              Se está conectando con emergencias. ¿Deseas avisar también a tus contactos de confianza?
             </SheetDescription>
           </SheetHeader>
           
           <div className="flex flex-col gap-4 mt-8 pb-8">
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={handleCall112}
-              className="h-20 text-left justify-start gap-4 bg-emergency/5 border-emergency/20 hover:bg-emergency/10 hover:border-emergency/30 rounded-2xl shadow-soft"
-            >
-              <div className="h-12 w-12 rounded-full bg-emergency/20 flex items-center justify-center">
-                <Phone className="h-6 w-6 text-emergency" />
-              </div>
-              <div>
-                <div className="font-bold text-lg text-foreground">Llamar al 112</div>
-                <div className="text-sm text-muted-foreground">Emergencias - Policía, Ambulancia</div>
-              </div>
-            </Button>
-            
             <Button
               size="lg"
               variant="outline"
@@ -143,7 +132,7 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
               </div>
               <div>
                 <div className="font-bold text-lg text-foreground">Avisar contactos de confianza</div>
-                <div className="text-sm text-muted-foreground">Envía alerta por WhatsApp/SMS</div>
+                <div className="text-sm text-muted-foreground">Envía: "Te escribo desde Refugi, y necesito tu ayuda"</div>
               </div>
             </Button>
           </div>
@@ -152,7 +141,7 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
       
       <div className="text-center max-w-xs">
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Pulsa el botón rojo para acceder a opciones de ayuda inmediata. 
+          Pulsa el botón rojo para llamar automáticamente al 112 y acceder a más opciones de ayuda. 
           Tu ubicación puede ser compartida solo si das tu consentimiento.
         </p>
       </div>
