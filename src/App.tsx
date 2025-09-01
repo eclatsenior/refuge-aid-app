@@ -22,7 +22,9 @@ const App = () => {
   const { settings } = useAppStore();
   
   // Check if user has seen manifesto
-  const manifestoSeen = sessionStorage.getItem('manifesto_seen') === 'true';
+  const [manifestoSeen, setManifestoSeen] = useState(
+    sessionStorage.getItem('manifesto_seen') === 'true'
+  );
   
   const handleNavigate = (path: string) => {
     setCurrentPath(path);
@@ -62,7 +64,10 @@ const App = () => {
             <CartaBienvenidaPage 
               onNavigate={handleNavigate} 
               isOverlay={true}
-              onClose={() => sessionStorage.setItem('manifesto_seen', 'true')}
+              onClose={() => {
+                sessionStorage.setItem('manifesto_seen', 'true');
+                setManifestoSeen(true);
+              }}
             />
           )}
         </div>
