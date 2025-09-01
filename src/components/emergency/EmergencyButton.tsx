@@ -46,15 +46,19 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
   const handleCall112 = async () => {
     onEmergencyAction('call');
     
-    if (confirm("¿Deseas llamar al 112? Se abrirá tu aplicación de teléfono.")) {
-      await openExternalApp('tel:112');
+    // Llamada automática sin confirmación
+    await openExternalApp('tel:112');
+    
+    // Mostrar feedback visual y opción de contactar confianza
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('emergency-call-initiated'));
     }
   };
 
   const handleContactTrusted = async () => {
     onEmergencyAction('whatsapp');
     
-    const message = encodeURIComponent("Necesito ayuda. Estoy en riesgo. Este es un aviso automático de Refugi.");
+    const message = encodeURIComponent("Te escribo desde Refugi, y necesito tu ayuda");
     await openExternalApp(`https://wa.me/?text=${message}`);
   };
 
