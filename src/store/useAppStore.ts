@@ -458,40 +458,61 @@ export const useAppStore = create<AppState>()(
       // Refugi Lead actions
       loadEmployeeData: async () => {
         try {
-          console.log('📊 Loading employee data...');
+          console.log('📊 Loading assigned employee data...');
           
-          // Get all employees with their status
+          // Get assignments for current refugi_lead, then fetch employee details
+          const { data: assignments, error: assignmentError } = await supabase
+            .from('employee_assignments')
+            .select('employee_id');
+
+          if (assignmentError) {
+            console.error('❌ Error loading assignments:', assignmentError);
+            throw assignmentError;
+          }
+
+          if (!assignments || assignments.length === 0) {
+            console.log('📊 No assigned employees found');
+            set({ assignedEmployees: [] });
+            return;
+          }
+
+          const employeeIds = assignments.map(a => a.employee_id);
+
+          // Get employee status for assigned employees
           const { data: employees, error } = await supabase
-            .from('profiles')
+            .from('employee_status')
             .select(`
               *,
-              employee_status (*)
+              profiles!employee_status_employee_id_fkey (
+                full_name,
+                email
+              )
             `)
-            .eq('role', 'employee');
+            .in('employee_id', employeeIds);
 
           if (error) {
-            console.error('❌ Error loading employees:', error);
+            console.error('❌ Error loading employee data:', error);
             throw error;
           }
 
           const formattedEmployees: EmployeeStatus[] = employees?.map(emp => ({
-            id: emp.user_id,
-            employee_id: emp.user_id,
-            employee_name: emp.full_name,
-            employee_email: emp.email,
-            is_online: emp.employee_status?.[0]?.is_online || false,
-            mood_level: emp.employee_status?.[0]?.mood_level || 5,
-            therapy_progress: emp.employee_status?.[0]?.therapy_progress || 0,
-            last_check_in: emp.employee_status?.[0]?.last_check_in || new Date().toISOString(),
-            emergency_alert: emp.employee_status?.[0]?.emergency_alert || false,
+            id: emp.id,
+            employee_id: emp.employee_id,
+            employee_name: emp.profiles?.full_name || 'Usuario desconocido',
+            employee_email: emp.profiles?.email || 'unknown@email.com',
+            is_online: emp.is_online || false,
+            mood_level: emp.mood_level || 5,
+            therapy_progress: emp.therapy_progress || 0,
+            last_check_in: emp.last_check_in || new Date().toISOString(),
+            emergency_alert: emp.emergency_alert || false,
             created_at: emp.created_at,
-            updated_at: emp.employee_status?.[0]?.updated_at || emp.updated_at
+            updated_at: emp.updated_at
           })) || [];
 
-          console.log('✅ Employee data loaded:', formattedEmployees);
+          console.log('✅ Assigned employee data loaded:', formattedEmployees);
           set({ assignedEmployees: formattedEmployees });
         } catch (error) {
-          console.error('❌ Error loading employees:', error);
+          console.error('❌ Error loading assigned employees:', error);
         }
       },
       

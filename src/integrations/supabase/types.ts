@@ -65,6 +65,33 @@ export type Database = {
           },
         ]
       }
+      employee_assignments: {
+        Row: {
+          assigned_at: string
+          created_at: string
+          employee_id: string
+          id: string
+          refugi_lead_id: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          created_at?: string
+          employee_id: string
+          id?: string
+          refugi_lead_id: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          created_at?: string
+          employee_id?: string
+          id?: string
+          refugi_lead_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       employee_status: {
         Row: {
           created_at: string
