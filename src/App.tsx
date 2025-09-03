@@ -34,11 +34,40 @@ const App = () => {
   
   // Initialize authentication on app load
   useEffect(() => {
+    let isMounted = true;
+    
     const initialize = async () => {
-      await initializeAuth();
-      setIsInitializing(false);
+      try {
+        console.log('🔄 Starting app initialization...');
+        
+        // Add timeout to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Initialization timeout')), 10000)
+        );
+        
+        await Promise.race([
+          initializeAuth(),
+          timeoutPromise
+        ]);
+        
+        if (isMounted) {
+          console.log('✅ App initialization complete');
+          setIsInitializing(false);
+        }
+      } catch (error) {
+        console.error('❌ App initialization failed:', error);
+        if (isMounted) {
+          // Even on error, stop loading to prevent infinite spinner
+          setIsInitializing(false);
+        }
+      }
     };
+    
     initialize();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [initializeAuth]);
   
   // Check if user has seen manifesto (only for employees)

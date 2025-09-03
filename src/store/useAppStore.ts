@@ -256,29 +256,43 @@ export const useAppStore = create<AppState>()(
       
       initializeAuth: async () => {
         try {
-          const { data: { session } } = await supabase.auth.getSession();
+          console.log('🔐 Initializing authentication...');
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          
+          if (sessionError) {
+            console.error('❌ Session error:', sessionError);
+            return;
+          }
+
           const { setAuth, setProfile } = get();
           
+          // Always set auth state first
           setAuth(session?.user ?? null, session);
+          console.log('✅ Auth state set:', { hasUser: !!session?.user, hasSession: !!session });
           
           if (session?.user) {
             // Load user profile
             try {
-              const { data: profile } = await supabase
+              const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('user_id', session.user.id)
                 .single();
               
-              if (profile) {
+              if (profileError) {
+                console.warn('⚠️ Profile error (may not exist yet):', profileError);
+              } else if (profile) {
                 setProfile(profile);
+                console.log('✅ Profile loaded:', { role: profile.role });
               }
             } catch (error) {
-              console.error('Error loading profile:', error);
+              console.error('❌ Profile loading failed:', error);
             }
           }
+          
+          console.log('🚀 Authentication initialization complete');
         } catch (error) {
-          console.error('Error initializing auth:', error);
+          console.error('❌ Critical auth initialization error:', error);
         }
       },
       
@@ -527,32 +541,12 @@ export const useAppStore = create<AppState>()(
   )
 );
 
-// Initialize auth state
-supabase.auth.onAuthStateChange(async (event, session) => {
-  const { setAuth, setProfile } = useAppStore.getState();
-  
-  setAuth(session?.user ?? null, session);
-  
-  if (session?.user) {
-    // Load user profile
-    try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single();
-      
-      if (profile) {
-        setProfile(profile);
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    }
-  }
-});
-
-// Initialize session on load
-supabase.auth.getSession().then(({ data: { session } }) => {
+// Auth state listener - only for session changes, not initialization
+supabase.auth.onAuthStateChange((event, session) => {
   const { setAuth } = useAppStore.getState();
-  setAuth(session?.user ?? null, session);
+  
+  // Only update auth state on sign in/out events, not during initialization
+  if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+    setAuth(session?.user ?? null, session);
+  }
 });
