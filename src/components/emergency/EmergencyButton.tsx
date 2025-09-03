@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useNativeFeatures } from "@/hooks/useNativeFeatures";
+import { useAppStore } from "@/store/useAppStore";
 
 interface EmergencyButtonProps {
   isDiscreetMode?: boolean;
@@ -22,6 +23,7 @@ interface EmergencyButtonProps {
 export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: EmergencyButtonProps) {
   const [isPressed, setIsPressed] = useState(false);
   const { isNative, openExternalApp } = useNativeFeatures();
+  const { triggerEmergency } = useAppStore();
   
   const handleEmergencyPress = async () => {
     setIsPressed(true);
@@ -39,6 +41,9 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
     } catch (error) {
       console.error('Haptic feedback error:', error);
     }
+    
+    // Create emergency alert in database
+    await triggerEmergency('Emergencia activada desde el botón de ayuda', null);
     
     // Llamada automática al 112
     onEmergencyAction('call');

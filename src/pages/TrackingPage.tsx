@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, Clock, TrendingUp, AlertCircle, CheckCircle, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,9 +8,38 @@ import { useToast } from "@/hooks/use-toast";
 import { ensureDate, safeToDateString, safeToLocaleTimeString, safeToLocaleDateString, safeGetTime } from "@/lib/dateUtils";
 
 export function TrackingPage() {
-  const { checkIns, addCheckIn, settings } = useAppStore();
-  const { toast } = useToast();
   const [selectedStatus, setSelectedStatus] = useState<'ok' | 'anxious' | 'alert' | null>(null);
+  const { checkIns, addCheckIn, settings, updateEmployeePresence } = useAppStore();
+  const { toast } = useToast();
+
+  // Heartbeat system - update presence every 2 minutes while on this page
+  useEffect(() => {
+    const updatePresence = () => {
+      updateEmployeePresence(true);
+    };
+
+    // Initial update
+    updatePresence();
+
+    // Set up interval for heartbeat
+    const heartbeatInterval = setInterval(updatePresence, 2 * 60 * 1000); // 2 minutes
+
+    // Update presence when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        updatePresence();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      // Mark as offline when leaving the page
+      updateEmployeePresence(false);
+    };
+  }, [updateEmployeePresence]);
   
   const handleCheckIn = (status: 'ok' | 'anxious' | 'alert') => {
     const newCheckIn: Omit<CheckIn, 'id'> = {

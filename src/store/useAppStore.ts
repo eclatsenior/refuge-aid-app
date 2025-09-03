@@ -144,12 +144,14 @@ interface AppState {
   addCheckIn: (checkIn: Omit<CheckIn, "id">) => void;
   addSUDS: (suds: Omit<SUDS, "id">) => void;
   updateSettings: (settings: Partial<Settings>) => void;
-  triggerEmergency: () => void;
+  triggerEmergency: (message?: string, locationData?: any) => Promise<void>;
   
   // Refugi Lead actions
   loadEmployeeData: () => Promise<void>;
   loadEmergencyAlerts: () => Promise<void>;
-  resolveAlert: (alertId: string) => Promise<void>;
+  resolveAlert: (alertId: string, resolutionNotes?: string) => Promise<void>;
+  setupRealtimeSubscriptions: () => (() => void) | undefined;
+  updateEmployeePresence: (isOnline?: boolean) => Promise<void>;
   
   // Trusted Contacts actions
   addTrustedContact: (contact: Omit<TrustedContact, 'id'>) => void;
@@ -382,119 +384,275 @@ export const useAppStore = create<AppState>()(
           settings: { ...state.settings, ...newSettings }
         })),
       
-      triggerEmergency: async () => {
-        const { user } = get();
-        if (!user) return;
-        
+      triggerEmergency: async (message?: string, locationData?: any) => {
         try {
-          // Create emergency alert in database
-          const { error } = await supabase.from('emergency_alerts').insert({
-            employee_id: user.id,
-            alert_type: 'emergency',
-            message: 'Alerta de emergencia activada desde la aplicación',
-            location_data: null // Would get location here
-          });
-          
-          if (error) {
-            console.error('Error creating emergency alert:', error);
+          const { user } = get();
+          if (!user) {
+            console.error('❌ No user found for emergency trigger');
+            return;
           }
+
+          console.log('🚨 Triggering emergency alert...');
+
+          // Create emergency alert in database
+          const { data: alert, error: alertError } = await supabase
+            .from('emergency_alerts')
+            .insert({
+              employee_id: user.id,
+              alert_type: 'emergency',
+              message: message || 'Emergencia activada desde la aplicación',
+              location_data: locationData
+            })
+            .select()
+            .single();
+
+          if (alertError) {
+            console.error('❌ Error creating emergency alert:', alertError);
+            throw alertError;
+          }
+
+          // Update employee status to show emergency
+          const { error: statusError } = await supabase
+            .from('employee_status')
+            .update({
+              emergency_alert: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('employee_id', user.id);
+
+          if (statusError) {
+            console.error('❌ Error updating employee status:', statusError);
+          }
+
+          console.log('✅ Emergency alert created:', alert);
+
+          // Show success toast
+          if (typeof window !== 'undefined') {
+            const event = new CustomEvent('show-toast', {
+              detail: {
+                title: "Emergencia Activada",
+                description: "Se ha notificado tu situación al equipo de soporte. Mantente segura.",
+                variant: "default"
+              }
+            });
+            window.dispatchEvent(event);
+          }
+
         } catch (error) {
-          console.error('Error triggering emergency:', error);
+          console.error('❌ Error triggering emergency:', error);
+          
+          // Show error toast
+          if (typeof window !== 'undefined') {
+            const event = new CustomEvent('show-toast', {
+              detail: {
+                title: "Error",
+                description: "No se pudo activar la emergencia. Intenta nuevamente.",
+                variant: "destructive"
+              }
+            });
+            window.dispatchEvent(event);
+          }
         }
       },
       
       // Refugi Lead actions
       loadEmployeeData: async () => {
         try {
-          // Mock data for now - would load from Supabase
-          const mockEmployees: EmployeeStatus[] = [
-            {
-              id: '1',
-              employee_id: 'emp1',
-              employee_name: 'María García',
-              employee_email: 'maria@refugi.com',
-              mood_level: 7,
-              therapy_progress: 65,
-              last_check_in: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-              is_online: true,
-              emergency_alert: false,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            },
-            {
-              id: '2',
-              employee_id: 'emp2', 
-              employee_name: 'Ana López',
-              employee_email: 'ana@refugi.com',
-              mood_level: 4,
-              therapy_progress: 30,
-              last_check_in: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
-              is_online: false,
-              emergency_alert: true,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            },
-            {
-              id: '3',
-              employee_id: 'emp3',
-              employee_name: 'Carmen Ruiz',
-              employee_email: 'carmen@refugi.com',
-              mood_level: 8,
-              therapy_progress: 80,
-              last_check_in: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-              is_online: true,
-              emergency_alert: false,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }
-          ];
+          console.log('📊 Loading employee data...');
           
-          set({ assignedEmployees: mockEmployees });
+          // Get all employees with their status
+          const { data: employees, error } = await supabase
+            .from('profiles')
+            .select(`
+              *,
+              employee_status (*)
+            `)
+            .eq('role', 'employee');
+
+          if (error) {
+            console.error('❌ Error loading employees:', error);
+            throw error;
+          }
+
+          const formattedEmployees: EmployeeStatus[] = employees?.map(emp => ({
+            id: emp.user_id,
+            employee_id: emp.user_id,
+            employee_name: emp.full_name,
+            employee_email: emp.email,
+            is_online: emp.employee_status?.[0]?.is_online || false,
+            mood_level: emp.employee_status?.[0]?.mood_level || 5,
+            therapy_progress: emp.employee_status?.[0]?.therapy_progress || 0,
+            last_check_in: emp.employee_status?.[0]?.last_check_in || new Date().toISOString(),
+            emergency_alert: emp.employee_status?.[0]?.emergency_alert || false,
+            created_at: emp.created_at,
+            updated_at: emp.employee_status?.[0]?.updated_at || emp.updated_at
+          })) || [];
+
+          console.log('✅ Employee data loaded:', formattedEmployees);
+          set({ assignedEmployees: formattedEmployees });
         } catch (error) {
-          console.error('Error loading employee data:', error);
+          console.error('❌ Error loading employees:', error);
         }
       },
       
       loadEmergencyAlerts: async () => {
         try {
-          // Mock data for now
-          const mockAlerts: EmergencyAlert[] = [
-            {
-              id: '1',
-              employee_id: 'emp2',
-              employee_name: 'Ana López',
-              alert_type: 'emergency',
-              message: 'Necesito ayuda urgente',
-              location_data: null,
-              is_resolved: false,
-              created_at: new Date(Date.now() - 10 * 60 * 1000).toISOString()
-            }
-          ];
+          console.log('🚨 Loading emergency alerts...');
           
-          set({ emergencyAlerts: mockAlerts });
+          const { data: alerts, error } = await supabase
+            .from('emergency_alerts')
+            .select(`
+              *,
+              profiles!emergency_alerts_employee_id_fkey (full_name)
+            `)
+            .order('created_at', { ascending: false });
+
+          if (error) {
+            console.error('❌ Error loading alerts:', error);
+            throw error;
+          }
+
+          const formattedAlerts: EmergencyAlert[] = alerts?.map(alert => ({
+            id: alert.id,
+            employee_id: alert.employee_id,
+            employee_name: alert.profiles?.full_name || 'Usuario desconocido',
+            alert_type: alert.alert_type,
+            message: alert.message || '',
+            created_at: alert.created_at,
+            is_resolved: alert.is_resolved || false,
+            resolved_by: alert.resolved_by,
+            resolved_at: alert.resolved_at,
+            location_data: alert.location_data as any
+          })) || [];
+
+          console.log('✅ Emergency alerts loaded:', formattedAlerts);
+          set({ emergencyAlerts: formattedAlerts });
         } catch (error) {
-          console.error('Error loading emergency alerts:', error);
+          console.error('❌ Error loading emergency alerts:', error);
         }
       },
       
-      resolveAlert: async (alertId) => {
+      resolveAlert: async (alertId: string, resolutionNotes?: string) => {
         try {
-          // Would update in Supabase
-          set((state) => ({
-            emergencyAlerts: state.emergencyAlerts.map(alert =>
-              alert.id === alertId 
-                ? { ...alert, is_resolved: true, resolved_at: new Date().toISOString() }
-                : alert
-            ),
-            assignedEmployees: state.assignedEmployees.map(emp =>
-              state.emergencyAlerts.find(a => a.id === alertId)?.employee_id === emp.employee_id
-                ? { ...emp, emergency_alert: false }
-                : emp
-            )
-          }));
+          const { user } = get();
+          if (!user) return;
+
+          console.log('✅ Resolving alert:', alertId);
+
+          // Update alert in database
+          const { data: alert, error: alertError } = await supabase
+            .from('emergency_alerts')
+            .update({
+              is_resolved: true,
+              resolved_by: user.id,
+              resolved_at: new Date().toISOString()
+            })
+            .eq('id', alertId)
+            .select()
+            .single();
+
+          if (alertError) {
+            console.error('❌ Error resolving alert:', alertError);
+            throw alertError;
+          }
+
+          // Update employee status to clear emergency flag
+          const { error: statusError } = await supabase
+            .from('employee_status')
+            .update({
+              emergency_alert: false,
+              updated_at: new Date().toISOString()
+            })
+            .eq('employee_id', alert.employee_id);
+
+          if (statusError) {
+            console.error('❌ Error updating employee status:', statusError);
+          }
+
+          console.log('✅ Alert resolved successfully');
+
+          // Refresh data to show changes
+          get().loadEmergencyAlerts();
+          get().loadEmployeeData();
+
         } catch (error) {
-          console.error('Error resolving alert:', error);
+          console.error('❌ Error resolving alert:', error);
         }
+      },
+
+      // Heartbeat system to track employee presence
+      updateEmployeePresence: async (isOnline: boolean = true) => {
+        try {
+          const { user } = get();
+          if (!user) return;
+
+          const { error } = await supabase
+            .from('employee_status')
+            .update({
+              is_online: isOnline,
+              last_check_in: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .eq('employee_id', user.id);
+
+          if (error) {
+            console.error('❌ Error updating presence:', error);
+          } else {
+            console.log('💓 Heartbeat updated:', { isOnline });
+          }
+        } catch (error) {
+          console.error('❌ Error in heartbeat:', error);
+        }
+      },
+
+      // Setup realtime subscriptions
+      setupRealtimeSubscriptions: () => {
+        const { loadEmployeeData, loadEmergencyAlerts } = get();
+
+        // Subscribe to employee status changes
+        const employeeChannel = supabase
+          .channel('employee-status-changes')
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'employee_status'
+          }, (payload) => {
+            console.log('👥 Employee status changed:', payload);
+            loadEmployeeData(); // Refresh employee data
+          })
+          .subscribe();
+
+        // Subscribe to emergency alerts
+        const alertsChannel = supabase
+          .channel('emergency-alerts-changes')
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public', 
+            table: 'emergency_alerts'
+          }, (payload) => {
+            console.log('🚨 Emergency alert changed:', payload);
+            loadEmergencyAlerts(); // Refresh alerts data
+            
+            // Show toast for new alerts
+            if (payload.eventType === 'INSERT' && typeof window !== 'undefined') {
+              const event = new CustomEvent('show-toast', {
+                detail: {
+                  title: "Nueva Alerta de Emergencia",
+                  description: "Una empleada ha activado una alerta de emergencia",
+                  variant: "destructive"
+                }
+              });
+              window.dispatchEvent(event);
+            }
+          })
+          .subscribe();
+
+        console.log('🔄 Realtime subscriptions setup complete');
+        
+        return () => {
+          employeeChannel.unsubscribe();
+          alertsChannel.unsubscribe();
+        };
       },
       
       // Security actions

@@ -31,33 +31,45 @@ export function DashboardPage() {
     emergencyAlerts, 
     loadEmployeeData, 
     loadEmergencyAlerts,
+    setupRealtimeSubscriptions,
     logout 
   } = useAppStore();
   
   const { toast } = useToast();
 
   useEffect(() => {
-    const loadDashboardData = async () => {
+    const loadData = async () => {
       setIsLoading(true);
       try {
         await Promise.all([
           loadEmployeeData(),
           loadEmergencyAlerts()
         ]);
-      } catch (error) {
-        console.error("Error loading dashboard data:", error);
+        
         toast({
-          title: "Error",
-          description: "No se pudieron cargar los datos del dashboard",
-          variant: "destructive"
+          title: "Dashboard actualizado",
+          description: "Datos cargados correctamente",
+        });
+      } catch (error) {
+        toast({
+          title: "Error al cargar datos",
+          description: "Hubo un problema al cargar la información del dashboard",
+          variant: "destructive",
         });
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadDashboardData();
-  }, [loadEmployeeData, loadEmergencyAlerts, toast]);
+    loadData();
+
+    // Setup realtime subscriptions
+    const unsubscribe = setupRealtimeSubscriptions();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [loadEmployeeData, loadEmergencyAlerts, setupRealtimeSubscriptions, toast]);
 
   const handleLogout = () => {
     logout();
