@@ -175,6 +175,22 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      get_employee_data_with_profiles: {
+        Args: { employee_ids: string[] }
+        Returns: {
+          created_at: string
+          email: string
+          emergency_alert: boolean
+          employee_id: string
+          full_name: string
+          id: string
+          is_online: boolean
+          last_check_in: string
+          mood_level: number
+          therapy_progress: number
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       app_role: "employee" | "refugi_lead"

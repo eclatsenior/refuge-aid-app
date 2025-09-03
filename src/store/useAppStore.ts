@@ -478,17 +478,9 @@ export const useAppStore = create<AppState>()(
 
           const employeeIds = assignments.map(a => a.employee_id);
 
-          // Get employee status for assigned employees
+          // Get employee status for assigned employees using database function
           const { data: employees, error } = await supabase
-            .from('employee_status')
-            .select(`
-              *,
-              profiles!employee_status_employee_id_fkey (
-                full_name,
-                email
-              )
-            `)
-            .in('employee_id', employeeIds);
+            .rpc('get_employee_data_with_profiles', { employee_ids: employeeIds });
 
           if (error) {
             console.error('❌ Error loading employee data:', error);
@@ -498,8 +490,8 @@ export const useAppStore = create<AppState>()(
           const formattedEmployees: EmployeeStatus[] = employees?.map(emp => ({
             id: emp.id,
             employee_id: emp.employee_id,
-            employee_name: emp.profiles?.full_name || 'Usuario desconocido',
-            employee_email: emp.profiles?.email || 'unknown@email.com',
+            employee_name: emp.full_name || 'Usuario desconocido',
+            employee_email: emp.email || 'unknown@email.com',
             is_online: emp.is_online || false,
             mood_level: emp.mood_level || 5,
             therapy_progress: emp.therapy_progress || 0,
