@@ -1,0 +1,266 @@
+import { useEffect, useState } from "react";
+import { 
+  Users, 
+  AlertTriangle, 
+  Activity, 
+  Shield,
+  LogOut,
+  Search,
+  Filter,
+  RefreshCw
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useAppStore } from "@/store/useAppStore";
+import { EmployeeCard } from "@/components/dashboard/EmployeeCard";
+import { EmergencyAlert } from "@/components/dashboard/EmergencyAlert";
+import { StatsOverview } from "@/components/dashboard/StatsOverview";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { useToast } from "@/hooks/use-toast";
+
+export function DashboardPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<'all' | 'online' | 'alert' | 'offline'>('all');
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const { 
+    profile, 
+    assignedEmployees, 
+    emergencyAlerts, 
+    loadEmployeeData, 
+    loadEmergencyAlerts,
+    logout 
+  } = useAppStore();
+  
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([
+          loadEmployeeData(),
+          loadEmergencyAlerts()
+        ]);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los datos del dashboard",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [loadEmployeeData, loadEmergencyAlerts, toast]);
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Sesión cerrada",
+      description: "Has cerrado sesión correctamente"
+    });
+  };
+
+  const handleRefresh = async () => {
+    setIsLoading(true);
+    try {
+      await Promise.all([
+        loadEmployeeData(),
+        loadEmergencyAlerts()
+      ]);
+      toast({
+        title: "Datos actualizados",
+        description: "La información se ha actualizado correctamente"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudieron actualizar los datos",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filteredEmployees = assignedEmployees.filter(employee => {
+    const matchesSearch = employee.employee_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         employee.employee_email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = (() => {
+      switch (filterStatus) {
+        case 'online':
+          return employee.is_online;
+        case 'alert':
+          return employee.emergency_alert;
+        case 'offline':
+          return !employee.is_online;
+        default:
+          return true;
+      }
+    })();
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const activeAlerts = emergencyAlerts.filter(alert => !alert.is_resolved);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-hero">
+      {/* Header */}
+      <header className="border-b border-border/20 bg-card/20 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 rounded-lg bg-primary/20">
+                <Shield className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-foreground">Dashboard Refugi Lead</h1>
+                <p className="text-sm text-muted-foreground">
+                  Bienvenido, {profile?.full_name || 'Refugi Lead'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleRefresh}
+                disabled={isLoading}
+              >
+                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4" />
+                Salir
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        {/* Stats Overview */}
+        <StatsOverview 
+          employees={assignedEmployees}
+          alerts={emergencyAlerts}
+        />
+
+        {/* Emergency Alerts */}
+        {activeAlerts.length > 0 && (
+          <Card className="border-destructive/20 bg-destructive/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+                Alertas de Emergencia ({activeAlerts.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {activeAlerts.map(alert => (
+                  <EmergencyAlert key={alert.id} alert={alert} />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Employees Section */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Empleadas Asignadas ({filteredEmployees.length})
+              </CardTitle>
+              
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="text-xs">
+                  {assignedEmployees.filter(e => e.is_online).length} conectadas
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  {assignedEmployees.filter(e => e.emergency_alert).length} alertas
+                </Badge>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {/* Search and Filter */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar empleadas..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                {(['all', 'online', 'alert', 'offline'] as const).map((status) => (
+                  <Button
+                    key={status}
+                    variant={filterStatus === status ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilterStatus(status)}
+                    className="capitalize"
+                  >
+                    {status === 'all' ? 'Todas' : 
+                     status === 'online' ? 'En línea' :
+                     status === 'alert' ? 'Alertas' : 'Desconectadas'}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Employees Grid */}
+            {filteredEmployees.length === 0 ? (
+              <div className="text-center py-8">
+                <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">
+                  No hay empleadas
+                </h3>
+                <p className="text-muted-foreground">
+                  {searchTerm || filterStatus !== 'all' 
+                    ? 'No se encontraron empleadas que coincidan con los filtros aplicados.'
+                    : 'No tienes empleadas asignadas en este momento.'
+                  }
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredEmployees.map(employee => (
+                  <EmployeeCard 
+                    key={employee.id} 
+                    employee={employee} 
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

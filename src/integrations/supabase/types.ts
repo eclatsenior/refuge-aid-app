@@ -14,16 +14,143 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      emergency_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          employee_id: string
+          id: string
+          is_resolved: boolean | null
+          location_data: Json | null
+          message: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+        }
+        Insert: {
+          alert_type?: string
+          created_at?: string
+          employee_id: string
+          id?: string
+          is_resolved?: boolean | null
+          location_data?: Json | null
+          message?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          employee_id?: string
+          id?: string
+          is_resolved?: boolean | null
+          location_data?: Json | null
+          message?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_alerts_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "emergency_alerts_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      employee_status: {
+        Row: {
+          created_at: string
+          emergency_alert: boolean | null
+          employee_id: string
+          id: string
+          is_online: boolean | null
+          last_check_in: string | null
+          mood_level: number | null
+          therapy_progress: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          emergency_alert?: boolean | null
+          employee_id: string
+          id?: string
+          is_online?: boolean | null
+          last_check_in?: string | null
+          mood_level?: number | null
+          therapy_progress?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          emergency_alert?: boolean | null
+          employee_id?: string
+          id?: string
+          is_online?: boolean | null
+          last_check_in?: string | null
+          mood_level?: number | null
+          therapy_progress?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_status_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "employee" | "refugi_lead"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +277,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["employee", "refugi_lead"],
+    },
   },
 } as const

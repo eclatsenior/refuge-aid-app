@@ -1,177 +1,222 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { supabase } from "@/integrations/supabase/client";
+import type { User, Session } from "@supabase/supabase-js";
 
 export interface TrustedContact {
   id: string;
   name: string;
   phone: string;
   relationship: string;
-  priority: number;
 }
 
 export interface Note {
   id: string;
   title: string;
   content: string;
-  isEncrypted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  isStarred: boolean;
-  isSafeVault: boolean;
-  forTherapy: boolean;
-  tags: string[];
+  timestamp: Date;
 }
 
 export interface SUDS {
   id: string;
-  beforeLevel: number;
-  afterLevel: number;
+  level: number;
+  notes: string;
   timestamp: Date;
-  exerciseId: string;
 }
 
 export interface CheckIn {
   id: string;
-  status: 'ok' | 'anxious' | 'alert';
+  mood: number;
   timestamp: Date;
-  location?: string;
+  notes?: string;
 }
 
 export interface Settings {
-  checkinFrequency: 'daily' | 'weekly' | 'off';
-  quietHoursStart: string;
-  quietHoursEnd: string;
-  locationConsent: boolean;
-  alertMessageTemplate: string;
-  isDiscreetMode: boolean;
-  hasBiometrics: boolean;
-  autoLockMinutes: number;
+  emergencyContacts: TrustedContact[];
+  emergencyMessage: string;
+  enableGeolocation: boolean;
+  privacyMode: boolean;
+  phoneVibration: boolean;
+  soundAlerts: boolean;
 }
 
+export interface EmployeeStatus {
+  id: string;
+  employee_id: string;
+  employee_name: string;
+  employee_email: string;
+  mood_level: number;
+  therapy_progress: number;
+  last_check_in: string;
+  is_online: boolean;
+  emergency_alert: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EmergencyAlert {
+  id: string;
+  employee_id: string;
+  employee_name: string;
+  alert_type: string;
+  message?: string;
+  location_data?: any;
+  is_resolved: boolean;
+  resolved_by?: string;
+  resolved_at?: string;
+  created_at: string;
+}
+
+export type UserRole = 'employee' | 'refugi_lead';
+
+const defaultSettings: Settings = {
+  emergencyContacts: [],
+  emergencyMessage: "Necesito ayuda urgente. Esta es una alerta automática de la aplicación Refugi.",
+  enableGeolocation: true,
+  privacyMode: false,
+  phoneVibration: true,
+  soundAlerts: true,
+};
+
 interface AppState {
-  // Auth
+  // Authentication
+  user: User | null;
+  session: Session | null;
+  userRole: UserRole | null;
+  profile: any | null;
   isAuthenticated: boolean;
-  userId: string | null;
   
-  // Data
-  trustedContacts: TrustedContact[];
+  // Employee data
   notes: Note[];
   checkIns: CheckIn[];
   sudsRecords: SUDS[];
   settings: Settings;
   
-  // Privacy & Security
-  isVaultLocked: boolean;
-  showDecoyScreen: boolean;
+  // Refugi Lead data
+  assignedEmployees: EmployeeStatus[];
+  emergencyAlerts: EmergencyAlert[];
   
-  // Actions
-  setAuthenticated: (userId: string) => void;
+  // Security
+  vaultLocked: boolean;
+  decoyScreenActive: boolean;
+  
+  // Authentication actions
+  setAuth: (user: User | null, session: Session | null) => void;
+  setProfile: (profile: any) => void;
   logout: () => void;
+  signUp: (email: string, password: string, fullName: string, role: UserRole) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
   
-  // Trusted Contacts
-  addTrustedContact: (contact: Omit<TrustedContact, 'id'>) => void;
-  updateTrustedContact: (id: string, contact: Partial<TrustedContact>) => void;
-  deleteTrustedContact: (id: string) => void;
-  
-  // Notes
-  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateNote: (id: string, note: Partial<Note>) => void;
+  // Employee actions
+  addNote: (note: Omit<Note, "id">) => void;
+  updateNote: (id: string, updates: Partial<Omit<Note, "id">>) => void;
   deleteNote: (id: string) => void;
-  toggleVaultStatus: (id: string) => void;
-  toggleTherapyFlag: (id: string) => void;
-  quickDeleteNote: (id: string, confirmWord: string) => boolean;
-  
-  // Check-ins
-  addCheckIn: (checkIn: Omit<CheckIn, 'id'>) => void;
-  
-  // SUDS
-  addSUDS: (suds: Omit<SUDS, 'id'>) => void;
-  
-  // Settings
+  addCheckIn: (checkIn: Omit<CheckIn, "id">) => void;
+  addSUDS: (suds: Omit<SUDS, "id">) => void;
   updateSettings: (settings: Partial<Settings>) => void;
+  triggerEmergency: () => void;
   
-  // Emergency Actions
-  triggerEmergency: (action: 'call' | 'whatsapp' | 'sms') => void;
+  // Refugi Lead actions
+  loadEmployeeData: () => Promise<void>;
+  loadEmergencyAlerts: () => Promise<void>;
+  resolveAlert: (alertId: string) => Promise<void>;
   
-  // Privacy & Security
+  // Security actions
   toggleVaultLock: () => void;
   unlockVault: (password: string) => boolean;
-  activateDecoyScreen: () => void;
-  deactivateDecoyScreen: () => void;
+  toggleDecoyScreen: () => void;
 }
-
-const defaultSettings: Settings = {
-  checkinFrequency: 'daily',
-  quietHoursStart: '22:00',
-  quietHoursEnd: '08:00',
-  locationConsent: false,
-  alertMessageTemplate: "Necesito ayuda. Estoy en riesgo. Este es un aviso automático de Refugi.",
-  isDiscreetMode: false,
-  hasBiometrics: false,
-  autoLockMinutes: 5
-};
 
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       // Initial state
+      user: null,
+      session: null,
+      userRole: null,
+      profile: null,
       isAuthenticated: false,
-      userId: null,
-      trustedContacts: [],
       notes: [],
       checkIns: [],
       sudsRecords: [],
       settings: defaultSettings,
-      isVaultLocked: true,
-      showDecoyScreen: false,
+      assignedEmployees: [],
+      emergencyAlerts: [],
+      vaultLocked: false,
+      decoyScreenActive: false,
       
-      // Auth actions
-      setAuthenticated: (userId: string) => 
-        set({ isAuthenticated: true, userId }),
+      // Authentication actions
+      setAuth: (user, session) => {
+        set({ 
+          user, 
+          session, 
+          isAuthenticated: !!user,
+          userRole: user ? 'employee' : null // Will be updated when profile loads
+        });
+      },
       
-      logout: () => 
-        set({ isAuthenticated: false, userId: null }),
+      setProfile: (profile) => {
+        set({ 
+          profile, 
+          userRole: profile?.role || 'employee'
+        });
+      },
       
-      // Trusted Contacts actions
-      addTrustedContact: (contact) =>
-        set((state) => ({
-          trustedContacts: [
-            ...state.trustedContacts,
-            { ...contact, id: crypto.randomUUID() }
-          ]
-        })),
+      logout: async () => {
+        await supabase.auth.signOut();
+        set({
+          user: null,
+          session: null,
+          profile: null,
+          userRole: null,
+          isAuthenticated: false,
+          assignedEmployees: [],
+          emergencyAlerts: []
+        });
+      },
       
-      updateTrustedContact: (id, contact) =>
-        set((state) => ({
-          trustedContacts: state.trustedContacts.map(tc =>
-            tc.id === id ? { ...tc, ...contact } : tc
-          )
-        })),
+      signUp: async (email, password, fullName, role) => {
+        try {
+          const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/`,
+              data: {
+                full_name: fullName,
+                role: role
+              }
+            }
+          });
+          
+          return { error };
+        } catch (error) {
+          return { error };
+        }
+      },
       
-      deleteTrustedContact: (id) =>
-        set((state) => ({
-          trustedContacts: state.trustedContacts.filter(tc => tc.id !== id)
-        })),
+      signIn: async (email, password) => {
+        try {
+          const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          
+          return { error };
+        } catch (error) {
+          return { error };
+        }
+      },
       
-      // Notes actions
+      // Employee actions
       addNote: (note) =>
         set((state) => ({
-          notes: [
-            ...state.notes,
-            {
-              ...note,
-              id: crypto.randomUUID(),
-              createdAt: new Date(),
-              updatedAt: new Date()
-            }
-          ]
+          notes: [...state.notes, { ...note, id: crypto.randomUUID() }]
         })),
       
-      updateNote: (id, note) =>
+      updateNote: (id, updates) =>
         set((state) => ({
-          notes: state.notes.map(n =>
-            n.id === id ? { ...n, ...note, updatedAt: new Date() } : n
-          )
+          notes: state.notes.map(n => n.id === id ? { ...n, ...updates } : n)
         })),
       
       deleteNote: (id) =>
@@ -179,116 +224,189 @@ export const useAppStore = create<AppState>()(
           notes: state.notes.filter(n => n.id !== id)
         })),
       
-      toggleVaultStatus: (id) =>
-        set((state) => ({
-          notes: state.notes.map(n =>
-            n.id === id ? { ...n, isSafeVault: !n.isSafeVault, updatedAt: new Date() } : n
-          )
-        })),
-      
-      toggleTherapyFlag: (id) =>
-        set((state) => ({
-          notes: state.notes.map(n =>
-            n.id === id ? { ...n, forTherapy: !n.forTherapy, updatedAt: new Date() } : n
-          )
-        })),
-      
-      quickDeleteNote: (id, confirmWord) => {
-        if (confirmWord.toUpperCase() !== 'BORRAR') {
-          return false;
-        }
-        set((state) => ({
-          notes: state.notes.filter(n => n.id !== id)
-        }));
-        return true;
-      },
-      
-      // Check-ins actions
       addCheckIn: (checkIn) =>
         set((state) => ({
-          checkIns: [
-            ...state.checkIns,
-            { ...checkIn, id: crypto.randomUUID() }
-          ]
+          checkIns: [...state.checkIns, { ...checkIn, id: crypto.randomUUID() }]
         })),
       
-      // SUDS actions
       addSUDS: (suds) =>
         set((state) => ({
-          sudsRecords: [
-            ...state.sudsRecords,
-            { ...suds, id: crypto.randomUUID() }
-          ]
+          sudsRecords: [...state.sudsRecords, { ...suds, id: crypto.randomUUID() }]
         })),
       
-      // Settings actions
       updateSettings: (newSettings) =>
         set((state) => ({
           settings: { ...state.settings, ...newSettings }
         })),
       
-      // Emergency actions
-      triggerEmergency: (action) => {
-        // Analytics event would be sent here
-        console.log(`Emergency action triggered: ${action}`);
+      triggerEmergency: async () => {
+        const { user } = get();
+        if (!user) return;
         
-        const { settings, trustedContacts } = get();
-        
-        if (action === 'call') {
-          // Already handled in EmergencyButton component
-          return;
-        }
-        
-        if (action === 'whatsapp' || action === 'sms') {
-          // Send to trusted contacts
-          trustedContacts
-            .sort((a, b) => a.priority - b.priority)
-            .slice(0, 3) // Top 3 priority contacts
-            .forEach(contact => {
-              const message = settings.alertMessageTemplate;
-              // Implementation would handle actual WhatsApp/SMS sending
-              console.log(`Sending alert to ${contact.name} (${contact.phone}): ${message}`);
-            });
+        try {
+          // Create emergency alert in database
+          const { error } = await supabase.from('emergency_alerts').insert({
+            employee_id: user.id,
+            alert_type: 'emergency',
+            message: 'Alerta de emergencia activada desde la aplicación',
+            location_data: null // Would get location here
+          });
+          
+          if (error) {
+            console.error('Error creating emergency alert:', error);
+          }
+        } catch (error) {
+          console.error('Error triggering emergency:', error);
         }
       },
       
-      // Privacy & Security actions
+      // Refugi Lead actions
+      loadEmployeeData: async () => {
+        try {
+          // Mock data for now - would load from Supabase
+          const mockEmployees: EmployeeStatus[] = [
+            {
+              id: '1',
+              employee_id: 'emp1',
+              employee_name: 'María García',
+              employee_email: 'maria@refugi.com',
+              mood_level: 7,
+              therapy_progress: 65,
+              last_check_in: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+              is_online: true,
+              emergency_alert: false,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            },
+            {
+              id: '2',
+              employee_id: 'emp2', 
+              employee_name: 'Ana López',
+              employee_email: 'ana@refugi.com',
+              mood_level: 4,
+              therapy_progress: 30,
+              last_check_in: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
+              is_online: false,
+              emergency_alert: true,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            },
+            {
+              id: '3',
+              employee_id: 'emp3',
+              employee_name: 'Carmen Ruiz',
+              employee_email: 'carmen@refugi.com',
+              mood_level: 8,
+              therapy_progress: 80,
+              last_check_in: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+              is_online: true,
+              emergency_alert: false,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ];
+          
+          set({ assignedEmployees: mockEmployees });
+        } catch (error) {
+          console.error('Error loading employee data:', error);
+        }
+      },
+      
+      loadEmergencyAlerts: async () => {
+        try {
+          // Mock data for now
+          const mockAlerts: EmergencyAlert[] = [
+            {
+              id: '1',
+              employee_id: 'emp2',
+              employee_name: 'Ana López',
+              alert_type: 'emergency',
+              message: 'Necesito ayuda urgente',
+              location_data: null,
+              is_resolved: false,
+              created_at: new Date(Date.now() - 10 * 60 * 1000).toISOString()
+            }
+          ];
+          
+          set({ emergencyAlerts: mockAlerts });
+        } catch (error) {
+          console.error('Error loading emergency alerts:', error);
+        }
+      },
+      
+      resolveAlert: async (alertId) => {
+        try {
+          // Would update in Supabase
+          set((state) => ({
+            emergencyAlerts: state.emergencyAlerts.map(alert =>
+              alert.id === alertId 
+                ? { ...alert, is_resolved: true, resolved_at: new Date().toISOString() }
+                : alert
+            ),
+            assignedEmployees: state.assignedEmployees.map(emp =>
+              state.emergencyAlerts.find(a => a.id === alertId)?.employee_id === emp.employee_id
+                ? { ...emp, emergency_alert: false }
+                : emp
+            )
+          }));
+        } catch (error) {
+          console.error('Error resolving alert:', error);
+        }
+      },
+      
+      // Security actions
       toggleVaultLock: () =>
-        set((state) => ({
-          isVaultLocked: !state.isVaultLocked
-        })),
+        set((state) => ({ vaultLocked: !state.vaultLocked })),
       
       unlockVault: (password) => {
-        // Por ahora acepta cualquier contraseña, en una app real sería más seguro
         if (password.length > 0) {
-          set({ isVaultLocked: false });
+          set({ vaultLocked: false });
           return true;
         }
         return false;
       },
       
-      activateDecoyScreen: () =>
-        set({ showDecoyScreen: true }),
-      
-      deactivateDecoyScreen: () =>
-        set({ showDecoyScreen: false })
+      toggleDecoyScreen: () =>
+        set((state) => ({ decoyScreenActive: !state.decoyScreenActive }))
     }),
     {
       name: 'refugi-storage',
-      // Only persist non-sensitive data
       partialize: (state) => ({
-        isAuthenticated: state.isAuthenticated,
-        userId: state.userId,
-        settings: {
-          ...state.settings,
-          // Don't persist alert message template for security
-          alertMessageTemplate: defaultSettings.alertMessageTemplate
-        },
-        trustedContacts: state.trustedContacts,
-        // Notes would be encrypted before persisting in a real app
+        settings: state.settings,
+        notes: state.notes,
         checkIns: state.checkIns,
         sudsRecords: state.sudsRecords
       })
     }
   )
 );
+
+// Initialize auth state
+supabase.auth.onAuthStateChange(async (event, session) => {
+  const { setAuth, setProfile } = useAppStore.getState();
+  
+  setAuth(session?.user ?? null, session);
+  
+  if (session?.user) {
+    // Load user profile
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .single();
+      
+      if (profile) {
+        setProfile(profile);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+  }
+});
+
+// Initialize session on load
+supabase.auth.getSession().then(({ data: { session } }) => {
+  const { setAuth } = useAppStore.getState();
+  setAuth(session?.user ?? null, session);
+});
