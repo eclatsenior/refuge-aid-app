@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,15 +12,36 @@ import { CalmPage } from "@/pages/CalmPage";
 import { ResourcesPage } from "@/pages/ResourcesPage";
 import { CaminoTerapeuticoPage } from "@/pages/CaminoTerapeuticoPage";
 import { CartaBienvenidaPage } from "@/pages/CartaBienvenidaPage";
+import { AuthPage } from "@/pages/AuthPage";
+import { DashboardPage } from "@/pages/DashboardPage";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [currentPath, setCurrentPath] = useState("/");
-  const { settings } = useAppStore();
+  const { 
+    isAuthenticated, 
+    user, 
+    userRole, 
+    profile,
+    settings, 
+    initializeAuth 
+  } = useAppStore();
   
-  // Check if user has seen manifesto
+  const [isInitializing, setIsInitializing] = useState(true);
+  
+  // Initialize authentication on app load
+  useEffect(() => {
+    const initialize = async () => {
+      await initializeAuth();
+      setIsInitializing(false);
+    };
+    initialize();
+  }, [initializeAuth]);
+  
+  // Check if user has seen manifesto (only for employees)
   const [manifestoSeen, setManifestoSeen] = useState(
     sessionStorage.getItem('manifesto_seen') === 'true'
   );
@@ -48,11 +68,31 @@ const App = () => {
         return <HomePage onNavigate={handleNavigate} />;
     }
   };
-  
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <div className="min-h-screen bg-background">
+
+  const renderApp = () => {
+    // Show loading during initialization
+    if (isInitializing) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <LoadingSpinner size="lg" />
+        </div>
+      );
+    }
+    
+    // If not authenticated, show AuthPage
+    if (!isAuthenticated || !user) {
+      return <AuthPage />;
+    }
+    
+    // If Refugi Lead, show DashboardPage
+    if (userRole === 'refugi_lead') {
+      return <DashboardPage />;
+    }
+    
+    // If employee, show main app with navigation
+    if (userRole === 'employee') {
+      return (
+        <>
           {renderCurrentPage()}
           <Navigation 
             currentPath={currentPath}
@@ -70,6 +110,19 @@ const App = () => {
               }}
             />
           )}
+        </>
+      );
+    }
+    
+    // Fallback to AuthPage
+    return <AuthPage />;
+  };
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <div className="min-h-screen bg-background">
+          {renderApp()}
         </div>
         <Toaster />
         <Sonner />

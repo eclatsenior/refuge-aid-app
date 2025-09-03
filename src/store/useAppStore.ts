@@ -135,6 +135,7 @@ interface AppState {
   logout: () => void;
   signUp: (email: string, password: string, fullName: string, role: UserRole) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  initializeAuth: () => Promise<void>;
   
   // Employee actions
   addNote: (note: Omit<Note, "id" | "isEncrypted" | "createdAt" | "updatedAt" | "isStarred" | "isSafeVault" | "forTherapy" | "tags">) => void;
@@ -250,6 +251,34 @@ export const useAppStore = create<AppState>()(
           return { error };
         } catch (error) {
           return { error };
+        }
+      },
+      
+      initializeAuth: async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          const { setAuth, setProfile } = get();
+          
+          setAuth(session?.user ?? null, session);
+          
+          if (session?.user) {
+            // Load user profile
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .single();
+              
+              if (profile) {
+                setProfile(profile);
+              }
+            } catch (error) {
+              console.error('Error loading profile:', error);
+            }
+          }
+        } catch (error) {
+          console.error('Error initializing auth:', error);
         }
       },
       
