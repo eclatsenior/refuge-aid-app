@@ -23,7 +23,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
   }, []);
   
   const handleEmergencyAction = (action: 'call' | 'whatsapp' | 'sms') => {
-    triggerEmergency(action);
+    triggerEmergency();
     
     if (action === 'call') {
       toast({

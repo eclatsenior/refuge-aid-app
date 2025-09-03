@@ -14,6 +14,7 @@ export function TrackingPage() {
   
   const handleCheckIn = (status: 'ok' | 'anxious' | 'alert') => {
     const newCheckIn: Omit<CheckIn, 'id'> = {
+      mood: status === 'ok' ? 8 : status === 'anxious' ? 4 : 2,
       status,
       timestamp: new Date(),
       location: settings.locationConsent ? 'Ubicación aproximada' : undefined

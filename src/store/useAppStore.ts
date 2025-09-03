@@ -15,6 +15,13 @@ export interface Note {
   title: string;
   content: string;
   timestamp: Date;
+  isEncrypted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  isStarred: boolean;
+  isSafeVault: boolean;
+  forTherapy: boolean;
+  tags: string[];
 }
 
 export interface SUDS {
@@ -27,8 +34,10 @@ export interface SUDS {
 export interface CheckIn {
   id: string;
   mood: number;
+  status: 'ok' | 'anxious' | 'alert';
   timestamp: Date;
   notes?: string;
+  location?: string;
 }
 
 export interface Settings {
@@ -38,6 +47,14 @@ export interface Settings {
   privacyMode: boolean;
   phoneVibration: boolean;
   soundAlerts: boolean;
+  checkinFrequency: 'daily' | 'weekly' | 'off';
+  quietHoursStart: string;
+  quietHoursEnd: string;
+  locationConsent: boolean;
+  alertMessageTemplate: string;
+  isDiscreetMode: boolean;
+  hasBiometrics: boolean;
+  autoLockMinutes: number;
 }
 
 export interface EmployeeStatus {
@@ -76,6 +93,14 @@ const defaultSettings: Settings = {
   privacyMode: false,
   phoneVibration: true,
   soundAlerts: true,
+  checkinFrequency: 'daily',
+  quietHoursStart: '22:00',
+  quietHoursEnd: '08:00',
+  locationConsent: false,
+  alertMessageTemplate: "Necesito ayuda. Estoy en riesgo. Este es un aviso automático de Refugi.",
+  isDiscreetMode: false,
+  hasBiometrics: false,
+  autoLockMinutes: 5
 };
 
 interface AppState {
@@ -85,12 +110,14 @@ interface AppState {
   userRole: UserRole | null;
   profile: any | null;
   isAuthenticated: boolean;
+  userId: string | null;
   
   // Employee data
   notes: Note[];
   checkIns: CheckIn[];
   sudsRecords: SUDS[];
   settings: Settings;
+  trustedContacts: TrustedContact[];
   
   // Refugi Lead data
   assignedEmployees: EmployeeStatus[];
@@ -99,6 +126,8 @@ interface AppState {
   // Security
   vaultLocked: boolean;
   decoyScreenActive: boolean;
+  isVaultLocked: boolean;
+  showDecoyScreen: boolean;
   
   // Authentication actions
   setAuth: (user: User | null, session: Session | null) => void;
@@ -108,7 +137,7 @@ interface AppState {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   
   // Employee actions
-  addNote: (note: Omit<Note, "id">) => void;
+  addNote: (note: Omit<Note, "id" | "isEncrypted" | "createdAt" | "updatedAt" | "isStarred" | "isSafeVault" | "forTherapy" | "tags">) => void;
   updateNote: (id: string, updates: Partial<Omit<Note, "id">>) => void;
   deleteNote: (id: string) => void;
   addCheckIn: (checkIn: Omit<CheckIn, "id">) => void;
@@ -121,10 +150,22 @@ interface AppState {
   loadEmergencyAlerts: () => Promise<void>;
   resolveAlert: (alertId: string) => Promise<void>;
   
+  // Trusted Contacts actions
+  addTrustedContact: (contact: Omit<TrustedContact, 'id'>) => void;
+  updateTrustedContact: (id: string, contact: Partial<TrustedContact>) => void;
+  deleteTrustedContact: (id: string) => void;
+  
+  // Note advanced actions
+  toggleVaultStatus: (id: string) => void;
+  toggleTherapyFlag: (id: string) => void;
+  quickDeleteNote: (id: string, confirmWord: string) => boolean;
+
   // Security actions
   toggleVaultLock: () => void;
   unlockVault: (password: string) => boolean;
   toggleDecoyScreen: () => void;
+  activateDecoyScreen: () => void;
+  deactivateDecoyScreen: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -136,14 +177,18 @@ export const useAppStore = create<AppState>()(
       userRole: null,
       profile: null,
       isAuthenticated: false,
+      userId: null,
       notes: [],
       checkIns: [],
       sudsRecords: [],
       settings: defaultSettings,
+      trustedContacts: [],
       assignedEmployees: [],
       emergencyAlerts: [],
       vaultLocked: false,
       decoyScreenActive: false,
+      isVaultLocked: true,
+      showDecoyScreen: false,
       
       // Authentication actions
       setAuth: (user, session) => {
@@ -208,15 +253,46 @@ export const useAppStore = create<AppState>()(
         }
       },
       
+      // Trusted Contacts actions
+      addTrustedContact: (contact) =>
+        set((state) => ({
+          trustedContacts: [
+            ...state.trustedContacts,
+            { ...contact, id: crypto.randomUUID() }
+          ]
+        })),
+      
+      updateTrustedContact: (id, contact) =>
+        set((state) => ({
+          trustedContacts: state.trustedContacts.map(tc =>
+            tc.id === id ? { ...tc, ...contact } : tc
+          )
+        })),
+      
+      deleteTrustedContact: (id) =>
+        set((state) => ({
+          trustedContacts: state.trustedContacts.filter(tc => tc.id !== id)
+        })),
+
       // Employee actions
       addNote: (note) =>
         set((state) => ({
-          notes: [...state.notes, { ...note, id: crypto.randomUUID() }]
+          notes: [...state.notes, { 
+            ...note, 
+            id: crypto.randomUUID(),
+            isEncrypted: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            isStarred: false,
+            isSafeVault: false,
+            forTherapy: false,
+            tags: []
+          }]
         })),
       
       updateNote: (id, updates) =>
         set((state) => ({
-          notes: state.notes.map(n => n.id === id ? { ...n, ...updates } : n)
+          notes: state.notes.map(n => n.id === id ? { ...n, ...updates, updatedAt: new Date() } : n)
         })),
       
       deleteNote: (id) =>
@@ -224,6 +300,30 @@ export const useAppStore = create<AppState>()(
           notes: state.notes.filter(n => n.id !== id)
         })),
       
+      toggleVaultStatus: (id) =>
+        set((state) => ({
+          notes: state.notes.map(n =>
+            n.id === id ? { ...n, isSafeVault: !n.isSafeVault, updatedAt: new Date() } : n
+          )
+        })),
+      
+      toggleTherapyFlag: (id) =>
+        set((state) => ({
+          notes: state.notes.map(n =>
+            n.id === id ? { ...n, forTherapy: !n.forTherapy, updatedAt: new Date() } : n
+          )
+        })),
+      
+      quickDeleteNote: (id, confirmWord) => {
+        if (confirmWord.toUpperCase() !== 'BORRAR') {
+          return false;
+        }
+        set((state) => ({
+          notes: state.notes.filter(n => n.id !== id)
+        }));
+        return true;
+      },
+
       addCheckIn: (checkIn) =>
         set((state) => ({
           checkIns: [...state.checkIns, { ...checkIn, id: crypto.randomUUID() }]
@@ -356,26 +456,43 @@ export const useAppStore = create<AppState>()(
       
       // Security actions
       toggleVaultLock: () =>
-        set((state) => ({ vaultLocked: !state.vaultLocked })),
+        set((state) => ({ 
+          vaultLocked: !state.vaultLocked,
+          isVaultLocked: !state.isVaultLocked 
+        })),
       
       unlockVault: (password) => {
         if (password.length > 0) {
-          set({ vaultLocked: false });
+          set({ vaultLocked: false, isVaultLocked: false });
           return true;
         }
         return false;
       },
       
       toggleDecoyScreen: () =>
-        set((state) => ({ decoyScreenActive: !state.decoyScreenActive }))
+        set((state) => ({ 
+          decoyScreenActive: !state.decoyScreenActive,
+          showDecoyScreen: !state.showDecoyScreen
+        })),
+        
+      activateDecoyScreen: () =>
+        set({ showDecoyScreen: true, decoyScreenActive: true }),
+      
+      deactivateDecoyScreen: () =>
+        set({ showDecoyScreen: false, decoyScreenActive: false })
     }),
     {
       name: 'refugi-storage',
       partialize: (state) => ({
-        settings: state.settings,
+        settings: {
+          ...state.settings,
+          // Don't persist alert message template for security
+          alertMessageTemplate: defaultSettings.alertMessageTemplate
+        },
         notes: state.notes,
         checkIns: state.checkIns,
-        sudsRecords: state.sudsRecords
+        sudsRecords: state.sudsRecords,
+        trustedContacts: state.trustedContacts
       })
     }
   )

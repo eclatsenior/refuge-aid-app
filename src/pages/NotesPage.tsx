@@ -96,8 +96,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     if (editingId) {
       updateNote(editingId, { 
         title: title.trim(), 
-        content: content.trim(),
-        isEncrypted: true // In a real app, this would encrypt the content
+        content: content.trim()
       });
       toast({
         title: "Nota actualizada",
@@ -107,11 +106,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
       addNote({
         title: title.trim(),
         content: content.trim(),
-        isEncrypted: true,
-        isStarred: false,
-        isSafeVault: isVaultMode,
-        forTherapy: false,
-        tags: []
+        timestamp: new Date()
       });
       toast({
         title: isVaultMode ? "Nota guardada en Caja Fuerte" : "Nota creada",
