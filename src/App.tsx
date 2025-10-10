@@ -14,13 +14,16 @@ import { CaminoTerapeuticoPage } from "@/pages/CaminoTerapeuticoPage";
 import { CartaBienvenidaPage } from "@/pages/CartaBienvenidaPage";
 import { AuthPage } from "@/pages/AuthPage";
 import { DashboardPage } from "@/pages/DashboardPage";
+import { StripeTestPage } from "@/pages/StripeTestPage";
+import { PaymentSuccessPage } from "@/pages/PaymentSuccessPage";
+import { PaymentCanceledPage } from "@/pages/PaymentCanceledPage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [currentPath, setCurrentPath] = useState("/");
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const { 
     isAuthenticated, 
     user, 
@@ -31,6 +34,16 @@ const App = () => {
   } = useAppStore();
   
   const [isInitializing, setIsInitializing] = useState(true);
+  
+  // Listen to URL changes
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   
   // Initialize authentication on app load
   useEffect(() => {
@@ -77,6 +90,7 @@ const App = () => {
   
   const handleNavigate = (path: string) => {
     setCurrentPath(path);
+    window.history.pushState({}, '', path);
   };
   
   const renderCurrentPage = () => {
@@ -93,6 +107,12 @@ const App = () => {
         return <ResourcesPage />;
       case "/carta":
         return <CartaBienvenidaPage onNavigate={handleNavigate} isOverlay={false} />;
+      case "/stripe-test-secret":
+        return <StripeTestPage />;
+      case "/payment-success":
+        return <PaymentSuccessPage />;
+      case "/payment-canceled":
+        return <PaymentCanceledPage />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
@@ -106,6 +126,12 @@ const App = () => {
           <LoadingSpinner size="lg" />
         </div>
       );
+    }
+    
+    // Special routes that don't require authentication
+    const publicRoutes = ["/stripe-test-secret", "/payment-success", "/payment-canceled"];
+    if (publicRoutes.includes(currentPath)) {
+      return renderCurrentPage();
     }
     
     // If not authenticated, show AuthPage
