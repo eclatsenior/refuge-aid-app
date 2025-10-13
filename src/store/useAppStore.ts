@@ -199,7 +199,7 @@ export const useAppStore = create<AppState>()(
           user, 
           session, 
           isAuthenticated: !!user,
-          userRole: user ? 'employee' : null // Will be updated when profile loads
+          userRole: null // Will be set when profile loads
         });
       },
       

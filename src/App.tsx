@@ -119,8 +119,8 @@ const App = () => {
   };
 
   const renderApp = () => {
-    // Show loading during initialization
-    if (isInitializing) {
+    // Show loading during initialization or while profile is loading
+    if (isInitializing || (user && !profile)) {
       return (
         <div className="min-h-screen bg-background flex items-center justify-center">
           <LoadingSpinner size="lg" />
