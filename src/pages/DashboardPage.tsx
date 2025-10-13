@@ -18,6 +18,7 @@ import { EmployeeCard } from "@/components/dashboard/EmployeeCard";
 import { EmergencyAlert } from "@/components/dashboard/EmergencyAlert";
 import { StatsOverview } from "@/components/dashboard/StatsOverview";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { RegisterEmployeeDialog } from "@/components/dashboard/RegisterEmployeeDialog";
 import { useToast } from "@/hooks/use-toast";
 
 export function DashboardPage() {
@@ -200,20 +201,26 @@ export function DashboardPage() {
         {/* Employees Section */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Empleadas Asignadas ({filteredEmployees.length})
-              </CardTitle>
-              
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs">
-                  {assignedEmployees.filter(e => e.is_online).length} conectadas
-                </Badge>
-                <Badge variant="outline" className="text-xs">
-                  {assignedEmployees.filter(e => e.emergency_alert).length} alertas
-                </Badge>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Empleadas Asignadas ({filteredEmployees.length})
+                </CardTitle>
+                
+                <div className="flex items-center space-x-2">
+                  <Badge variant="outline" className="text-xs">
+                    {assignedEmployees.filter(e => e.is_online).length} conectadas
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {assignedEmployees.filter(e => e.emergency_alert).length} alertas
+                  </Badge>
+                </div>
               </div>
+
+              <RegisterEmployeeDialog 
+                onEmployeeRegistered={handleRefresh}
+              />
             </div>
           </CardHeader>
           <CardContent>

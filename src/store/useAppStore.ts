@@ -152,6 +152,7 @@ interface AppState {
   resolveAlert: (alertId: string, resolutionNotes?: string) => Promise<void>;
   setupRealtimeSubscriptions: () => (() => void) | undefined;
   updateEmployeePresence: (isOnline?: boolean) => Promise<void>;
+  registerEmployee: (data: { email: string; fullName: string; password: string }) => Promise<void>;
   
   // Trusted Contacts actions
   addTrustedContact: (contact: Omit<TrustedContact, 'id'>) => void;
@@ -636,6 +637,33 @@ export const useAppStore = create<AppState>()(
           }
         } catch (error) {
           console.error('❌ Error in heartbeat:', error);
+        }
+      },
+
+      // Register new employee
+      registerEmployee: async (data: { email: string; fullName: string; password: string }) => {
+        try {
+          const { user } = get();
+          if (!user) throw new Error('No estás autenticado');
+
+          console.log('🔐 Registering new employee:', data.email);
+
+          const { data: result, error } = await supabase.functions.invoke('register-employee', {
+            body: {
+              email: data.email,
+              fullName: data.fullName,
+              password: data.password,
+              refugiLeadId: user.id,
+            },
+          });
+
+          if (error) throw error;
+          if (!result?.success) throw new Error(result?.message || 'Error al registrar empleada');
+
+          console.log('✅ Employee registered successfully:', result);
+        } catch (error: any) {
+          console.error('❌ Error registering employee:', error);
+          throw error;
         }
       },
 
