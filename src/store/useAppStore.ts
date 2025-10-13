@@ -512,12 +512,33 @@ export const useAppStore = create<AppState>()(
         try {
           console.log('🚨 Loading emergency alerts...');
           
+          // Get assignments for current refugi_lead
+          const { data: assignments, error: assignmentError } = await supabase
+            .from('employee_assignments')
+            .select('employee_id');
+
+          if (assignmentError) {
+            console.error('❌ Error loading assignments:', assignmentError);
+            throw assignmentError;
+          }
+          
+          // If no assignments, return empty array
+          if (!assignments || assignments.length === 0) {
+            console.log('ℹ️ No assigned employees, no alerts to show');
+            set({ emergencyAlerts: [] });
+            return;
+          }
+          
+          const employeeIds = assignments.map(a => a.employee_id);
+          console.log('👥 Loading alerts for assigned employees:', employeeIds);
+          
           const { data: alerts, error } = await supabase
             .from('emergency_alerts')
             .select(`
               *,
               profiles!emergency_alerts_employee_id_fkey (full_name)
             `)
+            .in('employee_id', employeeIds)
             .order('created_at', { ascending: false });
 
           if (error) {
