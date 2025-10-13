@@ -689,18 +689,6 @@ export const useAppStore = create<AppState>()(
             if (oldRecord?.emergency_alert === false && newRecord?.emergency_alert === true) {
               console.log('🚨 Emergency alert activated!');
               loadEmergencyAlerts(); // Immediately refresh alerts
-              
-              // Show toast notification
-              if (typeof window !== 'undefined') {
-                const event = new CustomEvent('show-toast', {
-                  detail: {
-                    title: "¡Alerta Activada!",
-                    description: "Se ha activado una alerta de emergencia",
-                    variant: "destructive"
-                  }
-                });
-                window.dispatchEvent(event);
-              }
             }
           })
           .subscribe();
