@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { toast } from "@/hooks/use-toast";
 
 export interface TrustedContact {
   id: string;
@@ -85,6 +86,12 @@ export interface EmergencyAlert {
 }
 
 export type UserRole = 'employee' | 'refugi_lead';
+
+// Prevent duplicate alert notifications
+const shownAlertToasts = new Set<string>();
+let realtimeInitialized = false;
+let employeeChannel: any = null;
+let alertsChannel: any = null;
 
 const defaultSettings: Settings = {
   emergencyContacts: [],
@@ -428,31 +435,20 @@ export const useAppStore = create<AppState>()(
           console.log('✅ Emergency alert created:', alert);
 
           // Show success toast
-          if (typeof window !== 'undefined') {
-            const event = new CustomEvent('show-toast', {
-              detail: {
-                title: "Emergencia Activada",
-                description: "Se ha notificado tu situación al equipo de soporte. Mantente segura.",
-                variant: "default"
-              }
-            });
-            window.dispatchEvent(event);
-          }
+          toast({
+            title: "Emergencia Activada",
+            description: "Se ha notificado tu situación al equipo de soporte. Mantente segura."
+          });
 
         } catch (error) {
           console.error('❌ Error triggering emergency:', error);
           
           // Show error toast
-          if (typeof window !== 'undefined') {
-            const event = new CustomEvent('show-toast', {
-              detail: {
-                title: "Error",
-                description: "No se pudo activar la emergencia. Intenta nuevamente.",
-                variant: "destructive"
-              }
-            });
-            window.dispatchEvent(event);
-          }
+          toast({
+            title: "Error",
+            description: "No se pudo activar la emergencia. Intenta nuevamente.",
+            variant: "destructive"
+          });
         }
       },
       
@@ -669,10 +665,20 @@ export const useAppStore = create<AppState>()(
 
       // Setup realtime subscriptions
       setupRealtimeSubscriptions: () => {
+        // Prevent duplicate subscriptions
+        if (realtimeInitialized) {
+          console.log('ℹ️ Realtime subscriptions already initialized');
+          return () => {
+            if (employeeChannel) employeeChannel.unsubscribe();
+            if (alertsChannel) alertsChannel.unsubscribe();
+          };
+        }
+
+        realtimeInitialized = true;
         const { loadEmployeeData, loadEmergencyAlerts } = get();
 
         // Subscribe to employee status changes
-        const employeeChannel = supabase
+        employeeChannel = supabase
           .channel('employee-status-changes')
           .on('postgres_changes', {
             event: 'UPDATE',
@@ -693,28 +699,42 @@ export const useAppStore = create<AppState>()(
           })
           .subscribe();
 
-        // Subscribe to emergency alerts
-        const alertsChannel = supabase
+        // Subscribe to emergency alerts (only INSERT events)
+        alertsChannel = supabase
           .channel('emergency-alerts-changes')
           .on('postgres_changes', {
-            event: '*',
+            event: 'INSERT',
             schema: 'public', 
             table: 'emergency_alerts'
           }, (payload) => {
-            console.log('🚨 Emergency alert changed:', payload);
-            loadEmergencyAlerts(); // Refresh alerts data
+            console.log('🚨 New emergency alert:', payload);
             
-            // Show toast for new alerts
-            if (payload.eventType === 'INSERT' && typeof window !== 'undefined') {
-              const event = new CustomEvent('show-toast', {
-                detail: {
-                  title: "Nueva Alerta de Emergencia",
-                  description: "Una empleada ha activado una alerta de emergencia",
-                  variant: "destructive"
-                }
-              });
-              window.dispatchEvent(event);
+            const alertId = payload.new?.id as string;
+            const employeeId = payload.new?.employee_id as string;
+            
+            // Prevent duplicate toasts
+            if (shownAlertToasts.has(alertId)) {
+              console.log('ℹ️ Alert toast already shown:', alertId);
+              return;
             }
+            
+            // Mark alert as shown
+            shownAlertToasts.add(alertId);
+            
+            // Get employee name from current state
+            const employeeName = get().assignedEmployees.find(
+              e => e.employee_id === employeeId
+            )?.employee_name || 'Empleada';
+            
+            // Show single toast with employee name
+            toast({
+              title: "Nueva Alerta de Emergencia",
+              description: `Alerta de ${employeeName}`,
+              variant: "destructive"
+            });
+            
+            // Refresh alerts data
+            loadEmergencyAlerts();
           })
           .subscribe();
 
@@ -736,8 +756,9 @@ export const useAppStore = create<AppState>()(
         
         return () => {
           clearInterval(pollingInterval);
-          employeeChannel.unsubscribe();
-          alertsChannel.unsubscribe();
+          if (employeeChannel) employeeChannel.unsubscribe();
+          if (alertsChannel) alertsChannel.unsubscribe();
+          realtimeInitialized = false;
         };
       },
       

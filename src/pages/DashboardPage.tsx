@@ -70,7 +70,7 @@ export function DashboardPage() {
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, [loadEmployeeData, loadEmergencyAlerts, setupRealtimeSubscriptions, toast]);
+  }, [loadEmployeeData, loadEmergencyAlerts, setupRealtimeSubscriptions]);
 
   const handleLogout = () => {
     logout();
