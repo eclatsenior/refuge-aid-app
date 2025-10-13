@@ -675,12 +675,33 @@ export const useAppStore = create<AppState>()(
         const employeeChannel = supabase
           .channel('employee-status-changes')
           .on('postgres_changes', {
-            event: '*',
+            event: 'UPDATE',
             schema: 'public',
             table: 'employee_status'
           }, (payload) => {
             console.log('👥 Employee status changed:', payload);
             loadEmployeeData(); // Refresh employee data
+            
+            // Check if emergency_alert changed from false to true
+            const oldRecord = payload.old as any;
+            const newRecord = payload.new as any;
+            
+            if (oldRecord?.emergency_alert === false && newRecord?.emergency_alert === true) {
+              console.log('🚨 Emergency alert activated!');
+              loadEmergencyAlerts(); // Immediately refresh alerts
+              
+              // Show toast notification
+              if (typeof window !== 'undefined') {
+                const event = new CustomEvent('show-toast', {
+                  detail: {
+                    title: "¡Alerta Activada!",
+                    description: "Se ha activado una alerta de emergencia",
+                    variant: "destructive"
+                  }
+                });
+                window.dispatchEvent(event);
+              }
+            }
           })
           .subscribe();
 
@@ -709,9 +730,24 @@ export const useAppStore = create<AppState>()(
           })
           .subscribe();
 
+        // Polling fallback for first 60 seconds (every 5 seconds)
+        let pollCount = 0;
+        const maxPolls = 12; // 12 * 5 seconds = 60 seconds
+        const pollingInterval = setInterval(() => {
+          pollCount++;
+          console.log('🔄 Polling fallback:', pollCount);
+          loadEmergencyAlerts();
+          
+          if (pollCount >= maxPolls) {
+            clearInterval(pollingInterval);
+            console.log('✅ Polling fallback completed');
+          }
+        }, 5000);
+
         console.log('🔄 Realtime subscriptions setup complete');
         
         return () => {
+          clearInterval(pollingInterval);
           employeeChannel.unsubscribe();
           alertsChannel.unsubscribe();
         };
