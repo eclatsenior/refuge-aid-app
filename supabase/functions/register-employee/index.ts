@@ -138,7 +138,7 @@ serve(async (req) => {
         .from('employee_status')
         .insert({
           employee_id: userId,
-          mood_level: 7,
+          mood_level: null, // No ha reportado aún
           therapy_progress: 0,
           is_online: false,
           emergency_alert: false

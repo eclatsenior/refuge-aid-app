@@ -136,6 +136,36 @@ export type Database = {
           },
         ]
       }
+      mood_check_ins: {
+        Row: {
+          created_at: string
+          employee_id: string
+          id: string
+          location_data: Json | null
+          mood_level: number
+          notes: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          id?: string
+          location_data?: Json | null
+          mood_level: number
+          notes?: string | null
+          status: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          id?: string
+          location_data?: Json | null
+          mood_level?: number
+          notes?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -174,6 +204,10 @@ export type Database = {
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      get_employee_average_mood_24h: {
+        Args: { emp_id: string }
+        Returns: number
       }
       get_employee_data_with_profiles: {
         Args: { employee_ids: string[] }

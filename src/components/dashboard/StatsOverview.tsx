@@ -23,9 +23,11 @@ export function StatsOverview({ employees, alerts }: StatsOverviewProps) {
   const activeAlerts = alerts.filter(a => !a.is_resolved).length;
   const employeesWithAlerts = employees.filter(e => e.emergency_alert).length;
   
-  const averageMood = employees.length > 0 
-    ? employees.reduce((sum, e) => sum + e.mood_level, 0) / employees.length
-    : 0;
+  // Solo considerar empleadas que han reportado su mood (no NULL)
+  const employeesWithMood = employees.filter(e => e.mood_level !== null && e.mood_level !== undefined);
+  const averageMood = employeesWithMood.length > 0
+    ? employeesWithMood.reduce((sum, e) => sum + (e.mood_level || 0), 0) / employeesWithMood.length
+    : null;
   
   const averageProgress = employees.length > 0 
     ? employees.reduce((sum, e) => sum + e.therapy_progress, 0) / employees.length
@@ -56,11 +58,11 @@ export function StatsOverview({ employees, alerts }: StatsOverviewProps) {
     },
     {
       title: "Estado de Ánimo Promedio",
-      value: `${averageMood.toFixed(1)}/10`,
+      value: averageMood !== null ? `${averageMood.toFixed(1)}/10` : 'Sin datos',
       icon: Heart,
-      description: "Últimas 24 horas",
-      color: getMoodColor(averageMood),
-      progress: averageMood * 10
+      description: averageMood !== null ? "Últimas 24 horas" : `${totalEmployees - employeesWithMood.length} sin reportar`,
+      color: averageMood !== null ? getMoodColor(averageMood) : "muted",
+      progress: averageMood !== null ? averageMood * 10 : 0
     },
     {
       title: "Progreso Terapéutico",

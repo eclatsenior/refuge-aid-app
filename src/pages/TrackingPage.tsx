@@ -6,10 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { useAppStore, type CheckIn } from "@/store/useAppStore";
 import { useToast } from "@/hooks/use-toast";
 import { ensureDate, safeToDateString, safeToLocaleTimeString, safeToLocaleDateString, safeGetTime } from "@/lib/dateUtils";
+import { supabase } from "@/integrations/supabase/client";
 
 export function TrackingPage() {
   const [selectedStatus, setSelectedStatus] = useState<'ok' | 'anxious' | 'alert' | null>(null);
-  const { checkIns, addCheckIn, settings, updateEmployeePresence } = useAppStore();
+  const { checkIns, addCheckIn, settings, updateEmployeePresence, profile } = useAppStore();
   const { toast } = useToast();
 
   // Heartbeat system - update presence every 2 minutes while on this page
@@ -41,9 +42,49 @@ export function TrackingPage() {
     };
   }, [updateEmployeePresence]);
   
-  const handleCheckIn = (status: 'ok' | 'anxious' | 'alert') => {
+  const handleCheckIn = async (status: 'ok' | 'anxious' | 'alert') => {
+    const mood = status === 'ok' ? 8 : status === 'anxious' ? 4 : 2;
+    
+    // Guardar en Supabase
+    if (profile?.user_id) {
+      const { error } = await supabase
+        .from('mood_check_ins')
+        .insert({
+          employee_id: profile.user_id,
+          mood_level: mood,
+          status,
+          location_data: settings.locationConsent 
+            ? { approximate: true, timestamp: new Date().toISOString() } 
+            : null
+        });
+
+      if (error) {
+        console.error('Error al guardar check-in:', error);
+        toast({
+          title: "Error al registrar",
+          description: "No se pudo guardar tu estado en el servidor",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // También actualizar employee_status con el último mood
+      const { error: statusError } = await supabase
+        .from('employee_status')
+        .update({
+          mood_level: mood,
+          last_check_in: new Date().toISOString()
+        })
+        .eq('employee_id', profile.user_id);
+
+      if (statusError) {
+        console.error('Error al actualizar estado:', statusError);
+      }
+    }
+
+    // Guardar en localStorage para acceso offline
     const newCheckIn: Omit<CheckIn, 'id'> = {
-      mood: status === 'ok' ? 8 : status === 'anxious' ? 4 : 2,
+      mood,
       status,
       timestamp: new Date(),
       location: settings.locationConsent ? 'Ubicación aproximada' : undefined
