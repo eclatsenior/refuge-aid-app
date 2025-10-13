@@ -546,7 +546,9 @@ export const useAppStore = create<AppState>()(
           const formattedAlerts: EmergencyAlert[] = alerts?.map(alert => ({
             id: alert.id,
             employee_id: alert.employee_id,
-            employee_name: alert.profiles?.full_name || 'Usuario desconocido',
+            employee_name: alert.profiles?.full_name || 
+                          get().assignedEmployees.find(e => e.employee_id === alert.employee_id)?.employee_name || 
+                          'Usuario desconocido',
             alert_type: alert.alert_type,
             message: alert.message || '',
             created_at: alert.created_at,
@@ -706,7 +708,7 @@ export const useAppStore = create<AppState>()(
             event: 'INSERT',
             schema: 'public', 
             table: 'emergency_alerts'
-          }, (payload) => {
+          }, async (payload) => {
             console.log('🚨 New emergency alert:', payload);
             
             const alertId = payload.new?.id as string;
@@ -721,17 +723,34 @@ export const useAppStore = create<AppState>()(
             // Mark alert as shown
             shownAlertToasts.add(alertId);
             
-            // Get employee name from current state
-            const employeeName = get().assignedEmployees.find(
+            // Try to get employee name from current state
+            let employeeName = get().assignedEmployees.find(
               e => e.employee_id === employeeId
-            )?.employee_name || 'Empleada';
+            )?.employee_name;
             
-            // Show single toast with employee name
-            toast({
+            // Show toast (will update if name not available yet)
+            const toastHandle = toast({
               title: "Nueva Alerta de Emergencia",
-              description: `Alerta de ${employeeName}`,
+              description: employeeName ? `Alerta de ${employeeName}` : 'Alerta entrante...',
               variant: "destructive"
             });
+            
+            // If name not available, load data and update toast
+            if (!employeeName) {
+              await get().loadEmployeeData();
+              employeeName = get().assignedEmployees.find(
+                e => e.employee_id === employeeId
+              )?.employee_name;
+              
+              if (employeeName && toastHandle?.update) {
+                toastHandle.update({
+                  id: toastHandle.id,
+                  title: "Nueva Alerta de Emergencia",
+                  description: `Alerta de ${employeeName}`,
+                  variant: "destructive"
+                });
+              }
+            }
             
             // Refresh alerts data
             loadEmergencyAlerts();
