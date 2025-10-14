@@ -82,9 +82,9 @@ export function KPIsSection() {
 
         <KPICard
           title="Ánimo Promedio (24h)"
-          value={kpis.avg_mood.toFixed(1)}
+          value={kpis.avg_mood > 0 ? kpis.avg_mood.toFixed(1) : 'Sin datos'}
           icon={Heart}
-          variant={kpis.avg_mood < 5 ? 'warning' : 'success'}
+          variant={kpis.avg_mood > 0 && kpis.avg_mood < 5 ? 'warning' : 'success'}
           onClick={() => console.log('Drill-down: Ánimo')}
         />
 

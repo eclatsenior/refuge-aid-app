@@ -314,7 +314,7 @@ serve(async (req) => {
         total_checkins: moodCheckins.length,
         avg_level: moodCheckins.length > 0
           ? moodCheckins.reduce((sum, mc) => sum + mc.mood_level, 0) / moodCheckins.length
-          : 0,
+          : null,
         by_level: moodCheckins.reduce((acc, mc) => {
           acc[mc.mood_level] = (acc[mc.mood_level] || 0) + 1;
           return acc;

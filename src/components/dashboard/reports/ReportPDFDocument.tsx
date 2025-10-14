@@ -66,7 +66,7 @@ export function ReportPDFDocument({ data }: { data: ReportData }) {
         <View style={styles.kpiGrid}>
           <View style={styles.kpiCard}><Text style={styles.kpiLabel}>Riesgo Promedio</Text><Text style={styles.kpiValue}>{data.statistics.risk.avg_score.toFixed(1)}</Text></View>
           <View style={styles.kpiCard}><Text style={styles.kpiLabel}>Incidentes</Text><Text style={styles.kpiValue}>{data.statistics.incidents.total}</Text></View>
-          <View style={styles.kpiCard}><Text style={styles.kpiLabel}>Ánimo</Text><Text style={styles.kpiValue}>{data.statistics.mood.avg_level.toFixed(1)}</Text></View>
+          <View style={styles.kpiCard}><Text style={styles.kpiLabel}>Ánimo</Text><Text style={styles.kpiValue}>{data.statistics.mood.avg_level !== null ? data.statistics.mood.avg_level.toFixed(1) : 'Sin datos'}</Text></View>
           <View style={styles.kpiCard}><Text style={styles.kpiLabel}>Formación</Text><Text style={styles.kpiValue}>{((data.statistics.training.employees_100_percent / data.metadata.total_employees) * 100).toFixed(0)}%</Text></View>
         </View>
         {data.statistics.risk.high_risk > 0 && <View style={styles.alertBox}><Text style={[styles.text, styles.boldText]}>⚠️ {data.statistics.risk.high_risk} empleadas en riesgo alto</Text></View>}
