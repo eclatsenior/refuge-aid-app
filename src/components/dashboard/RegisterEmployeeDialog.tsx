@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { UserPlus, Mail, User, Key, Loader2 } from "lucide-react";
+import { UserPlus, Mail, User, Key, Loader2, Copy, Check } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -47,6 +47,7 @@ interface RegisterEmployeeDialogProps {
 export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmployeeDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { registerEmployee, canAddEmployee, subscription } = useAppStore();
   const { toast } = useToast();
 
@@ -67,6 +68,20 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
       password += charset.charAt(Math.floor(Math.random() * charset.length));
     }
     form.setValue("password", password);
+    setCopied(false);
+  };
+
+  const copyPassword = async () => {
+    const password = form.getValues("password");
+    if (password) {
+      await navigator.clipboard.writeText(password);
+      setCopied(true);
+      toast({
+        title: "Contraseña copiada",
+        description: "La contraseña ha sido copiada al portapapeles"
+      });
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const onSubmit = async (data: RegisterEmployeeFormData) => {
@@ -202,15 +217,30 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
                       <Input 
                         type="text"
                         placeholder="Mínimo 8 caracteres" 
-                        className="pl-10 font-mono text-sm"
+                        className="pl-10 pr-10 font-mono text-sm"
                         {...field} 
                       />
+                      {field.value && (
+                        <button
+                          type="button"
+                          onClick={copyPassword}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                          title="Copiar contraseña"
+                        >
+                          {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                      )}
                     </div>
                   </FormControl>
                   <FormMessage />
-                  <p className="text-xs text-muted-foreground">
-                    Esta contraseña será proporcionada a la empleada para su primer acceso.
-                  </p>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">
+                      ⚠️ Esta contraseña será proporcionada a la empleada para su primer acceso.
+                    </p>
+                    <p className="text-xs text-amber-600 dark:text-amber-500 font-medium">
+                      💡 Importante: Distingue mayúsculas/minúsculas y no tiene espacios.
+                    </p>
+                  </div>
                 </FormItem>
               )}
             />

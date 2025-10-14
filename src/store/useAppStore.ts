@@ -266,13 +266,26 @@ export const useAppStore = create<AppState>()(
       
       signIn: async (email, password) => {
         try {
+          // Normalize credentials to prevent login issues
+          const normalizedEmail = email.trim().toLowerCase();
+          const normalizedPassword = password.trim();
+          
+          console.log('🔐 Attempting login with normalized email:', normalizedEmail);
+          
           const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password
+            email: normalizedEmail,
+            password: normalizedPassword
           });
+          
+          if (error) {
+            console.error('❌ Login error:', error.message);
+          } else {
+            console.log('✅ Login successful');
+          }
           
           return { error };
         } catch (error) {
+          console.error('❌ Login exception:', error);
           return { error };
         }
       },

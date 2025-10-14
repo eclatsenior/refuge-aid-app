@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, Scan, Shield, User, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Scan, Shield, User, Loader2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,14 @@ import { Switch } from "@/components/ui/switch";
 import { useAppStore } from "@/store/useAppStore";
 import { FaceRecognition } from "@/components/auth/FaceRecognition";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export function AuthPage() {
   const [email, setEmail] = useState("");
@@ -19,6 +27,8 @@ export function AuthPage() {
   const [showFaceRecognition, setShowFaceRecognition] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   
   const { signIn, signUp, user, profile } = useAppStore();
   const { toast } = useToast();
@@ -33,7 +43,12 @@ export function AuthPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+    
+    // Normalize credentials
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+    
+    if (!normalizedEmail || !normalizedPassword) {
       toast({
         title: "Error",
         description: "Por favor completa todos los campos",
@@ -44,7 +59,7 @@ export function AuthPage() {
 
     setIsLoading(true);
     try {
-      const { error } = await signIn(email, password);
+      const { error } = await signIn(normalizedEmail, normalizedPassword);
       if (error) {
         toast({
           title: "Error de autenticación",
@@ -69,7 +84,13 @@ export function AuthPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !fullName) {
+    
+    // Normalize credentials
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+    const normalizedFullName = fullName.trim();
+    
+    if (!normalizedEmail || !normalizedPassword || !normalizedFullName) {
       toast({
         title: "Error",
         description: "Por favor completa todos los campos",
@@ -78,7 +99,7 @@ export function AuthPage() {
       return;
     }
 
-    if (password.length < 6) {
+    if (normalizedPassword.length < 6) {
       toast({
         title: "Error",
         description: "La contraseña debe tener al menos 6 caracteres",
@@ -90,7 +111,7 @@ export function AuthPage() {
     setIsLoading(true);
     try {
       const role = isRefugiLead ? 'refugi_lead' : 'employee';
-      const { error } = await signUp(email, password, fullName, role);
+      const { error } = await signUp(normalizedEmail, normalizedPassword, normalizedFullName, role);
       
       if (error) {
         toast({
@@ -101,7 +122,7 @@ export function AuthPage() {
       } else {
         toast({
           title: "Cuenta creada",
-          description: "Tu cuenta ha sido creada exitosamente. Por favor verifica tu email."
+          description: "Por favor verifica tu email antes de iniciar sesión."
         });
         setActiveTab("login");
       }
@@ -129,6 +150,48 @@ export function AuthPage() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    const normalizedEmail = resetEmail.trim().toLowerCase();
+    
+    if (!normalizedEmail) {
+      toast({
+        title: "Error",
+        description: "Por favor ingresa tu email",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: `${window.location.origin}/`
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message || "No se pudo enviar el email de recuperación",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Email enviado",
+          description: "Revisa tu correo para restablecer tu contraseña"
+        });
+        setShowForgotPassword(false);
+        setResetEmail("");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Ha ocurrido un error inesperado",
+        variant: "destructive"
+      });
+    }
+    setIsLoading(false);
+  };
+
   if (showFaceRecognition) {
     return (
       <FaceRecognition 
@@ -139,7 +202,17 @@ export function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+    <>
+      <ForgotPasswordDialog
+        open={showForgotPassword}
+        onOpenChange={setShowForgotPassword}
+        resetEmail={resetEmail}
+        setResetEmail={setResetEmail}
+        isLoading={isLoading}
+        onSubmit={handleForgotPassword}
+      />
+      
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center mb-6">
@@ -222,6 +295,15 @@ export function AuthPage() {
                       "Acceder"
                     )}
                   </Button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-sm text-primary hover:underline text-center w-full"
+                    disabled={isLoading}
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
                 </form>
 
                 <div className="relative my-6">
@@ -246,6 +328,13 @@ export function AuthPage() {
               </TabsContent>
 
               <TabsContent value="register" className="space-y-4">
+                <div className="mb-3 p-3 rounded-lg bg-muted/50 border border-border">
+                  <p className="text-xs text-muted-foreground">
+                    ⚠️ Si te registras aquí, debes verificar tu email antes de iniciar sesión. 
+                    Los empleados registrados desde el dashboard tienen acceso inmediato.
+                  </p>
+                </div>
+                
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="register-name">Nombre completo</Label>
@@ -332,6 +421,68 @@ export function AuthPage() {
           Tu privacidad y seguridad son nuestra prioridad
         </p>
       </div>
-    </div>
+      </div>
+    </>
+  );
+}
+
+function ForgotPasswordDialog({ 
+  open, 
+  onOpenChange, 
+  resetEmail, 
+  setResetEmail, 
+  isLoading, 
+  onSubmit 
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void;
+  resetEmail: string;
+  setResetEmail: (email: string) => void;
+  isLoading: boolean;
+  onSubmit: () => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Restablecer Contraseña</DialogTitle>
+          <DialogDescription>
+            Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <Label htmlFor="reset-email">Email</Label>
+            <Input
+              id="reset-email"
+              type="email"
+              placeholder="tu@email.com"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              disabled={isLoading}
+            />
+          </div>
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={onSubmit} disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                "Enviar enlace"
+              )}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
