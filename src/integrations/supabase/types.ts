@@ -598,6 +598,7 @@ export type Database = {
           is_online: boolean
           last_check_in: string
           mood_level: number
+          phone: string
           therapy_progress: number
           updated_at: string
         }[]

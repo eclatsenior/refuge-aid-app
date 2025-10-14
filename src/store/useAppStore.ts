@@ -528,6 +528,7 @@ export const useAppStore = create<AppState>()(
             employee_id: emp.employee_id,
             employee_name: emp.full_name || 'Usuario desconocido',
             employee_email: emp.email || 'unknown@email.com',
+            employee_phone: emp.phone,
             is_online: emp.is_online || false,
             mood_level: emp.mood_level ?? null,
             therapy_progress: emp.therapy_progress ?? 0,
