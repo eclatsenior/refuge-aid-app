@@ -157,6 +157,10 @@ interface AppState {
     employee_limit: number;
   } | null;
   
+  // Paywall & Access Control
+  accessType: 'managed' | 'individual' | 'refugi_lead' | 'none' | null;
+  showPaywall: boolean;
+  
   // Security
   vaultLocked: boolean;
   decoyScreenActive: boolean;
@@ -191,6 +195,11 @@ interface AppState {
   // Subscription actions
   loadSubscriptionStatus: () => Promise<void>;
   canAddEmployee: () => boolean;
+  
+  // Paywall actions
+  checkUserAccess: () => Promise<void>;
+  shouldShowPaywall: () => boolean;
+  setAccessType: (type: 'managed' | 'individual' | 'refugi_lead' | 'none') => void;
   
   // Messaging actions
   loadMessages: () => Promise<void>;
@@ -235,6 +244,8 @@ export const useAppStore = create<AppState>()(
       messages: [],
       unreadMessageCount: 0,
       subscription: null,
+      accessType: null,
+      showPaywall: false,
       vaultLocked: false,
       decoyScreenActive: false,
       isVaultLocked: true,
@@ -396,6 +407,9 @@ export const useAppStore = create<AppState>()(
               
               // Load messages for all users
               await loadMessages();
+              
+              // Check user access for employees
+              await get().checkUserAccess();
               
               // Load subscription status for Refugi Leads
               if (profile.role === 'refugi_lead') {
@@ -807,6 +821,60 @@ export const useAppStore = create<AppState>()(
         if (!subscription?.subscribed) return false;
         if (subscription.employee_limit === 0) return false;
         return assignedEmployees.length < subscription.employee_limit;
+      },
+
+      // Paywall actions
+      setAccessType: (type) => set({ accessType: type }),
+      
+      checkUserAccess: async () => {
+        const { profile, user } = get();
+        
+        if (!user || !profile) {
+          set({ showPaywall: false, accessType: null });
+          return;
+        }
+        
+        // Refugi Leads siempre tienen acceso
+        if (profile.role === 'refugi_lead') {
+          set({ showPaywall: false, accessType: 'refugi_lead' });
+          return;
+        }
+        
+        // Para empleados, verificar suscripción
+        if (profile.role === 'employee') {
+          try {
+            const { data, error } = await supabase.functions.invoke('check-subscription');
+            
+            if (error) {
+              console.error('Error checking subscription:', error);
+              set({ showPaywall: true, accessType: 'none' });
+              return;
+            }
+            
+            if (data?.subscribed) {
+              const accessType = data.type || 'individual';
+              set({ 
+                showPaywall: false, 
+                accessType: accessType,
+                subscription: data 
+              });
+            } else {
+              set({ 
+                showPaywall: true, 
+                accessType: 'none',
+                subscription: null 
+              });
+            }
+          } catch (error) {
+            console.error('Exception checking subscription:', error);
+            set({ showPaywall: true, accessType: 'none' });
+          }
+        }
+      },
+      
+      shouldShowPaywall: () => {
+        const { profile, showPaywall, accessType } = get();
+        return profile?.role === 'employee' && (showPaywall || accessType === 'none');
       },
 
       // Setup realtime subscriptions

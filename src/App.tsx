@@ -19,6 +19,7 @@ import { PaymentSuccessPage } from "@/pages/PaymentSuccessPage";
 import { PaymentCanceledPage } from "@/pages/PaymentCanceledPage";
 import { SubscriptionSuccessPage } from "@/pages/SubscriptionSuccessPage";
 import { SubscriptionCanceledPage } from "@/pages/SubscriptionCanceledPage";
+import PaywallPage from "@/pages/PaywallPage";
 import SettingsPage from "@/pages/SettingsPage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
@@ -136,6 +137,8 @@ const App = () => {
         return <SubscriptionSuccessPage />;
       case "/subscription-canceled":
         return <SubscriptionCanceledPage />;
+      case "/paywall":
+        return <PaywallPage />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
@@ -206,8 +209,26 @@ const App = () => {
       return <DashboardPage />;
     }
     
-    // If employee, show main app with navigation
+  // If employee, show main app with navigation
     if (userRole === 'employee') {
+      // Check if should show paywall
+      const { shouldShowPaywall } = useAppStore.getState();
+      
+      if (shouldShowPaywall()) {
+        // Allowed routes without subscription
+        const allowedRoutes = [
+          '/paywall',
+          '/subscription-success',
+          '/subscription-canceled',
+          '/auth'
+        ];
+        
+        if (!allowedRoutes.some(route => currentPath.startsWith(route))) {
+          console.log('🚫 Paywall: Redirecting to paywall page');
+          return <PaywallPage />;
+        }
+      }
+      
       return (
         <>
           {renderCurrentPage()}

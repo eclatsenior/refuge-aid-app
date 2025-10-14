@@ -49,6 +49,119 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // Obtener perfil del usuario
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('role, managed_by_lead, user_id, email, full_name')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profileError || !profile) {
+      logStep("Profile not found", { error: profileError?.message });
+      return new Response(JSON.stringify({ 
+        subscribed: false,
+        type: 'none',
+        product_id: null,
+        subscription_end: null,
+        employee_limit: 0
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    logStep("Profile loaded", { role: profile.role, managed: profile.managed_by_lead });
+
+    // Si es empleado y está gestionado por un Lead
+    if (profile.role === 'employee' && profile.managed_by_lead) {
+      logStep("Checking managed employee access");
+      
+      // Buscar su asignación a un Lead
+      const { data: assignment, error: assignmentError } = await supabaseClient
+        .from('employee_assignments')
+        .select('refugi_lead_id')
+        .eq('employee_id', user.id)
+        .single();
+      
+      if (assignment && !assignmentError) {
+        logStep("Assignment found", { leadId: assignment.refugi_lead_id });
+        
+        // Verificar que el Lead tenga suscripción activa
+        const { data: leadSub, error: leadSubError } = await supabaseClient
+          .from('subscriptions')
+          .select('*')
+          .eq('refugi_lead_id', assignment.refugi_lead_id)
+          .eq('status', 'active')
+          .single();
+        
+        if (leadSub && !leadSubError && new Date(leadSub.current_period_end) > new Date()) {
+          logStep("Lead has active subscription", { 
+            productId: leadSub.product_id,
+            employeeLimit: leadSub.employee_limit 
+          });
+          
+          return new Response(JSON.stringify({
+            subscribed: true,
+            type: 'managed',
+            managed_by: assignment.refugi_lead_id,
+            product_id: leadSub.product_id,
+            subscription_end: leadSub.current_period_end,
+            employee_limit: leadSub.employee_limit
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
+      }
+      
+      logStep("No valid Lead subscription found for managed employee");
+    }
+
+    // Si es empleado individual (no gestionado) o si el Lead no tiene sub activa
+    if (profile.role === 'employee') {
+      logStep("Checking individual employee subscription");
+      
+      // Buscar suscripción individual en tabla local
+      const { data: individualSub, error: individualSubError } = await supabaseClient
+        .from('subscriptions')
+        .select('*')
+        .eq('refugi_lead_id', user.id) // Empleado individual usa su propio user_id
+        .eq('product_id', 'prod_TD9UdEM6XDdBZT') // Plan individual
+        .eq('status', 'active')
+        .single();
+      
+      if (individualSub && !individualSubError && new Date(individualSub.current_period_end) > new Date()) {
+        logStep("Individual subscription found", { 
+          productId: individualSub.product_id 
+        });
+        
+        return new Response(JSON.stringify({
+          subscribed: true,
+          type: 'individual',
+          product_id: individualSub.product_id,
+          subscription_end: individualSub.current_period_end,
+          employee_limit: 1
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      
+      // No tiene ninguna suscripción activa
+      logStep("No active subscription found for individual employee");
+      return new Response(JSON.stringify({ 
+        subscribed: false,
+        type: 'none',
+        product_id: null,
+        subscription_end: null,
+        employee_limit: 0
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // Para Refugi Leads, continuar con la lógica existente de Stripe
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     

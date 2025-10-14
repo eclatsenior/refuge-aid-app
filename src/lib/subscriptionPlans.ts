@@ -1,4 +1,21 @@
 export const SUBSCRIPTION_PLANS = {
+  individual: {
+    product_id: 'prod_TD9UdEM6XDdBZT',
+    price_id: 'price_1SGjBeR3C9Xn67YcQrAPwhDO',
+    name: 'Refugi Individual',
+    price: 9.99,
+    employee_limit: 1,
+    popular: false,
+    features: [
+      'Acceso completo a todas las funciones',
+      'Alertas de emergencia 24/7',
+      'Contactos de confianza ilimitados',
+      'Notas cifradas y seguras',
+      'Seguimiento de estado de ánimo',
+      'Recursos terapéuticos',
+      'Soporte prioritario'
+    ]
+  },
   basic: {
     product_id: 'prod_TD9YFQnIPhkgz4',
     price_id: 'price_1SGjFHR3C9Xn67YcDTCa71lq',

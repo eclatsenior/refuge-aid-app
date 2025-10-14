@@ -403,6 +403,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          managed_by_lead: boolean | null
           phone: string | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
@@ -413,6 +414,7 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          managed_by_lead?: boolean | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
@@ -423,6 +425,7 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          managed_by_lead?: boolean | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
@@ -656,6 +659,10 @@ export type Database = {
           therapy_progress: number
           updated_at: string
         }[]
+      }
+      has_active_subscription: {
+        Args: { user_id_param: string }
+        Returns: boolean
       }
     }
     Enums: {
