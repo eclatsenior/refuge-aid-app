@@ -338,15 +338,29 @@ export const useAppStore = create<AppState>()(
           return;
         }
         set({ isAuthInitializing: true });
+
+        // Helper to prevent hanging calls
+        const withTimeout = async <T,>(p: Promise<T>, ms: number, label: string) => {
+          return Promise.race([
+            p,
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error(`${label} timeout (${ms}ms)`)), ms)
+            ),
+          ]) as Promise<T>;
+        };
+
         try {
           console.log('🔐 Initializing authentication...');
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          
-          if (sessionError) {
-            console.error('❌ Session error:', sessionError);
-            return;
-          }
 
+          // Get session with timeout
+          let session: Session | null = null;
+          try {
+            const res: any = await withTimeout(supabase.auth.getSession(), 5000, 'get-session');
+            session = res?.data?.session ?? null;
+          } catch (e) {
+            console.warn('⚠️ get-session failed or timed out:', e);
+          }
+          
           const { setAuth, setProfile, loadSubscriptionStatus, loadMessages } = get();
           
           // Always set auth state first
@@ -354,66 +368,71 @@ export const useAppStore = create<AppState>()(
           console.log('✅ Auth state set:', { hasUser: !!session?.user, hasSession: !!session });
           
           if (session?.user) {
-            // Load user profile with retry logic
-            let profile = null;
-            let attempts = 0;
-            const maxAttempts = 3;
-            
-            while (!profile && attempts < maxAttempts) {
-              attempts++;
-              console.log(`🔄 Loading profile (attempt ${attempts}/${maxAttempts})...`);
-              
-              const { data, error: profileError } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('user_id', session.user.id)
-                .maybeSingle();
-              
-              if (data) {
-                profile = data;
-                console.log('✅ Profile loaded:', { role: profile.role });
-                break;
+            // Load user profile with retry logic (times out fast)
+            let profile: any = null;
+            const maxAttempts = 2;
+            for (let attempt = 1; attempt <= maxAttempts && !profile; attempt++) {
+              try {
+                console.log(`🔄 Loading profile (attempt ${attempt}/${maxAttempts})...`);
+                const { data }: any = await withTimeout(
+                  (async () => {
+                    return await supabase
+                      .from('profiles')
+                      .select('*')
+                      .eq('user_id', session.user.id)
+                      .maybeSingle();
+                  })(),
+                  5000,
+                  'load-profile'
+                );
+                if (data) {
+                  profile = data;
+                  console.log('✅ Profile loaded:', { role: profile.role });
+                  break;
+                }
+              } catch (e) {
+                console.warn('⚠️ load-profile failed or timed out:', e);
               }
-              
-              if (profileError && profileError.code !== 'PGRST116') {
-                // Error other than "not found"
-                console.error('❌ Profile error:', profileError);
-              }
-              
-              // Wait before retry
-              if (attempts < maxAttempts) {
-                await new Promise(resolve => setTimeout(resolve, 500));
+              if (!profile && attempt < maxAttempts) {
+                await new Promise(r => setTimeout(r, 300));
               }
             }
             
-            // If profile still doesn't exist, create it automatically
+            // If profile still doesn't exist, create it automatically (with timeout)
             if (!profile) {
-              console.log('📝 Profile not found, creating automatically...');
-              const roleFromMeta = session.user.user_metadata?.role || 'employee';
-              const fullNameFromMeta = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuario';
-              
-              const { data: newProfile, error: createError } = await supabase
-                .from('profiles')
-                .upsert({
-                  user_id: session.user.id,
-                  email: session.user.email,
-                  full_name: fullNameFromMeta,
-                  role: roleFromMeta
-                }, { onConflict: 'user_id' })
-                .select()
-                .maybeSingle();
-                
-              if (createError) {
-                console.error('❌ Error creating/upserting profile:', createError);
-              } else if (newProfile) {
-                profile = newProfile;
-                console.log('✅ Profile created/upserted:', { role: profile.role });
+              try {
+                console.log('📝 Profile not found, upserting...');
+                const roleFromMeta = session.user.user_metadata?.role || 'employee';
+                const fullNameFromMeta = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuario';
+                const { data: newProfile }: any = await withTimeout(
+                  (async () => {
+                    return await supabase
+                      .from('profiles')
+                      .upsert({
+                        user_id: session.user.id,
+                        email: session.user.email,
+                        full_name: fullNameFromMeta,
+                        role: roleFromMeta
+                      }, { onConflict: 'user_id' })
+                      .select()
+                      .maybeSingle();
+                  })(),
+                  5000,
+                  'upsert-profile'
+                );
+                if (newProfile) {
+                  profile = newProfile;
+                  console.log('✅ Profile created/upserted:', { role: profile.role });
+                }
+              } catch (e) {
+                console.warn('⚠️ upsert-profile failed or timed out:', e);
               }
             }
             
             // Always set profile, even if DB insert failed (fallback in-memory profile)
             if (profile) {
               setProfile(profile);
+              console.log('👤 Profile set', { source: 'db', role: profile.role });
             } else {
               const fallbackProfile = {
                 user_id: session.user.id,
@@ -422,12 +441,12 @@ export const useAppStore = create<AppState>()(
                 role: session.user.user_metadata?.role || 'employee',
                 managed_by_lead: false
               } as any;
-              console.warn('⚠️ Using fallback profile (DB not available). Proceeding with limited mode.');
               setProfile(fallbackProfile);
+              console.warn('👤 Profile set (fallback)', { source: 'fallback', role: fallbackProfile.role });
             }
             
-            // Load messages for all users
-            await loadMessages();
+            // Load messages for all users (non-fatal)
+            loadMessages().catch(e => console.warn('⚠️ Messages load failed:', e));
             
             // Check user access for employees (non-blocking)
             setTimeout(() => {
@@ -436,13 +455,18 @@ export const useAppStore = create<AppState>()(
               console.log('🔐 Access check complete:', { 
                 showPaywall, 
                 accessType,
-                role: (profile as any)?.role || session.user.user_metadata?.role || 'employee'
+                role: (profile as any)?.role || session?.user?.user_metadata?.role || 'employee'
               });
             }, 0);
             
             // Load subscription status for Refugi Leads
-            if ((profile as any)?.role === 'refugi_lead' || session.user.user_metadata?.role === 'refugi_lead') {
-              await loadSubscriptionStatus();
+            const effectiveRole = (profile as any)?.role || session.user.user_metadata?.role;
+            if (effectiveRole === 'refugi_lead') {
+              try {
+                await loadSubscriptionStatus();
+              } catch (e) {
+                console.warn('⚠️ Subscription status load failed:', e);
+              }
             }
           }
           
@@ -1229,21 +1253,27 @@ export const useAppStore = create<AppState>()(
   )
 );
 
-// Auth state listener - enhanced to reload profile on sign in
-supabase.auth.onAuthStateChange((event, session) => {
-  const { setAuth, initializeAuth } = useAppStore.getState();
-  
-  console.log('🔐 Auth state changed:', event);
-  
-  if (event === 'SIGNED_IN') {
-    console.log('🔐 SIGNED_IN event detected, initializing full auth...');
-    setAuth(session?.user ?? null, session);
-    // Defer to avoid deadlocks inside the callback
-    setTimeout(() => initializeAuth(), 0);
-  } else if (event === 'SIGNED_OUT') {
-    console.log('🚪 SIGNED_OUT event detected');
-    setAuth(null, null);
-  } else if (event === 'TOKEN_REFRESHED') {
-    setAuth(session?.user ?? null, session);
-  }
-});
+// Auth state listener - single registration with guard to avoid duplicates during HMR
+if (!(globalThis as any).__refugiAuthListener__) {
+  (globalThis as any).__refugiAuthListener__ = true;
+  supabase.auth.onAuthStateChange((event, session) => {
+    const { setAuth, initializeAuth } = useAppStore.getState();
+    
+    console.log('🔐 Auth state changed:', event);
+    
+    if (event === 'INITIAL_SESSION') {
+      // Only sync auth state. App will handle initial initializeAuth.
+      setAuth(session?.user ?? null, session);
+    } else if (event === 'SIGNED_IN') {
+      console.log('🔐 SIGNED_IN event detected, initializing full auth...');
+      setAuth(session?.user ?? null, session);
+      // Defer to avoid deadlocks inside the callback
+      setTimeout(() => initializeAuth(), 0);
+    } else if (event === 'SIGNED_OUT') {
+      console.log('🚪 SIGNED_OUT event detected');
+      setAuth(null, null);
+    } else if (event === 'TOKEN_REFRESHED') {
+      setAuth(session?.user ?? null, session);
+    }
+  });
+}
