@@ -77,9 +77,19 @@ export function DashboardPage() {
 
     // Setup realtime subscriptions
     const unsubscribe = setupRealtimeSubscriptions();
+    
+    // CRITICAL: Listen for forced dashboard refresh events
+    const handleForceRefresh = () => {
+      console.log('🔄 Force refresh triggered - loading emergency alerts immediately');
+      loadEmergencyAlerts();
+      loadEmployeeData();
+    };
+    
+    window.addEventListener('force-dashboard-refresh', handleForceRefresh);
 
     return () => {
       if (unsubscribe) unsubscribe();
+      window.removeEventListener('force-dashboard-refresh', handleForceRefresh);
     };
   }, [loadEmployeeData, loadEmergencyAlerts, setupRealtimeSubscriptions]);
 

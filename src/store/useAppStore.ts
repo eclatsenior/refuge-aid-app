@@ -465,6 +465,13 @@ export const useAppStore = create<AppState>()(
 
           console.log('✅ Emergency alert created:', alert);
 
+          // CRITICAL: Force immediate dashboard refresh for all Refugi Leads
+          // Small delay to ensure database synchronization
+          setTimeout(() => {
+            console.log('📢 Dispatching force-dashboard-refresh event');
+            window.dispatchEvent(new CustomEvent('force-dashboard-refresh'));
+          }, 100);
+
           // Show success toast
           toast({
             title: "Emergencia Activada",
