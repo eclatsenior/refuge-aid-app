@@ -93,11 +93,20 @@ const App = () => {
     if (user && !profile && !loadingTimeout) {
       console.log('⏱️ Starting profile loading timeout...');
       const timer = setTimeout(() => {
-        console.warn('⚠️ Profile loading timeout - proceeding anyway');
-        setLoadingTimeout(true);
+        // Only show error if profile truly didn't load
+        const currentProfile = useAppStore.getState().profile;
+        if (!currentProfile) {
+          console.warn('⚠️ Profile loading timeout - showing error');
+          setLoadingTimeout(true);
+        }
       }, 5000);
       
       return () => clearTimeout(timer);
+    }
+    
+    // Clear timeout if profile loaded successfully
+    if (profile && loadingTimeout) {
+      setLoadingTimeout(false);
     }
   }, [user, profile, loadingTimeout]);
   
@@ -154,6 +163,19 @@ const App = () => {
       );
     }
     
+    // Check if employee should see paywall (priority check)
+    if (profile?.role === 'employee') {
+      const { shouldShowPaywall } = useAppStore.getState();
+      
+      if (shouldShowPaywall()) {
+        const allowedRoutes = ['/paywall', '/subscription-success', '/subscription-canceled', '/auth'];
+        if (!allowedRoutes.some(route => currentPath.startsWith(route))) {
+          console.log('🚫 Paywall: Employee without subscription');
+          return <PaywallPage />;
+        }
+      }
+    }
+    
     // If user exists but profile is still loading and hasn't timed out
     if (user && !profile && !loadingTimeout) {
       return (
@@ -166,7 +188,7 @@ const App = () => {
       );
     }
     
-    // If profile loading timed out, show error with retry
+    // If profile loading timed out AND no profile, show error with retry
     if (user && !profile && loadingTimeout) {
       return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -211,24 +233,6 @@ const App = () => {
     
   // If employee, show main app with navigation
     if (userRole === 'employee') {
-      // Check if should show paywall
-      const { shouldShowPaywall } = useAppStore.getState();
-      
-      if (shouldShowPaywall()) {
-        // Allowed routes without subscription
-        const allowedRoutes = [
-          '/paywall',
-          '/subscription-success',
-          '/subscription-canceled',
-          '/auth'
-        ];
-        
-        if (!allowedRoutes.some(route => currentPath.startsWith(route))) {
-          console.log('🚫 Paywall: Redirecting to paywall page');
-          return <PaywallPage />;
-        }
-      }
-      
       return (
         <>
           {renderCurrentPage()}

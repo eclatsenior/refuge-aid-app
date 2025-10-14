@@ -410,6 +410,12 @@ export const useAppStore = create<AppState>()(
               
               // Check user access for employees
               await get().checkUserAccess();
+              const { showPaywall, accessType } = get();
+              console.log('🔐 Access check complete:', { 
+                showPaywall, 
+                accessType,
+                role: profile.role 
+              });
               
               // Load subscription status for Refugi Leads
               if (profile.role === 'refugi_lead') {
