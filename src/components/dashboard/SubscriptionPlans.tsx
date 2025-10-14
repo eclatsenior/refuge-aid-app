@@ -42,7 +42,7 @@ export function SubscriptionPlans({ currentProductId, onCheckoutStart }: Subscri
     }
   };
 
-  const plans = Object.values(SUBSCRIPTION_PLANS);
+  const plans = Object.values(SUBSCRIPTION_PLANS).filter(plan => plan.product_id !== SUBSCRIPTION_PLANS.individual.product_id);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
