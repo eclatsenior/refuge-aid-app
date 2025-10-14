@@ -47,7 +47,7 @@ interface RegisterEmployeeDialogProps {
 export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmployeeDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { registerEmployee } = useAppStore();
+  const { registerEmployee, canAddEmployee, subscription } = useAppStore();
   const { toast } = useToast();
 
   const form = useForm<RegisterEmployeeFormData>({
@@ -70,6 +70,15 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
   };
 
   const onSubmit = async (data: RegisterEmployeeFormData) => {
+    if (!canAddEmployee()) {
+      toast({
+        title: "Límite alcanzado",
+        description: `Has alcanzado el límite de ${subscription?.employee_limit} empleadas de tu plan.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await registerEmployee({
@@ -100,10 +109,16 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
     }
   };
 
+  const isAtLimit = !canAddEmployee();
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button 
+          className="gap-2"
+          disabled={isAtLimit}
+          title={isAtLimit ? `Límite de ${subscription?.employee_limit} empleadas alcanzado` : ''}
+        >
           <UserPlus className="h-4 w-4" />
           Registrar Nueva Empleada
         </Button>

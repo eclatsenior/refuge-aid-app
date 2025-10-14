@@ -130,6 +130,14 @@ interface AppState {
   assignedEmployees: EmployeeStatus[];
   emergencyAlerts: EmergencyAlert[];
   
+  // Subscription data
+  subscription: {
+    subscribed: boolean;
+    product_id: string | null;
+    subscription_end: string | null;
+    employee_limit: number;
+  } | null;
+  
   // Security
   vaultLocked: boolean;
   decoyScreenActive: boolean;
@@ -160,6 +168,10 @@ interface AppState {
   setupRealtimeSubscriptions: () => (() => void) | undefined;
   updateEmployeePresence: (isOnline?: boolean) => Promise<void>;
   registerEmployee: (data: { email: string; fullName: string; password: string }) => Promise<void>;
+  
+  // Subscription actions
+  loadSubscriptionStatus: () => Promise<void>;
+  canAddEmployee: () => boolean;
   
   // Trusted Contacts actions
   addTrustedContact: (contact: Omit<TrustedContact, 'id'>) => void;
@@ -196,6 +208,7 @@ export const useAppStore = create<AppState>()(
       trustedContacts: [],
       assignedEmployees: [],
       emergencyAlerts: [],
+      subscription: null,
       vaultLocked: false,
       decoyScreenActive: false,
       isVaultLocked: true,
@@ -274,7 +287,7 @@ export const useAppStore = create<AppState>()(
             return;
           }
 
-          const { setAuth, setProfile } = get();
+          const { setAuth, setProfile, loadSubscriptionStatus } = get();
           
           // Always set auth state first
           setAuth(session?.user ?? null, session);
@@ -294,6 +307,11 @@ export const useAppStore = create<AppState>()(
               } else if (profile) {
                 setProfile(profile);
                 console.log('✅ Profile loaded:', { role: profile.role });
+                
+                // Load subscription status for Refugi Leads
+                if (profile.role === 'refugi_lead') {
+                  await loadSubscriptionStatus();
+                }
               }
             } catch (error) {
               console.error('❌ Profile loading failed:', error);
@@ -663,6 +681,37 @@ export const useAppStore = create<AppState>()(
           console.error('❌ Error registering employee:', error);
           throw error;
         }
+      },
+
+      // Load subscription status
+      loadSubscriptionStatus: async () => {
+        try {
+          const { user } = get();
+          if (!user) {
+            set({ subscription: null });
+            return;
+          }
+
+          console.log('💳 Loading subscription status...');
+
+          const { data, error } = await supabase.functions.invoke('check-subscription');
+
+          if (error) throw error;
+
+          console.log('✅ Subscription status loaded:', data);
+          set({ subscription: data });
+        } catch (error: any) {
+          console.error('❌ Error loading subscription status:', error);
+          set({ subscription: null });
+        }
+      },
+
+      // Check if can add more employees
+      canAddEmployee: () => {
+        const { subscription, assignedEmployees } = get();
+        if (!subscription?.subscribed) return false;
+        if (subscription.employee_limit === 0) return false;
+        return assignedEmployees.length < subscription.employee_limit;
       },
 
       // Setup realtime subscriptions

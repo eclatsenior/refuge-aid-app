@@ -17,6 +17,8 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { StripeTestPage } from "@/pages/StripeTestPage";
 import { PaymentSuccessPage } from "@/pages/PaymentSuccessPage";
 import { PaymentCanceledPage } from "@/pages/PaymentCanceledPage";
+import { SubscriptionSuccessPage } from "@/pages/SubscriptionSuccessPage";
+import { SubscriptionCanceledPage } from "@/pages/SubscriptionCanceledPage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -113,6 +115,10 @@ const App = () => {
         return <PaymentSuccessPage />;
       case "/payment-canceled":
         return <PaymentCanceledPage />;
+      case "/subscription-success":
+        return <SubscriptionSuccessPage />;
+      case "/subscription-canceled":
+        return <SubscriptionCanceledPage />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
@@ -129,7 +135,7 @@ const App = () => {
     }
     
     // Special routes that don't require authentication
-    const publicRoutes = ["/stripe-test-secret", "/payment-success", "/payment-canceled"];
+    const publicRoutes = ["/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled"];
     if (publicRoutes.includes(currentPath)) {
       return renderCurrentPage();
     }

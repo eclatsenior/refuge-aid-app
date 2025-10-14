@@ -23,18 +23,24 @@ import { useToast } from "@/hooks/use-toast";
 import { KPIsSection } from "@/components/dashboard/KPIsSection";
 import { AttentionQueue } from "@/components/dashboard/AttentionQueue";
 import { useFeatureFlags } from "@/hooks/useFeatureFlags";
+import { SubscriptionPlans } from "@/components/dashboard/SubscriptionPlans";
+import { SubscriptionStatus } from "@/components/dashboard/SubscriptionStatus";
 
 export function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<'all' | 'online' | 'alert' | 'offline'>('all');
   const [isLoading, setIsLoading] = useState(true);
+  const [showPlans, setShowPlans] = useState(false);
   
   const { 
     profile, 
     assignedEmployees, 
     emergencyAlerts, 
+    subscription,
     loadEmployeeData, 
     loadEmergencyAlerts,
+    loadSubscriptionStatus,
+    canAddEmployee,
     setupRealtimeSubscriptions,
     logout 
   } = useAppStore();
@@ -177,6 +183,26 @@ export function DashboardPage() {
       </header>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
+        {/* Subscription Section */}
+        <div className="space-y-4">
+          <SubscriptionStatus
+            subscription={subscription || { subscribed: false, product_id: null, subscription_end: null, employee_limit: 0 }}
+            currentEmployeeCount={assignedEmployees.length}
+            onRefresh={loadSubscriptionStatus}
+            onViewPlans={() => setShowPlans(!showPlans)}
+          />
+          
+          {showPlans && (
+            <div className="animate-fade-in">
+              <h2 className="text-2xl font-bold text-center mb-6">Planes Disponibles</h2>
+              <SubscriptionPlans 
+                currentProductId={subscription?.product_id}
+                onCheckoutStart={() => setShowPlans(false)}
+              />
+            </div>
+          )}
+        </div>
+
         {/* Stats Overview */}
         <StatsOverview 
           employees={assignedEmployees}

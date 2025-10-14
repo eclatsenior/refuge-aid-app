@@ -480,6 +480,56 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string | null
+          current_period_end: string | null
+          employee_limit: number
+          id: string
+          price_id: string
+          product_id: string
+          refugi_lead_id: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_period_end?: string | null
+          employee_limit: number
+          id?: string
+          price_id: string
+          product_id: string
+          refugi_lead_id: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_period_end?: string | null
+          employee_limit?: number
+          id?: string
+          price_id?: string
+          product_id?: string
+          refugi_lead_id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_refugi_lead_id_fkey"
+            columns: ["refugi_lead_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       training_completions: {
         Row: {
           completed_at: string | null
