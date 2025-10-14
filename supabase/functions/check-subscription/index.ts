@@ -52,13 +52,40 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
+    // If no Stripe customer found, check local subscriptions table
     if (customers.data.length === 0) {
-      logStep("No customer found, returning unsubscribed state");
-      return new Response(JSON.stringify({ 
-        subscribed: false,
-        product_id: null,
-        subscription_end: null,
-        employee_limit: 0
+      logStep("No Stripe customer found, checking local subscriptions table");
+      
+      const { data: localSub, error: subError } = await supabaseClient
+        .from('subscriptions')
+        .select('*')
+        .eq('refugi_lead_id', user.id)
+        .eq('status', 'active')
+        .single();
+      
+      if (subError || !localSub) {
+        logStep("No local subscription found either", { error: subError?.message });
+        return new Response(JSON.stringify({ 
+          subscribed: false,
+          product_id: null,
+          subscription_end: null,
+          employee_limit: 0
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      
+      logStep("Found local subscription", { 
+        productId: localSub.product_id,
+        employeeLimit: localSub.employee_limit 
+      });
+      
+      return new Response(JSON.stringify({
+        subscribed: true,
+        product_id: localSub.product_id,
+        subscription_end: localSub.current_period_end,
+        employee_limit: localSub.employee_limit
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
