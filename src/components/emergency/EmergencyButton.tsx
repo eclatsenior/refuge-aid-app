@@ -22,10 +22,12 @@ interface EmergencyButtonProps {
 
 export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: EmergencyButtonProps) {
   const [isPressed, setIsPressed] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const { isNative, openExternalApp } = useNativeFeatures();
   const { triggerEmergency } = useAppStore();
   
   const handleEmergencyPress = async () => {
+    console.log('🚨 Emergency button pressed - creating alert immediately');
     setIsPressed(true);
     
     // Native haptic feedback
@@ -42,12 +44,18 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
       console.error('Haptic feedback error:', error);
     }
     
-    // Create emergency alert in database
+    // CRITICAL: Create emergency alert in database FIRST
+    console.log('🚨 Creating emergency alert in database...');
     await triggerEmergency('Emergencia activada desde el botón de ayuda', null);
+    console.log('✅ Emergency alert created successfully');
     
     // Llamada automática al 112
     onEmergencyAction('call');
     await openExternalApp('tel:112');
+    
+    // THEN open the sheet with additional options
+    console.log('📱 Opening sheet with additional options');
+    setSheetOpen(true);
     
     setTimeout(() => setIsPressed(false), 200);
   };
@@ -91,29 +99,28 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button
-            size="lg"
-            className={cn(
-              "h-40 w-40 rounded-full text-xl font-bold shadow-glow relative overflow-hidden",
-              "bg-gradient-to-br from-coral via-emergency to-coral/80",
-              "hover:from-coral/90 hover:via-emergency/90 hover:to-coral/70",
-              "text-white border-4 border-white/20",
-              "transform transition-all duration-300 active:scale-95",
-              "focus:outline-none focus:ring-4 focus:ring-coral/30 focus:ring-offset-4",
-              "before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity",
-              isPressed && "scale-95"
-            )}
-            onClick={handleEmergencyPress}
-            aria-label="Botón de emergencia - pulsa para obtener ayuda inmediata"
-          >
-            <div className="flex flex-col items-center gap-3 relative z-10">
-              <AlertTriangle size={36} className="drop-shadow-sm" />
-              <span className="text-lg font-bold tracking-wide drop-shadow-sm">AYUDA</span>
-            </div>
-          </Button>
-        </SheetTrigger>
+      <Button
+        size="lg"
+        className={cn(
+          "h-40 w-40 rounded-full text-xl font-bold shadow-glow relative overflow-hidden",
+          "bg-gradient-to-br from-coral via-emergency to-coral/80",
+          "hover:from-coral/90 hover:via-emergency/90 hover:to-coral/70",
+          "text-white border-4 border-white/20",
+          "transform transition-all duration-300 active:scale-95",
+          "focus:outline-none focus:ring-4 focus:ring-coral/30 focus:ring-offset-4",
+          "before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity",
+          isPressed && "scale-95"
+        )}
+        onClick={handleEmergencyPress}
+        aria-label="Botón de emergencia - pulsa para obtener ayuda inmediata"
+      >
+        <div className="flex flex-col items-center gap-3 relative z-10">
+          <AlertTriangle size={36} className="drop-shadow-sm" />
+          <span className="text-lg font-bold tracking-wide drop-shadow-sm">AYUDA</span>
+        </div>
+      </Button>
+      
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         
         <SheetContent side="bottom" className="h-auto bg-gradient-card backdrop-blur-sm border-t border-white/20">
           <SheetHeader>
