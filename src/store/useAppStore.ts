@@ -86,6 +86,19 @@ export interface EmergencyAlert {
   created_at: string;
 }
 
+export interface InternalMessage {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  message: string;
+  related_alert_id?: string;
+  related_case_id?: string;
+  is_read: boolean;
+  read_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export type UserRole = 'employee' | 'refugi_lead';
 
 // Prevent duplicate alert notifications
@@ -93,6 +106,7 @@ const shownAlertToasts = new Set<string>();
 let realtimeInitialized = false;
 let employeeChannel: any = null;
 let alertsChannel: any = null;
+let messagesChannel: any = null;
 
 const defaultSettings: Settings = {
   emergencyContacts: [],
@@ -130,6 +144,10 @@ interface AppState {
   // Refugi Lead data
   assignedEmployees: EmployeeStatus[];
   emergencyAlerts: EmergencyAlert[];
+  
+  // Messaging
+  messages: InternalMessage[];
+  unreadMessageCount: number;
   
   // Subscription data
   subscription: {
@@ -174,6 +192,11 @@ interface AppState {
   loadSubscriptionStatus: () => Promise<void>;
   canAddEmployee: () => boolean;
   
+  // Messaging actions
+  loadMessages: () => Promise<void>;
+  sendMessage: (recipientId: string, message: string, relatedAlertId?: string) => Promise<void>;
+  markMessageAsRead: (messageId: string) => Promise<void>;
+  
   // Trusted Contacts actions
   addTrustedContact: (contact: Omit<TrustedContact, 'id'>) => void;
   updateTrustedContact: (id: string, contact: Partial<TrustedContact>) => void;
@@ -209,6 +232,8 @@ export const useAppStore = create<AppState>()(
       trustedContacts: [],
       assignedEmployees: [],
       emergencyAlerts: [],
+      messages: [],
+      unreadMessageCount: 0,
       subscription: null,
       vaultLocked: false,
       decoyScreenActive: false,
@@ -301,7 +326,7 @@ export const useAppStore = create<AppState>()(
             return;
           }
 
-          const { setAuth, setProfile, loadSubscriptionStatus } = get();
+          const { setAuth, setProfile, loadSubscriptionStatus, loadMessages } = get();
           
           // Always set auth state first
           setAuth(session?.user ?? null, session);
@@ -321,6 +346,9 @@ export const useAppStore = create<AppState>()(
               } else if (profile) {
                 setProfile(profile);
                 console.log('✅ Profile loaded:', { role: profile.role });
+                
+                // Load messages for all users
+                await loadMessages();
                 
                 // Load subscription status for Refugi Leads
                 if (profile.role === 'refugi_lead') {
@@ -865,6 +893,63 @@ export const useAppStore = create<AppState>()(
             loadEmergencyAlerts();
           })
           .subscribe();
+        
+        // Subscribe to internal messages
+        messagesChannel = supabase
+          .channel('internal-messages-changes')
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'internal_messages',
+            filter: `recipient_id=eq.${get().user?.id}`
+          }, async (payload) => {
+            console.log('💬 New message received:', payload);
+            const newMessage = payload.new as any;
+            
+            // Get sender name
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('user_id', newMessage.sender_id)
+              .maybeSingle();
+            
+            set(state => ({
+              messages: [...state.messages, newMessage],
+              unreadMessageCount: state.unreadMessageCount + 1
+            }));
+            
+            // Show toast notification
+            toast({
+              title: "💬 Nuevo mensaje",
+              description: `De ${profile?.full_name || 'Usuario'}`,
+              duration: 5000,
+            });
+            
+            // Play notification sound
+            const audioEnabled = localStorage.getItem('audio-alerts-enabled') === 'true';
+            if (audioEnabled) {
+              try {
+                const audio = new Audio('/message-notification.mp3');
+                audio.volume = 0.5;
+                await audio.play();
+              } catch (error) {
+                console.log('Audio notification not available');
+              }
+            }
+          })
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'internal_messages'
+          }, (payload) => {
+            const updatedMessage = payload.new as any;
+            set(state => ({
+              messages: state.messages.map(msg =>
+                msg.id === updatedMessage.id ? updatedMessage : msg
+              )
+            }));
+          })
+          .subscribe();
 
         // Polling fallback for first 60 seconds (every 5 seconds)
         let pollCount = 0;
@@ -886,8 +971,76 @@ export const useAppStore = create<AppState>()(
           clearInterval(pollingInterval);
           if (employeeChannel) employeeChannel.unsubscribe();
           if (alertsChannel) alertsChannel.unsubscribe();
+          if (messagesChannel) messagesChannel.unsubscribe();
           realtimeInitialized = false;
         };
+      },
+      
+      // Messaging actions
+      loadMessages: async () => {
+        const state = get();
+        if (!state.user) return;
+
+        const { data, error } = await supabase
+          .from('internal_messages')
+          .select('*')
+          .or(`sender_id.eq.${state.user.id},recipient_id.eq.${state.user.id}`)
+          .order('created_at', { ascending: true });
+
+        if (error) {
+          console.error('Error loading messages:', error);
+          return;
+        }
+
+        const unreadCount = data?.filter(
+          (msg) => msg.recipient_id === state.user?.id && !msg.is_read
+        ).length || 0;
+
+        set({ messages: data || [], unreadMessageCount: unreadCount });
+      },
+
+      sendMessage: async (recipientId: string, message: string, relatedAlertId?: string) => {
+        const state = get();
+        if (!state.user) return;
+
+        const { data, error } = await supabase
+          .from('internal_messages')
+          .insert({
+            sender_id: state.user.id,
+            recipient_id: recipientId,
+            message,
+            related_alert_id: relatedAlertId,
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error sending message:', error);
+          throw error;
+        }
+
+        set((state) => ({
+          messages: [...state.messages, data],
+        }));
+      },
+
+      markMessageAsRead: async (messageId: string) => {
+        const { error } = await supabase
+          .from('internal_messages')
+          .update({ is_read: true, read_at: new Date().toISOString() })
+          .eq('id', messageId);
+
+        if (error) {
+          console.error('Error marking message as read:', error);
+          return;
+        }
+
+        set((state) => ({
+          messages: state.messages.map((msg) =>
+            msg.id === messageId ? { ...msg, is_read: true, read_at: new Date().toISOString() } : msg
+          ),
+          unreadMessageCount: Math.max(0, state.unreadMessageCount - 1),
+        }));
       },
       
       // Security actions

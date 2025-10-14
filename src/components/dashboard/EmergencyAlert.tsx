@@ -9,7 +9,8 @@ import {
   User,
   Calendar,
   MoreVertical,
-  PhoneCall
+  PhoneCall,
+  MessageCircle
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ import { es } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { useAppStore } from "@/store/useAppStore";
 import { useNativeFeatures } from "@/hooks/useNativeFeatures";
+import { MessageDialog } from "@/components/messaging/MessageDialog";
 
 interface EmergencyAlertProps {
   alert: EmergencyAlertType;
@@ -39,6 +41,7 @@ export function EmergencyAlert({ alert }: EmergencyAlertProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [resolutionNotes, setResolutionNotes] = useState("");
   const [isResolving, setIsResolving] = useState(false);
+  const [showMessageDialog, setShowMessageDialog] = useState(false);
   
   const { resolveAlert, assignedEmployees } = useAppStore();
   const { toast } = useToast();
@@ -287,6 +290,15 @@ export function EmergencyAlert({ alert }: EmergencyAlertProps) {
                   {!employeePhone && <span className="ml-auto text-xs text-muted-foreground">No disponible</span>}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMessageDialog(true);
+                }}>
+                  <MessageCircle className="h-4 w-4 mr-2 text-primary" />
+                  Mensaje interno
+                  <Badge variant="secondary" className="ml-auto text-xs">Nuevo</Badge>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleCall112}>
                   <PhoneCall className="h-4 w-4 mr-2 text-destructive" />
                   Llamar al 112
@@ -350,6 +362,14 @@ export function EmergencyAlert({ alert }: EmergencyAlertProps) {
           )}
         </div>
       </CardContent>
+      
+      <MessageDialog
+        isOpen={showMessageDialog}
+        onClose={() => setShowMessageDialog(false)}
+        recipientId={alert.employee_id}
+        recipientName={alert.employee_name}
+        relatedAlertId={alert.id}
+      />
     </Card>
   );
 }

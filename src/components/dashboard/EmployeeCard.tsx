@@ -9,7 +9,8 @@ import {
   WifiOff,
   Phone,
   MessageSquare,
-  MoreVertical
+  MoreVertical,
+  MessageCircle
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,12 +21,15 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { EmployeeStatus } from "@/store/useAppStore";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
+import { useAppStore } from "@/store/useAppStore";
+import { MessageDialog } from "@/components/messaging/MessageDialog";
 
 interface EmployeeCardProps {
   employee: EmployeeStatus;
@@ -33,7 +37,9 @@ interface EmployeeCardProps {
 
 export function EmployeeCard({ employee }: EmployeeCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showMessageDialog, setShowMessageDialog] = useState(false);
   const { toast } = useToast();
+  const { messages } = useAppStore();
 
   const getStatusColor = () => {
     if (employee.emergency_alert) return "destructive";
@@ -101,6 +107,14 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
   const timeSinceLastCheckIn = lastCheckInDate 
     ? formatDistanceToNow(lastCheckInDate, { addSuffix: true, locale: es })
     : 'Sin registro';
+  
+  // Count unread messages from this employee
+  const { user } = useAppStore();
+  const unreadCount = messages.filter(
+    msg => msg.sender_id === employee.employee_id && 
+           msg.recipient_id === user?.id && 
+           !msg.is_read
+  ).length;
 
   return (
     <Card 
@@ -167,6 +181,18 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
                   Mensaje
                   {!employee.employee_phone && <span className="ml-auto text-xs text-muted-foreground">No disponible</span>}
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMessageDialog(true);
+                }}>
+                  <MessageCircle className="mr-2 h-4 w-4 text-primary" />
+                  Mensaje interno
+                  {unreadCount > 0 && (
+                    <Badge variant="destructive" className="ml-auto text-xs">{unreadCount}</Badge>
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleMarkFollowUp}>
                   <Clock className="mr-2 h-4 w-4" />
                   Marcar seguimiento
@@ -271,6 +297,13 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
           )}
         </div>
       </CardContent>
+      
+      <MessageDialog
+        isOpen={showMessageDialog}
+        onClose={() => setShowMessageDialog(false)}
+        recipientId={employee.employee_id}
+        recipientName={employee.employee_name}
+      />
     </Card>
   );
 }
