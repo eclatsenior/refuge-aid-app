@@ -167,6 +167,9 @@ interface AppState {
   isVaultLocked: boolean;
   showDecoyScreen: boolean;
   
+  // Internal flags
+  isAuthInitializing: boolean;
+  
   // Authentication actions
   setAuth: (user: User | null, session: Session | null) => void;
   setProfile: (profile: any) => void;
@@ -250,6 +253,7 @@ export const useAppStore = create<AppState>()(
       decoyScreenActive: false,
       isVaultLocked: true,
       showDecoyScreen: false,
+      isAuthInitializing: false,
       
       // Authentication actions
       setAuth: (user, session) => {
@@ -328,6 +332,12 @@ export const useAppStore = create<AppState>()(
       },
       
       initializeAuth: async () => {
+        const { isAuthInitializing } = get();
+        if (isAuthInitializing) {
+          console.log('⏳ initializeAuth already running, skipping');
+          return;
+        }
+        set({ isAuthInitializing: true });
         try {
           console.log('🔐 Initializing authentication...');
           const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -439,6 +449,8 @@ export const useAppStore = create<AppState>()(
           console.log('🚀 Authentication initialization complete');
         } catch (error) {
           console.error('❌ Critical auth initialization error:', error);
+        } finally {
+          set({ isAuthInitializing: false });
         }
       },
       
@@ -1218,7 +1230,7 @@ export const useAppStore = create<AppState>()(
 );
 
 // Auth state listener - enhanced to reload profile on sign in
-supabase.auth.onAuthStateChange(async (event, session) => {
+supabase.auth.onAuthStateChange((event, session) => {
   const { setAuth, initializeAuth } = useAppStore.getState();
   
   console.log('🔐 Auth state changed:', event);
@@ -1226,8 +1238,8 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   if (event === 'SIGNED_IN') {
     console.log('🔐 SIGNED_IN event detected, initializing full auth...');
     setAuth(session?.user ?? null, session);
-    // Reload profile and related data
-    await initializeAuth();
+    // Defer to avoid deadlocks inside the callback
+    setTimeout(() => initializeAuth(), 0);
   } else if (event === 'SIGNED_OUT') {
     console.log('🚪 SIGNED_OUT event detected');
     setAuth(null, null);
