@@ -7,7 +7,9 @@ import {
   LogOut,
   Search,
   Filter,
-  RefreshCw
+  RefreshCw,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,12 +28,16 @@ import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import { SubscriptionPlans } from "@/components/dashboard/SubscriptionPlans";
 import { SubscriptionStatus } from "@/components/dashboard/SubscriptionStatus";
 import { ReportingSection } from "@/components/dashboard/ReportingSection";
+import { AlertPermissionDialog } from "@/components/dashboard/AlertPermissionDialog";
+import { audioManager, requestNotificationPermission } from "@/lib/audioManager";
 
 export function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<'all' | 'online' | 'alert' | 'offline'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [showPlans, setShowPlans] = useState(false);
+  const [showPermissionDialog, setShowPermissionDialog] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(audioManager.isAudioEnabled());
   
   const { 
     profile, 
@@ -92,6 +98,81 @@ export function DashboardPage() {
       window.removeEventListener('force-dashboard-refresh', handleForceRefresh);
     };
   }, [loadEmployeeData, loadEmergencyAlerts, setupRealtimeSubscriptions]);
+
+  // Request audio and notification permissions on first load
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const audioEnabled = localStorage.getItem('audio-alerts-enabled');
+      const permissionAsked = localStorage.getItem('alert-permission-asked');
+      
+      if (!audioEnabled && !permissionAsked) {
+        // Wait 1 second before showing dialog to avoid overwhelming user
+        setTimeout(() => {
+          setShowPermissionDialog(true);
+        }, 1000);
+      }
+    };
+
+    checkPermissions();
+  }, []);
+
+  const handleAcceptPermissions = async () => {
+    try {
+      // Initialize audio
+      const audioSuccess = await audioManager.initialize();
+      
+      // Request notification permission
+      const notificationSuccess = await requestNotificationPermission();
+      
+      localStorage.setItem('alert-permission-asked', 'true');
+      setAudioEnabled(audioSuccess);
+      setShowPermissionDialog(false);
+      
+      toast({
+        title: "✅ Alertas habilitadas",
+        description: audioSuccess 
+          ? "Recibirás alertas sonoras y notificaciones" 
+          : "Recibirás notificaciones (audio no disponible)",
+      });
+    } catch (error) {
+      console.error('Error enabling permissions:', error);
+      toast({
+        title: "Error",
+        description: "No se pudieron habilitar las alertas",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeclinePermissions = () => {
+    localStorage.setItem('alert-permission-asked', 'true');
+    setShowPermissionDialog(false);
+    
+    toast({
+      title: "Alertas deshabilitadas",
+      description: "Puedes habilitarlas más tarde desde la configuración",
+    });
+  };
+
+  const toggleAudio = async () => {
+    if (audioEnabled) {
+      audioManager.disable();
+      setAudioEnabled(false);
+      toast({
+        title: "Audio deshabilitado",
+        description: "Las alertas sonoras están desactivadas"
+      });
+    } else {
+      const success = await audioManager.initialize();
+      setAudioEnabled(success);
+      if (success) {
+        toast({
+          title: "Audio habilitado",
+          description: "Las alertas sonoras están activadas"
+        });
+      }
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -172,6 +253,18 @@ export function DashboardPage() {
             </div>
             
             <div className="flex items-center space-x-2">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={toggleAudio}
+                title={audioEnabled ? "Deshabilitar alertas sonoras" : "Habilitar alertas sonoras"}
+              >
+                {audioEnabled ? (
+                  <Volume2 className="h-4 w-4 text-primary" />
+                ) : (
+                  <VolumeX className="h-4 w-4 text-muted-foreground" />
+                )}
+              </Button>
               <Button 
                 variant="ghost" 
                 size="sm"
@@ -337,6 +430,14 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Permission Dialog */}
+      <AlertPermissionDialog
+        open={showPermissionDialog}
+        onOpenChange={setShowPermissionDialog}
+        onAccept={handleAcceptPermissions}
+        onDecline={handleDeclinePermissions}
+      />
     </div>
   );
 }

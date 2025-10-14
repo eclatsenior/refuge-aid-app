@@ -800,13 +800,41 @@ export const useAppStore = create<AppState>()(
               e => e.employee_id === employeeId
             )?.employee_name;
             
-            // Play emergency sound
-            try {
-              const audio = new Audio('/emergency-alert.mp3');
-              audio.volume = 0.7;
-              audio.play().catch(err => console.warn('Could not play alert sound:', err));
-            } catch (error) {
-              console.warn('Audio not available:', error);
+            // Play emergency sound with fallback to notification
+            const audioEnabled = localStorage.getItem('audio-alerts-enabled') === 'true';
+            
+            if (audioEnabled) {
+              try {
+                const audio = new Audio('/emergency-alert.mp3');
+                audio.volume = 0.7;
+                
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                  playPromise
+                    .then(() => {
+                      console.log('✅ Alert sound played successfully');
+                    })
+                    .catch(err => {
+                      console.warn('⚠️ Audio autoplay blocked, trying notification fallback');
+                      
+                      // Fallback: Try browser notification
+                      if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('🚨 Alerta de Emergencia', {
+                          body: employeeName ? `Alerta de ${employeeName}` : 'Alerta entrante',
+                          icon: '/icon-192.png',
+                          badge: '/icon-192.png',
+                          tag: 'emergency-alert',
+                          requireInteraction: true
+                        });
+                      }
+                    });
+                }
+              } catch (error) {
+                console.warn('⚠️ Audio not available:', error);
+              }
+            } else {
+              console.log('ℹ️ Audio alerts disabled by user');
             }
 
             // Show toast (will update if name not available yet)
