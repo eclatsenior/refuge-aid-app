@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { UserPlus, Mail, User, Key, Loader2, Copy, Check } from "lucide-react";
+import { UserPlus, Mail, User, Key, Loader2, Copy, Check, Phone } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +33,10 @@ const registerEmployeeSchema = z.object({
     .email("Email inválido")
     .max(255, "El email no puede superar los 255 caracteres")
     .trim(),
+  phone: z.string()
+    .regex(/^(\+34|0034|34)?[6789]\d{8}$/, "Número de teléfono español inválido (ej: +34612345678)")
+    .optional()
+    .or(z.literal('')),
   password: z.string()
     .min(8, "La contraseña debe tener al menos 8 caracteres")
     .max(100, "La contraseña no puede superar los 100 caracteres"),
@@ -56,6 +60,7 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
     defaultValues: {
       fullName: "",
       email: "",
+      phone: "",
       password: "",
     },
   });
@@ -99,6 +104,7 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
       await registerEmployee({
         email: data.email,
         fullName: data.fullName,
+        phone: data.phone,
         password: data.password,
       });
 
@@ -190,6 +196,31 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
                     </div>
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Teléfono (Opcional)</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input 
+                        type="tel"
+                        placeholder="+34612345678 o 612345678" 
+                        className="pl-10"
+                        {...field} 
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                  <p className="text-xs text-muted-foreground">
+                    Para llamadas y mensajes de emergencia
+                  </p>
                 </FormItem>
               )}
             />

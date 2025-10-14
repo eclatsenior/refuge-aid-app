@@ -68,8 +68,24 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
   };
 
   const handleContact = (method: 'phone' | 'message') => {
+    if (!employee.employee_phone) {
+      toast({
+        title: "Teléfono no disponible",
+        description: `${employee.employee_name} no tiene teléfono registrado`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (method === 'phone') {
+      window.open(`tel:${employee.employee_phone}`, '_system');
+    } else {
+      const message = encodeURIComponent(`Hola ${employee.employee_name.split(' ')[0]}, ¿cómo estás?`);
+      window.open(`sms:${employee.employee_phone}?body=${message}`, '_system');
+    }
+    
     toast({
-      title: "Contactar empleada",
+      title: "Contactando empleada",
       description: `Iniciando ${method === 'phone' ? 'llamada' : 'mensaje'} con ${employee.employee_name}...`
     });
   };
@@ -110,6 +126,12 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
               <p className="text-xs text-muted-foreground truncate">
                 {employee.employee_email}
               </p>
+              {employee.employee_phone && (
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Phone className="h-3 w-3" />
+                  {employee.employee_phone}
+                </p>
+              )}
             </div>
           </div>
 
@@ -129,13 +151,21 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem onClick={() => handleContact('phone')}>
+                <DropdownMenuItem 
+                  onClick={() => handleContact('phone')}
+                  disabled={!employee.employee_phone}
+                >
                   <Phone className="mr-2 h-4 w-4" />
                   Llamar
+                  {!employee.employee_phone && <span className="ml-auto text-xs text-muted-foreground">No disponible</span>}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleContact('message')}>
+                <DropdownMenuItem 
+                  onClick={() => handleContact('message')}
+                  disabled={!employee.employee_phone}
+                >
                   <MessageSquare className="mr-2 h-4 w-4" />
                   Mensaje
+                  {!employee.employee_phone && <span className="ml-auto text-xs text-muted-foreground">No disponible</span>}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleMarkFollowUp}>
                   <Clock className="mr-2 h-4 w-4" />

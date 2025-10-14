@@ -63,6 +63,7 @@ export interface EmployeeStatus {
   employee_id: string;
   employee_name: string;
   employee_email: string;
+  employee_phone?: string;
   mood_level: number | null;
   therapy_progress: number | null;
   last_check_in: string | null;
@@ -167,7 +168,7 @@ interface AppState {
   resolveAlert: (alertId: string, resolutionNotes?: string) => Promise<void>;
   setupRealtimeSubscriptions: () => (() => void) | undefined;
   updateEmployeePresence: (isOnline?: boolean) => Promise<void>;
-  registerEmployee: (data: { email: string; fullName: string; password: string }) => Promise<void>;
+  registerEmployee: (data: { email: string; fullName: string; password: string; phone?: string }) => Promise<void>;
   
   // Subscription actions
   loadSubscriptionStatus: () => Promise<void>;
@@ -677,7 +678,7 @@ export const useAppStore = create<AppState>()(
       },
 
       // Register new employee
-      registerEmployee: async (data: { email: string; fullName: string; password: string }) => {
+      registerEmployee: async (data: { email: string; fullName: string; password: string; phone?: string }) => {
         try {
           const { user } = get();
           if (!user) throw new Error('No estás autenticado');
@@ -689,6 +690,7 @@ export const useAppStore = create<AppState>()(
               email: data.email,
               fullName: data.fullName,
               password: data.password,
+              phone: data.phone,
               refugiLeadId: user.id,
             },
           });
@@ -797,9 +799,18 @@ export const useAppStore = create<AppState>()(
               e => e.employee_id === employeeId
             )?.employee_name;
             
+            // Play emergency sound
+            try {
+              const audio = new Audio('/emergency-alert.mp3');
+              audio.volume = 0.7;
+              audio.play().catch(err => console.warn('Could not play alert sound:', err));
+            } catch (error) {
+              console.warn('Audio not available:', error);
+            }
+
             // Show toast (will update if name not available yet)
             const toastHandle = toast({
-              title: "Nueva Alerta de Emergencia",
+              title: "🚨 Nueva Alerta de Emergencia",
               description: employeeName ? `Alerta de ${employeeName}` : 'Alerta entrante...',
               variant: "destructive"
             });

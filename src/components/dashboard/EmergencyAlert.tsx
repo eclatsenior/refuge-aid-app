@@ -7,7 +7,9 @@ import {
   MessageSquare, 
   CheckCircle,
   User,
-  Calendar
+  Calendar,
+  MoreVertical,
+  PhoneCall
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,11 +17,19 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { EmergencyAlert as EmergencyAlertType } from "@/store/useAppStore";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { useAppStore } from "@/store/useAppStore";
+import { useNativeFeatures } from "@/hooks/useNativeFeatures";
 
 interface EmergencyAlertProps {
   alert: EmergencyAlertType;
@@ -30,8 +40,13 @@ export function EmergencyAlert({ alert }: EmergencyAlertProps) {
   const [resolutionNotes, setResolutionNotes] = useState("");
   const [isResolving, setIsResolving] = useState(false);
   
-  const { resolveAlert } = useAppStore();
+  const { resolveAlert, assignedEmployees } = useAppStore();
   const { toast } = useToast();
+  const { openExternalApp } = useNativeFeatures();
+  
+  // Get employee phone from assigned employees
+  const employee = assignedEmployees.find(emp => emp.employee_id === alert.employee_id);
+  const employeePhone = employee?.employee_phone;
 
   const getInitials = (name: string) => {
     return name
@@ -48,11 +63,93 @@ export function EmergencyAlert({ alert }: EmergencyAlertProps) {
     locale: es
   });
 
-  const handleContact = (method: 'phone' | 'message') => {
+  const handleCall = () => {
+    if (!employeePhone) {
+      toast({
+        title: "Teléfono no disponible",
+        description: `${alert.employee_name} no tiene teléfono registrado`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const telUrl = `tel:${employeePhone}`;
+    openExternalApp(telUrl);
+    
     toast({
-      title: "Contactando empleada",
-      description: `Iniciando ${method === 'phone' ? 'llamada' : 'mensaje'} con ${alert.employee_name}...`
+      title: "Llamando...",
+      description: `Iniciando llamada a ${alert.employee_name}`
     });
+  };
+
+  const handleMessage = () => {
+    if (!employeePhone) {
+      toast({
+        title: "Teléfono no disponible",
+        description: `${alert.employee_name} no tiene teléfono registrado`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const message = encodeURIComponent(`Hola ${alert.employee_name.split(' ')[0]}, vi tu alerta de emergencia. ¿Estás bien? ¿Necesitas ayuda?`);
+    const smsUrl = `sms:${employeePhone}?body=${message}`;
+    openExternalApp(smsUrl);
+    
+    toast({
+      title: "Abriendo mensajes...",
+      description: `Enviando mensaje a ${alert.employee_name}`
+    });
+  };
+
+  const handleWhatsApp = () => {
+    if (!employeePhone) {
+      toast({
+        title: "Teléfono no disponible",
+        description: `${alert.employee_name} no tiene teléfono registrado`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const cleanPhone = employeePhone.replace(/\D/g, '');
+    const message = encodeURIComponent(`Hola ${alert.employee_name.split(' ')[0]}, vi tu alerta de emergencia. ¿Estás bien? ¿Necesitas ayuda?`);
+    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${message}`;
+    openExternalApp(whatsappUrl);
+    
+    toast({
+      title: "Abriendo WhatsApp...",
+      description: `Contactando a ${alert.employee_name}`
+    });
+  };
+
+  const handleCall112 = () => {
+    const telUrl = 'tel:112';
+    openExternalApp(telUrl);
+    
+    toast({
+      title: "Llamando a emergencias",
+      description: "Iniciando llamada al 112"
+    });
+  };
+
+  const handleViewLocation = () => {
+    if (alert.location_data) {
+      const { latitude, longitude } = alert.location_data;
+      const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      openExternalApp(mapsUrl);
+      
+      toast({
+        title: "Abriendo ubicación",
+        description: "Visualizando en Google Maps"
+      });
+    } else {
+      toast({
+        title: "Ubicación no disponible",
+        description: "Esta alerta no tiene datos de ubicación",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleResolve = async () => {
@@ -153,36 +250,57 @@ export function EmergencyAlert({ alert }: EmergencyAlertProps) {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-2">
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={() => handleContact('phone')}
-              className="border-destructive/30 hover:bg-destructive/10"
-            >
-              <Phone className="h-4 w-4 mr-2" />
-              Llamar
-            </Button>
-            
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={() => handleContact('message')}
-              className="border-destructive/30 hover:bg-destructive/10"
-            >
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Mensaje
-            </Button>
-
-            {alert.location_data && (
-              <Button 
-                size="sm" 
-                variant="outline"
-                className="border-destructive/30 hover:bg-destructive/10"
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                Ver ubicación
-              </Button>
-            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  className="border-destructive/30 hover:bg-destructive/10"
+                >
+                  <MoreVertical className="h-4 w-4 mr-2" />
+                  Acciones
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuItem 
+                  onClick={handleCall}
+                  disabled={!employeePhone}
+                >
+                  <Phone className="h-4 w-4 mr-2" />
+                  Llamar empleada
+                  {!employeePhone && <span className="ml-auto text-xs text-muted-foreground">No disponible</span>}
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={handleMessage}
+                  disabled={!employeePhone}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Enviar SMS
+                  {!employeePhone && <span className="ml-auto text-xs text-muted-foreground">No disponible</span>}
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={handleWhatsApp}
+                  disabled={!employeePhone}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  WhatsApp
+                  {!employeePhone && <span className="ml-auto text-xs text-muted-foreground">No disponible</span>}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleCall112}>
+                  <PhoneCall className="h-4 w-4 mr-2 text-destructive" />
+                  Llamar al 112
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={handleViewLocation}
+                  disabled={!alert.location_data}
+                >
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Ver ubicación
+                  {!alert.location_data && <span className="ml-auto text-xs text-muted-foreground">No disponible</span>}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             <Button 
               size="sm" 

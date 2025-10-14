@@ -10,6 +10,7 @@ interface RegisterEmployeeRequest {
   email: string;
   fullName: string;
   password: string;
+  phone?: string;
   refugiLeadId: string;
 }
 
@@ -26,9 +27,9 @@ serve(async (req) => {
     // Create admin client with service role key
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { email, fullName, password, refugiLeadId }: RegisterEmployeeRequest = await req.json();
+    const { email, fullName, password, phone, refugiLeadId }: RegisterEmployeeRequest = await req.json();
 
-    console.log('📝 Registration request:', { email, fullName, refugiLeadId });
+    console.log('📝 Registration request:', { email, fullName, phone, refugiLeadId });
 
     // Validate input
     if (!email || !fullName || !password || !refugiLeadId) {
@@ -113,12 +114,24 @@ serve(async (req) => {
           user_id: userId,
           email: email,
           full_name: fullName,
+          phone: phone,
           role: 'employee'
         });
 
       if (manualProfileError) {
         console.error('❌ Profile creation error:', manualProfileError);
         throw new Error(`Error al crear perfil: ${manualProfileError.message}`);
+      }
+    } else if (phone) {
+      // If profile exists but phone was provided, update it
+      console.log('📞 Updating phone number...');
+      const { error: updatePhoneError } = await supabaseAdmin
+        .from('profiles')
+        .update({ phone: phone })
+        .eq('user_id', userId);
+      
+      if (updatePhoneError) {
+        console.error('⚠️ Could not update phone:', updatePhoneError);
       }
     }
 
