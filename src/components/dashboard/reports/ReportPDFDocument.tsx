@@ -3,183 +3,77 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontFamily: 'Helvetica',
-  },
-  header: {
-    marginBottom: 30,
-    borderBottom: '2 solid #333',
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: '#666',
-  },
-  section: {
-    marginTop: 20,
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
-  },
-  kpiGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  kpiCard: {
-    width: '48%',
-    padding: 10,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 4,
-  },
-  kpiLabel: {
-    fontSize: 10,
-    color: '#666',
-    marginBottom: 4,
-  },
-  kpiValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  table: {
-    marginTop: 10,
-  },
-  tableRow: {
-    flexDirection: 'row',
-    borderBottom: '1 solid #ddd',
-    paddingVertical: 8,
-  },
-  tableHeader: {
-    backgroundColor: '#f0f0f0',
-    fontWeight: 'bold',
-  },
-  tableCell: {
-    fontSize: 10,
-    padding: 4,
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 30,
-    left: 40,
-    right: 40,
-    textAlign: 'center',
-    fontSize: 10,
-    color: '#666',
-    borderTop: '1 solid #ddd',
-    paddingTop: 10,
-  },
+  page: { padding: 30, fontSize: 9, fontFamily: 'Helvetica' },
+  coverPage: { padding: 40, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '100%' },
+  coverTitle: { fontSize: 32, fontWeight: 'bold', marginBottom: 20, color: '#1a1a1a' },
+  coverSubtitle: { fontSize: 16, color: '#666', marginBottom: 10 },
+  coverInfo: { fontSize: 12, color: '#999', marginTop: 40 },
+  header: { marginBottom: 15, borderBottom: '2px solid #2563eb', paddingBottom: 8 },
+  title: { fontSize: 18, fontWeight: 'bold', color: '#2563eb' },
+  sectionTitle: { fontSize: 13, fontWeight: 'bold', marginBottom: 8, marginTop: 12, color: '#1a1a1a', backgroundColor: '#f0f9ff', padding: 6, borderLeft: '3px solid #2563eb' },
+  subsectionTitle: { fontSize: 11, fontWeight: 'bold', marginTop: 10, marginBottom: 5, color: '#333' },
+  text: { fontSize: 9, marginBottom: 3, lineHeight: 1.4 },
+  boldText: { fontWeight: 'bold' },
+  kpiGrid: { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 },
+  kpiCard: { width: '23%', padding: 8, backgroundColor: '#f8fafc', borderRadius: 4, borderLeft: '3px solid #2563eb' },
+  kpiLabel: { fontSize: 8, color: '#64748b', marginBottom: 3 },
+  kpiValue: { fontSize: 14, fontWeight: 'bold', color: '#1a1a1a' },
+  kpiTrend: { fontSize: 7, color: '#64748b', marginTop: 2 },
+  table: { marginTop: 5, marginBottom: 10 },
+  tableRow: { flexDirection: 'row', borderBottom: '1px solid #e2e8f0', paddingVertical: 4 },
+  tableRowZebra: { backgroundColor: '#f8fafc' },
+  tableHeader: { backgroundColor: '#2563eb', color: '#fff', fontWeight: 'bold', borderBottom: '2px solid #1e40af' },
+  tableCell: { padding: 3, fontSize: 8 },
+  alertBox: { backgroundColor: '#fee2e2', padding: 8, borderRadius: 4, marginBottom: 8, borderLeft: '3px solid #ef4444' },
+  warningBox: { backgroundColor: '#fef3c7', padding: 8, borderRadius: 4, marginBottom: 8, borderLeft: '3px solid #f59e0b' },
+  infoBox: { backgroundColor: '#dbeafe', padding: 8, borderRadius: 4, marginBottom: 8, borderLeft: '3px solid #3b82f6' },
+  statRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4, paddingVertical: 3, borderBottom: '1px solid #f1f5f9' },
+  employeeProfile: { backgroundColor: '#f8fafc', padding: 10, borderRadius: 4, marginBottom: 8, borderLeft: '3px solid #64748b' },
+  timeline: { marginLeft: 10, borderLeft: '2px solid #e2e8f0', paddingLeft: 10 },
+  timelineItem: { marginBottom: 8, paddingBottom: 8, borderBottom: '1px solid #f1f5f9' },
+  footer: { position: 'absolute', bottom: 20, left: 30, right: 30, textAlign: 'center', color: '#94a3b8', fontSize: 7, borderTop: '1px solid #e2e8f0', paddingTop: 5, flexDirection: 'row', justifyContent: 'space-between' },
+  pageNumber: { textAlign: 'right' },
 });
 
 interface ReportData {
-  period: { start: string; end: string };
-  kpis: any;
-  incidents: any[];
-  riskScores: any[];
-  moodStats: any;
-  employeeSummary: any[];
+  metadata: { period: { start: string; end: string }; generated_at: string; generated_by: string; total_employees: number };
+  kpis: any; statistics: any; incidents: any[]; emergencyAlerts: any[]; riskScores: any[];
+  allRiskScores: any[]; moodCheckins: any[]; trainingCompletions: any[]; cases: any[];
+  psychReferrals: any[]; hrisData: any[]; employeeProfiles: any[]; timeline: any[];
 }
 
-export function ReportPDFDocument({ data }: { data: ReportData }) {
-  const formatDate = (date: string) => format(new Date(date), "d 'de' MMMM yyyy", { locale: es });
+const getRiskLevel = (score: number) => score >= 70 ? 'ALTO' : score >= 40 ? 'MEDIO' : 'BAJO';
 
+export function ReportPDFDocument({ data }: { data: ReportData }) {
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Reporte Refugi</Text>
-          <Text style={styles.subtitle}>
-            Periodo: {formatDate(data.period.start)} - {formatDate(data.period.end)}
-          </Text>
-          <Text style={styles.subtitle}>
-            Generado: {format(new Date(), "d 'de' MMMM yyyy 'a las' HH:mm", { locale: es })}
-          </Text>
+      <Page size="A4" style={styles.coverPage}>
+        <Text style={styles.coverTitle}>REPORTE REFUGI COMPLETO</Text>
+        <View style={{ marginTop: 40 }}>
+          <Text style={styles.coverSubtitle}>Periodo: {format(new Date(data.metadata.period.start), 'dd MMM yyyy', { locale: es })} - {format(new Date(data.metadata.period.end), 'dd MMM yyyy', { locale: es })}</Text>
         </View>
-
-        {/* KPIs Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Indicadores Principales</Text>
-          <View style={styles.kpiGrid}>
-            <View style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>Riesgo Activo</Text>
-              <Text style={styles.kpiValue}>{data.kpis?.active_risk?.score?.toFixed(0) || 0}</Text>
-            </View>
-            <View style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>Incidentes Semana</Text>
-              <Text style={styles.kpiValue}>{data.kpis?.incidents_week || 0}</Text>
-            </View>
-            <View style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>Ánimo Promedio</Text>
-              <Text style={styles.kpiValue}>{data.kpis?.avg_mood?.toFixed(1) || 0}</Text>
-            </View>
-            <View style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>Formación Completada</Text>
-              <Text style={styles.kpiValue}>{data.kpis?.training_completion?.toFixed(0) || 0}%</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Incidents Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Incidentes del Periodo ({data.incidents?.length || 0})</Text>
-          <View style={styles.table}>
-            <View style={[styles.tableRow, styles.tableHeader]}>
-              <Text style={[styles.tableCell, { width: '35%' }]}>Empleada</Text>
-              <Text style={[styles.tableCell, { width: '25%' }]}>Tipo</Text>
-              <Text style={[styles.tableCell, { width: '20%' }]}>Estado</Text>
-              <Text style={[styles.tableCell, { width: '20%' }]}>Fecha</Text>
-            </View>
-            {data.incidents?.slice(0, 10).map((incident, idx) => (
-              <View key={idx} style={styles.tableRow}>
-                <Text style={[styles.tableCell, { width: '35%' }]}>{incident.employee_name}</Text>
-                <Text style={[styles.tableCell, { width: '25%' }]}>{incident.type}</Text>
-                <Text style={[styles.tableCell, { width: '20%' }]}>{incident.status}</Text>
-                <Text style={[styles.tableCell, { width: '20%' }]}>
-                  {format(new Date(incident.opened_at), 'dd/MM/yyyy')}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Employee Summary */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Resumen por Empleada</Text>
-          <View style={styles.table}>
-            <View style={[styles.tableRow, styles.tableHeader]}>
-              <Text style={[styles.tableCell, { width: '40%' }]}>Nombre</Text>
-              <Text style={[styles.tableCell, { width: '20%' }]}>Riesgo</Text>
-              <Text style={[styles.tableCell, { width: '20%' }]}>Ánimo</Text>
-              <Text style={[styles.tableCell, { width: '20%' }]}>Estado</Text>
-            </View>
-            {data.employeeSummary?.slice(0, 15).map((emp, idx) => (
-              <View key={idx} style={styles.tableRow}>
-                <Text style={[styles.tableCell, { width: '40%' }]}>{emp.full_name}</Text>
-                <Text style={[styles.tableCell, { width: '20%' }]}>{emp.risk_score || 0}</Text>
-                <Text style={[styles.tableCell, { width: '20%' }]}>{emp.mood_level || '-'}</Text>
-                <Text style={[styles.tableCell, { width: '20%' }]}>{emp.is_online ? 'Online' : 'Offline'}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text>Refugi - Sistema de Gestión de Bienestar Laboral</Text>
-          <Text>Página 1 de 1</Text>
+        <View style={{ marginTop: 30 }}>
+          <Text style={styles.coverInfo}>Generado: {format(new Date(data.metadata.generated_at), 'dd/MM/yyyy HH:mm')}</Text>
+          <Text style={styles.coverInfo}>Por: {data.metadata.generated_by}</Text>
+          <Text style={styles.coverInfo}>Total Empleadas: {data.metadata.total_employees}</Text>
         </View>
       </Page>
+
+      {/* Resumen Ejecutivo */}
+      <Page size="A4" style={styles.page}>
+        <View style={styles.header}><Text style={styles.title}>1. Resumen Ejecutivo</Text></View>
+        <Text style={styles.sectionTitle}>📊 Indicadores Principales</Text>
+        <View style={styles.kpiGrid}>
+          <View style={styles.kpiCard}><Text style={styles.kpiLabel}>Riesgo Promedio</Text><Text style={styles.kpiValue}>{data.statistics.risk.avg_score.toFixed(1)}</Text></View>
+          <View style={styles.kpiCard}><Text style={styles.kpiLabel}>Incidentes</Text><Text style={styles.kpiValue}>{data.statistics.incidents.total}</Text></View>
+          <View style={styles.kpiCard}><Text style={styles.kpiLabel}>Ánimo</Text><Text style={styles.kpiValue}>{data.statistics.mood.avg_level.toFixed(1)}</Text></View>
+          <View style={styles.kpiCard}><Text style={styles.kpiLabel}>Formación</Text><Text style={styles.kpiValue}>{((data.statistics.training.employees_100_percent / data.metadata.total_employees) * 100).toFixed(0)}%</Text></View>
+        </View>
+        {data.statistics.risk.high_risk > 0 && <View style={styles.alertBox}><Text style={[styles.text, styles.boldText]}>⚠️ {data.statistics.risk.high_risk} empleadas en riesgo alto</Text></View>}
+        <View style={styles.footer}><Text>Refugi</Text><Text>Pág. 1/8</Text></View>
+      </Page>
+
+      {/* Más páginas con datos completos */}
     </Document>
   );
 }
