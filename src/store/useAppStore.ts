@@ -357,7 +357,7 @@ export const useAppStore = create<AppState>()(
                 .from('profiles')
                 .select('*')
                 .eq('user_id', session.user.id)
-                .single();
+                .maybeSingle();
               
               if (data) {
                 profile = data;
@@ -379,50 +379,60 @@ export const useAppStore = create<AppState>()(
             // If profile still doesn't exist, create it automatically
             if (!profile) {
               console.log('📝 Profile not found, creating automatically...');
-              const role = session.user.user_metadata?.role || 'employee';
-              const fullName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuario';
+              const roleFromMeta = session.user.user_metadata?.role || 'employee';
+              const fullNameFromMeta = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuario';
               
               const { data: newProfile, error: createError } = await supabase
                 .from('profiles')
-                .insert({
+                .upsert({
                   user_id: session.user.id,
                   email: session.user.email,
-                  full_name: fullName,
-                  role: role
-                })
+                  full_name: fullNameFromMeta,
+                  role: roleFromMeta
+                }, { onConflict: 'user_id' })
                 .select()
-                .single();
+                .maybeSingle();
                 
               if (createError) {
-                console.error('❌ Error creating profile:', createError);
+                console.error('❌ Error creating/upserting profile:', createError);
               } else if (newProfile) {
                 profile = newProfile;
-                console.log('✅ Profile created:', { role: profile.role });
+                console.log('✅ Profile created/upserted:', { role: profile.role });
               }
             }
             
-            // Always set profile, even if null
+            // Always set profile, even if DB insert failed (fallback in-memory profile)
             if (profile) {
               setProfile(profile);
-              
-              // Load messages for all users
-              await loadMessages();
-              
-              // Check user access for employees (non-blocking)
-              setTimeout(() => {
-                get().checkUserAccess();
-                const { showPaywall, accessType } = get();
-                console.log('🔐 Access check complete:', { 
-                  showPaywall, 
-                  accessType,
-                  role: profile.role 
-                });
-              }, 0);
-              
-              // Load subscription status for Refugi Leads
-              if (profile.role === 'refugi_lead') {
-                await loadSubscriptionStatus();
-              }
+            } else {
+              const fallbackProfile = {
+                user_id: session.user.id,
+                email: session.user.email,
+                full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuario',
+                role: session.user.user_metadata?.role || 'employee',
+                managed_by_lead: false
+              } as any;
+              console.warn('⚠️ Using fallback profile (DB not available). Proceeding with limited mode.');
+              setProfile(fallbackProfile);
+            }
+            
+            // Load messages for all users
+            await loadMessages();
+            
+            // Check user access for employees (non-blocking)
+            setTimeout(() => {
+              get().checkUserAccess();
+              const { showPaywall, accessType } = get();
+              console.log('🔐 Access check complete:', { 
+                showPaywall, 
+                accessType,
+                role: (profile as any)?.role || session.user.user_metadata?.role || 'employee'
+              });
+            }, 0);
+            
+            // Load subscription status for Refugi Leads
+            if ((profile as any)?.role === 'refugi_lead' || session.user.user_metadata?.role === 'refugi_lead') {
+              await loadSubscriptionStatus();
             }
           }
           
