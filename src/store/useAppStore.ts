@@ -408,14 +408,16 @@ export const useAppStore = create<AppState>()(
               // Load messages for all users
               await loadMessages();
               
-              // Check user access for employees
-              await get().checkUserAccess();
-              const { showPaywall, accessType } = get();
-              console.log('🔐 Access check complete:', { 
-                showPaywall, 
-                accessType,
-                role: profile.role 
-              });
+              // Check user access for employees (non-blocking)
+              setTimeout(() => {
+                get().checkUserAccess();
+                const { showPaywall, accessType } = get();
+                console.log('🔐 Access check complete:', { 
+                  showPaywall, 
+                  accessType,
+                  role: profile.role 
+                });
+              }, 0);
               
               // Load subscription status for Refugi Leads
               if (profile.role === 'refugi_lead') {
