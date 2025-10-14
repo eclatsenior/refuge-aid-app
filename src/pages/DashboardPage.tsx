@@ -20,6 +20,9 @@ import { StatsOverview } from "@/components/dashboard/StatsOverview";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { RegisterEmployeeDialog } from "@/components/dashboard/RegisterEmployeeDialog";
 import { useToast } from "@/hooks/use-toast";
+import { KPIsSection } from "@/components/dashboard/KPIsSection";
+import { AttentionQueue } from "@/components/dashboard/AttentionQueue";
+import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 
 export function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,6 +40,7 @@ export function DashboardPage() {
   } = useAppStore();
   
   const { toast } = useToast();
+  const { isEnabled } = useFeatureFlags();
 
   useEffect(() => {
     const loadData = async () => {
@@ -178,6 +182,16 @@ export function DashboardPage() {
           employees={assignedEmployees}
           alerts={emergencyAlerts}
         />
+
+        {/* KPIs Section - Feature Flag */}
+        {isEnabled('ff_refugi_kpis') && (
+          <KPIsSection />
+        )}
+
+        {/* Attention Queue - Feature Flag */}
+        {isEnabled('ff_refugi_queue') && (
+          <AttentionQueue items={[]} />
+        )}
 
         {/* Emergency Alerts */}
         {activeAlerts.length > 0 && (

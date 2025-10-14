@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      cases: {
+        Row: {
+          created_at: string | null
+          employee_id: string
+          id: string
+          next_action_at: string | null
+          owner_user_id: string | null
+          playbook: string | null
+          state: string | null
+          summary: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          employee_id: string
+          id?: string
+          next_action_at?: string | null
+          owner_user_id?: string | null
+          playbook?: string | null
+          state?: string | null
+          summary?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          employee_id?: string
+          id?: string
+          next_action_at?: string | null
+          owner_user_id?: string | null
+          playbook?: string | null
+          state?: string | null
+          summary?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       emergency_alerts: {
         Row: {
           alert_type: string
@@ -136,11 +202,120 @@ export type Database = {
           },
         ]
       }
+      feature_flags: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          flag_name: string
+          id: string
+          is_enabled: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          flag_name: string
+          id?: string
+          is_enabled?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          flag_name?: string
+          id?: string
+          is_enabled?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      hris_employees_sync: {
+        Row: {
+          created_at: string | null
+          department: string | null
+          employee_id: string | null
+          external_id: string | null
+          id: string
+          location: string | null
+          shift: string | null
+          status: string | null
+          synced_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          department?: string | null
+          employee_id?: string | null
+          external_id?: string | null
+          id?: string
+          location?: string | null
+          shift?: string | null
+          status?: string | null
+          synced_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          department?: string | null
+          employee_id?: string | null
+          external_id?: string | null
+          id?: string
+          location?: string | null
+          shift?: string | null
+          status?: string | null
+          synced_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      incidents: {
+        Row: {
+          closed_at: string | null
+          created_at: string | null
+          employee_id: string
+          id: string
+          notes: string | null
+          opened_at: string | null
+          sla_breached_bool: boolean | null
+          sla_target_mins: number | null
+          status: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string | null
+          employee_id: string
+          id?: string
+          notes?: string | null
+          opened_at?: string | null
+          sla_breached_bool?: boolean | null
+          sla_target_mins?: number | null
+          status?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string | null
+          employee_id?: string
+          id?: string
+          notes?: string | null
+          opened_at?: string | null
+          sla_breached_bool?: boolean | null
+          sla_target_mins?: number | null
+          status?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       mood_check_ins: {
         Row: {
           created_at: string
           employee_id: string
           id: string
+          is_anonymous_bool: boolean | null
           location_data: Json | null
           mood_level: number
           notes: string | null
@@ -150,6 +325,7 @@ export type Database = {
           created_at?: string
           employee_id: string
           id?: string
+          is_anonymous_bool?: boolean | null
           location_data?: Json | null
           mood_level: number
           notes?: string | null
@@ -159,6 +335,7 @@ export type Database = {
           created_at?: string
           employee_id?: string
           id?: string
+          is_anonymous_bool?: boolean | null
           location_data?: Json | null
           mood_level?: number
           notes?: string | null
@@ -196,14 +373,161 @@ export type Database = {
         }
         Relationships: []
       }
+      psych_referrals: {
+        Row: {
+          appointment_at: string | null
+          case_id: string | null
+          created_at: string | null
+          employee_id: string
+          id: string
+          notes: string | null
+          provider_name: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          appointment_at?: string | null
+          case_id?: string | null
+          created_at?: string | null
+          employee_id: string
+          id?: string
+          notes?: string | null
+          provider_name?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          appointment_at?: string | null
+          case_id?: string | null
+          created_at?: string | null
+          employee_id?: string
+          id?: string
+          notes?: string | null
+          provider_name?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "psych_referrals_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports: {
+        Row: {
+          created_at: string | null
+          file_url: string | null
+          generated_by: string | null
+          id: string
+          period_end: string
+          period_start: string
+          scope: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_url?: string | null
+          generated_by?: string | null
+          id?: string
+          period_end: string
+          period_start: string
+          scope?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          file_url?: string | null
+          generated_by?: string | null
+          id?: string
+          period_end?: string
+          period_start?: string
+          scope?: Json | null
+        }
+        Relationships: []
+      }
+      risk_scores: {
+        Row: {
+          calculated_at: string | null
+          created_at: string | null
+          employee_id: string
+          explain_chips: string[] | null
+          id: string
+          score_int: number | null
+          trend_30d: number | null
+          trend_7d: number | null
+        }
+        Insert: {
+          calculated_at?: string | null
+          created_at?: string | null
+          employee_id: string
+          explain_chips?: string[] | null
+          id?: string
+          score_int?: number | null
+          trend_30d?: number | null
+          trend_7d?: number | null
+        }
+        Update: {
+          calculated_at?: string | null
+          created_at?: string | null
+          employee_id?: string
+          explain_chips?: string[] | null
+          id?: string
+          score_int?: number | null
+          trend_30d?: number | null
+          trend_7d?: number | null
+        }
+        Relationships: []
+      }
+      training_completions: {
+        Row: {
+          completed_at: string | null
+          course_code: string
+          created_at: string | null
+          employee_id: string
+          expires_at: string | null
+          id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          course_code: string
+          created_at?: string | null
+          employee_id: string
+          expires_at?: string | null
+          id?: string
+        }
+        Update: {
+          completed_at?: string | null
+          course_code?: string
+          created_at?: string | null
+          employee_id?: string
+          expires_at?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      calculate_risk_score: {
+        Args: { emp_id: string }
+        Returns: {
+          chips: string[]
+          score: number
+          trend_30d: number
+          trend_7d: number
+        }[]
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      get_dashboard_kpis: {
+        Args: { scope_filter?: Json }
+        Returns: Json
       }
       get_employee_average_mood_24h: {
         Args: { emp_id: string }
