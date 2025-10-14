@@ -63,9 +63,9 @@ export interface EmployeeStatus {
   employee_id: string;
   employee_name: string;
   employee_email: string;
-  mood_level: number;
-  therapy_progress: number;
-  last_check_in: string;
+  mood_level: number | null;
+  therapy_progress: number | null;
+  last_check_in: string | null;
   is_online: boolean;
   emergency_alert: boolean;
   created_at: string;
@@ -508,9 +508,9 @@ export const useAppStore = create<AppState>()(
             employee_name: emp.full_name || 'Usuario desconocido',
             employee_email: emp.email || 'unknown@email.com',
             is_online: emp.is_online || false,
-            mood_level: emp.mood_level || 5,
-            therapy_progress: emp.therapy_progress || 0,
-            last_check_in: emp.last_check_in || new Date().toISOString(),
+            mood_level: emp.mood_level ?? null,
+            therapy_progress: emp.therapy_progress ?? 0,
+            last_check_in: emp.last_check_in ?? null,
             emergency_alert: emp.emergency_alert || false,
             created_at: emp.created_at,
             updated_at: emp.updated_at

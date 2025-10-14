@@ -38,15 +38,17 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
   const getStatusColor = () => {
     if (employee.emergency_alert) return "destructive";
     if (!employee.is_online) return "secondary";
-    if (employee.mood_level <= 4) return "warning";
-    return "safe";
+    if (employee.mood_level !== null && employee.mood_level <= 4) return "warning";
+    if (employee.mood_level !== null) return "safe";
+    return "secondary";
   };
 
   const getStatusText = () => {
     if (employee.emergency_alert) return "Emergencia";
     if (!employee.is_online) return "Desconectada";
-    if (employee.mood_level <= 4) return "Necesita atención";
-    return "Bien";
+    if (employee.mood_level !== null && employee.mood_level <= 4) return "Necesita atención";
+    if (employee.mood_level !== null) return "Bien";
+    return "Sin datos";
   };
 
   const getMoodEmoji = (level: number) => {
@@ -79,11 +81,10 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
     });
   };
 
-  const lastCheckInDate = new Date(employee.last_check_in);
-  const timeSinceLastCheckIn = formatDistanceToNow(lastCheckInDate, {
-    addSuffix: true,
-    locale: es
-  });
+  const lastCheckInDate = employee.last_check_in ? new Date(employee.last_check_in) : null;
+  const timeSinceLastCheckIn = lastCheckInDate 
+    ? formatDistanceToNow(lastCheckInDate, { addSuffix: true, locale: es })
+    : 'Sin registro';
 
   return (
     <Card 
@@ -189,19 +190,18 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
                 <Heart className="h-4 w-4 text-coral" />
                 <span className="text-sm text-muted-foreground">Estado de ánimo</span>
               </div>
-              <div className="flex items-center space-x-1">
-                <span className="text-lg">{getMoodEmoji(employee.mood_level)}</span>
-                <span className="text-sm font-medium">{employee.mood_level}/10</span>
-              </div>
+              {employee.mood_level !== null ? (
+                <div className="flex items-center space-x-1">
+                  <span className="text-lg">{getMoodEmoji(employee.mood_level)}</span>
+                  <span className="text-sm font-medium">{employee.mood_level}/10</span>
+                </div>
+              ) : (
+                <span className="text-sm text-muted-foreground">Sin datos</span>
+              )}
             </div>
             <Progress 
-              value={employee.mood_level * 10} 
+              value={employee.mood_level !== null ? employee.mood_level * 10 : 0} 
               className="h-2"
-              // @ts-ignore
-              indicatorClassName={
-                employee.mood_level <= 4 ? "bg-warning" :
-                employee.mood_level <= 7 ? "bg-coral" : "bg-safe"
-              }
             />
           </div>
 
@@ -212,10 +212,10 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
                 <TrendingUp className="h-4 w-4 text-cyan" />
                 <span className="text-sm text-muted-foreground">Progreso terapéutico</span>
               </div>
-              <span className="text-sm font-medium">{employee.therapy_progress}%</span>
+              <span className="text-sm font-medium">{employee.therapy_progress ?? 0}%</span>
             </div>
             <Progress 
-              value={employee.therapy_progress} 
+              value={employee.therapy_progress ?? 0} 
               className="h-2"
             />
           </div>
@@ -226,7 +226,7 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
               <div className="text-xs text-muted-foreground">
                 <div className="flex justify-between py-1">
                   <span>Último check-in:</span>
-                  <span>{lastCheckInDate.toLocaleDateString('es-ES')}</span>
+                  <span>{lastCheckInDate ? lastCheckInDate.toLocaleDateString('es-ES') : 'Sin registro'}</span>
                 </div>
                 <div className="flex justify-between py-1">
                   <span>Tiempo en línea hoy:</span>
