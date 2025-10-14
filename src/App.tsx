@@ -37,6 +37,7 @@ const App = () => {
   } = useAppStore();
   
   const [isInitializing, setIsInitializing] = useState(true);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
   
   // Listen to URL changes
   useEffect(() => {
@@ -86,6 +87,19 @@ const App = () => {
     };
   }, [initializeAuth]);
   
+  // Add timeout for profile loading
+  useEffect(() => {
+    if (user && !profile && !loadingTimeout) {
+      console.log('⏱️ Starting profile loading timeout...');
+      const timer = setTimeout(() => {
+        console.warn('⚠️ Profile loading timeout - proceeding anyway');
+        setLoadingTimeout(true);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user, profile, loadingTimeout]);
+  
   // Check if user has seen manifesto (only for employees)
   const [manifestoSeen, setManifestoSeen] = useState(
     sessionStorage.getItem('manifesto_seen') === 'true'
@@ -128,11 +142,50 @@ const App = () => {
   };
 
   const renderApp = () => {
-    // Show loading during initialization or while profile is loading
-    if (isInitializing || (user && !profile)) {
+    // Show loading during initialization
+    if (isInitializing) {
       return (
         <div className="min-h-screen bg-background flex items-center justify-center">
           <LoadingSpinner size="lg" />
+        </div>
+      );
+    }
+    
+    // If user exists but profile is still loading and hasn't timed out
+    if (user && !profile && !loadingTimeout) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <LoadingSpinner size="lg" />
+            <p className="text-muted-foreground">Cargando perfil...</p>
+          </div>
+        </div>
+      );
+    }
+    
+    // If profile loading timed out, show error with retry
+    if (user && !profile && loadingTimeout) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="max-w-md w-full space-y-4 text-center">
+            <div className="p-4 rounded-lg border border-destructive/20 bg-destructive/10">
+              <h2 className="text-lg font-semibold text-foreground mb-2">
+                Error cargando perfil
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                No se pudo cargar tu perfil. Por favor, intenta nuevamente.
+              </p>
+              <button
+                onClick={() => {
+                  setLoadingTimeout(false);
+                  initializeAuth();
+                }}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+              >
+                Reintentar
+              </button>
+            </div>
+          </div>
         </div>
       );
     }

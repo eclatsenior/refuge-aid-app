@@ -333,30 +333,74 @@ export const useAppStore = create<AppState>()(
           console.log('✅ Auth state set:', { hasUser: !!session?.user, hasSession: !!session });
           
           if (session?.user) {
-            // Load user profile
-            try {
-              const { data: profile, error: profileError } = await supabase
+            // Load user profile with retry logic
+            let profile = null;
+            let attempts = 0;
+            const maxAttempts = 3;
+            
+            while (!profile && attempts < maxAttempts) {
+              attempts++;
+              console.log(`🔄 Loading profile (attempt ${attempts}/${maxAttempts})...`);
+              
+              const { data, error: profileError } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('user_id', session.user.id)
                 .single();
               
-              if (profileError) {
-                console.warn('⚠️ Profile error (may not exist yet):', profileError);
-              } else if (profile) {
-                setProfile(profile);
+              if (data) {
+                profile = data;
                 console.log('✅ Profile loaded:', { role: profile.role });
-                
-                // Load messages for all users
-                await loadMessages();
-                
-                // Load subscription status for Refugi Leads
-                if (profile.role === 'refugi_lead') {
-                  await loadSubscriptionStatus();
-                }
+                break;
               }
-            } catch (error) {
-              console.error('❌ Profile loading failed:', error);
+              
+              if (profileError && profileError.code !== 'PGRST116') {
+                // Error other than "not found"
+                console.error('❌ Profile error:', profileError);
+              }
+              
+              // Wait before retry
+              if (attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+              }
+            }
+            
+            // If profile still doesn't exist, create it automatically
+            if (!profile) {
+              console.log('📝 Profile not found, creating automatically...');
+              const role = session.user.user_metadata?.role || 'employee';
+              const fullName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Usuario';
+              
+              const { data: newProfile, error: createError } = await supabase
+                .from('profiles')
+                .insert({
+                  user_id: session.user.id,
+                  email: session.user.email,
+                  full_name: fullName,
+                  role: role
+                })
+                .select()
+                .single();
+                
+              if (createError) {
+                console.error('❌ Error creating profile:', createError);
+              } else if (newProfile) {
+                profile = newProfile;
+                console.log('✅ Profile created:', { role: profile.role });
+              }
+            }
+            
+            // Always set profile, even if null
+            if (profile) {
+              setProfile(profile);
+              
+              // Load messages for all users
+              await loadMessages();
+              
+              // Load subscription status for Refugi Leads
+              if (profile.role === 'refugi_lead') {
+                await loadSubscriptionStatus();
+              }
             }
           }
           
@@ -1087,12 +1131,21 @@ export const useAppStore = create<AppState>()(
   )
 );
 
-// Auth state listener - only for session changes, not initialization
-supabase.auth.onAuthStateChange((event, session) => {
-  const { setAuth } = useAppStore.getState();
+// Auth state listener - enhanced to reload profile on sign in
+supabase.auth.onAuthStateChange(async (event, session) => {
+  const { setAuth, initializeAuth } = useAppStore.getState();
   
-  // Only update auth state on sign in/out events, not during initialization
-  if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+  console.log('🔐 Auth state changed:', event);
+  
+  if (event === 'SIGNED_IN') {
+    console.log('🔐 SIGNED_IN event detected, initializing full auth...');
+    setAuth(session?.user ?? null, session);
+    // Reload profile and related data
+    await initializeAuth();
+  } else if (event === 'SIGNED_OUT') {
+    console.log('🚪 SIGNED_OUT event detected');
+    setAuth(null, null);
+  } else if (event === 'TOKEN_REFRESHED') {
     setAuth(session?.user ?? null, session);
   }
 });

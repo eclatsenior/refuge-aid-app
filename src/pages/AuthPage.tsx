@@ -33,11 +33,20 @@ export function AuthPage() {
   const { signIn, signUp, user, profile } = useAppStore();
   const { toast } = useToast();
 
-  // Redirect if already authenticated
+  // Redirect authenticated users automatically
   useEffect(() => {
     if (user && profile) {
-      // This will be handled by App.tsx routing
-      return;
+      console.log('✅ User authenticated, redirecting...', { role: profile.role });
+      
+      // Small delay to ensure state is synchronized
+      setTimeout(() => {
+        if (profile.role === 'employee') {
+          window.location.href = '/';
+        } else if (profile.role === 'refugi_lead') {
+          // App.tsx will handle dashboard rendering
+          window.location.reload();
+        }
+      }, 100);
     }
   }, [user, profile]);
 
