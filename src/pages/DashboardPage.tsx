@@ -25,6 +25,7 @@ import { AttentionQueue } from "@/components/dashboard/AttentionQueue";
 import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import { SubscriptionPlans } from "@/components/dashboard/SubscriptionPlans";
 import { SubscriptionStatus } from "@/components/dashboard/SubscriptionStatus";
+import { ReportingSection } from "@/components/dashboard/ReportingSection";
 
 export function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -237,6 +238,12 @@ export function DashboardPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Reporting Section */}
+        <ReportingSection 
+          employees={assignedEmployees} 
+          alerts={emergencyAlerts} 
+        />
 
         {/* Employees Section */}
         <Card>
