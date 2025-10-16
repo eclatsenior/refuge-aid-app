@@ -1,0 +1,29 @@
+{
+  "title": "Ajustes",
+  "back": "Volver",
+  "emergencyContacts": {
+    "title": "Contactos de Emergencia",
+    "description": "Estos contactos recibirán tu alerta en caso de emergencia",
+    "add": "Añadir contacto"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "vibration": "Vibración del teléfono",
+    "soundAlerts": "Alertas sonoras",
+    "vibrationEnabled": "Vibración activada",
+    "vibrationDisabled": "Vibración desactivada",
+    "soundEnabled": "Alertas sonoras activadas",
+    "soundDisabled": "Alertas sonoras desactivadas"
+  },
+  "privacy": {
+    "title": "Privacidad",
+    "discreetMode": "Modo discreto",
+    "discreetDescription": "La app se muestra como una aplicación de notas",
+    "discreetEnabled": "Modo discreto activado",
+    "discreetDisabled": "Modo discreto desactivado",
+    "shareLocation": "Enviar ubicación en alertas",
+    "shareLocationDescription": "Incluye tu ubicación cuando envíes una alerta",
+    "locationEnabled": "Compartir ubicación activado",
+    "locationDisabled": "Compartir ubicación desactivado"
+  }
+}

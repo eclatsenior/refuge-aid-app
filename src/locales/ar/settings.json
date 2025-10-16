@@ -1,0 +1,29 @@
+{
+  "title": "الإعدادات",
+  "back": "رجوع",
+  "emergencyContacts": {
+    "title": "جهات اتصال الطوارئ",
+    "description": "ستتلقى جهات الاتصال هذه تنبيهك في حالة الطوارئ",
+    "add": "إضافة جهة اتصال"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "vibration": "اهتزاز الهاتف",
+    "soundAlerts": "تنبيهات صوتية",
+    "vibrationEnabled": "تم تفعيل الاهتزاز",
+    "vibrationDisabled": "تم تعطيل الاهتزاز",
+    "soundEnabled": "تم تفعيل التنبيهات الصوتية",
+    "soundDisabled": "تم تعطيل التنبيهات الصوتية"
+  },
+  "privacy": {
+    "title": "الخصوصية",
+    "discreetMode": "الوضع السري",
+    "discreetDescription": "يظهر التطبيق كتطبيق ملاحظات",
+    "discreetEnabled": "تم تفعيل الوضع السري",
+    "discreetDisabled": "تم تعطيل الوضع السري",
+    "shareLocation": "إرسال الموقع في التنبيهات",
+    "shareLocationDescription": "قم بتضمين موقعك عند إرسال تنبيه",
+    "locationEnabled": "تم تفعيل مشاركة الموقع",
+    "locationDisabled": "تم تعطيل مشاركة الموقع"
+  }
+}

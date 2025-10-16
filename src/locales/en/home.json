@@ -1,0 +1,38 @@
+{
+  "title": "Refugi",
+  "discreetMode": {
+    "title": "My Notes",
+    "show": "Show",
+    "hide": "Discreet",
+    "description": "You have secure access to all your features. Press \"Show\" to return to normal mode."
+  },
+  "safetyStatus": {
+    "title": "Safety Status",
+    "safe": "Safe",
+    "anxious": "Anxious",
+    "alert": "Alert",
+    "noRecords": "No records",
+    "lastCheckIn": "Last check-in: {{date}}",
+    "noRecent": "No recent records",
+    "registerNow": "Register current status"
+  },
+  "supportNetwork": {
+    "title": "Support Network",
+    "contacts": "{{count}} trusted contacts configured",
+    "noContacts": "Set up your emergency contacts",
+    "manage": "Manage contacts",
+    "add": "Add contacts"
+  },
+  "emergency": {
+    "callTitle": "Emergency call",
+    "callDescription": "Opening dialer to call 112...",
+    "alertSent": "Alert sent",
+    "alertDescription": "Notifying your trusted contacts via {{method}}..."
+  },
+  "modeToggle": {
+    "normalActivated": "Normal mode activated",
+    "discreetActivated": "Discreet mode activated",
+    "normalDescription": "The app shows its normal interface",
+    "discreetDescription": "The app now looks like a notes app"
+  }
+}

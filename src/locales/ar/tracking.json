@@ -1,0 +1,43 @@
+{
+  "title": "التتبع",
+  "description": "سجل حالتك لتتبع رفاهيتك",
+  "todayQuestion": "كيف تشعر اليوم؟",
+  "todayDescription": "سجل حالتك الحالية للحفاظ على تتبع رفاهيتك",
+  "status": {
+    "stable": {
+      "title": "أشعر بحال جيدة",
+      "description": "مستقر، آمن، هادئ",
+      "label": "مستقر"
+    },
+    "anxious": {
+      "title": "قليلاً من القلق",
+      "description": "قلق، مهموم",
+      "label": "قلق"
+    },
+    "alert": {
+      "title": "لا أشعر بالأمان",
+      "description": "تنبيه، في خطر، أحتاج دعم",
+      "label": "تنبيه"
+    }
+  },
+  "statusRegistered": "تم تسجيل الحالة اليوم",
+  "weeklySummary": {
+    "title": "الملخص الأسبوعي",
+    "description": "آخر 7 أيام - {{registered}} من {{total}} أيام مسجلة",
+    "stableDays": "أيام مستقرة",
+    "anxiousDays": "أيام قلق",
+    "alertDays": "أيام تنبيه"
+  },
+  "last7Days": "آخر 7 أيام",
+  "recentHistory": "السجل الأخير",
+  "toast": {
+    "stable": "تم تسجيل الحالة كمستقرة",
+    "anxious": "تم تسجيل مستوى قلق مرتفع",
+    "alert": "تم تسجيل التنبيه - فكر في الاتصال بالدعم",
+    "saved": "تم حفظ سجلك بشكل آمن",
+    "needHelp": "هل تحتاج مساعدة فورية؟",
+    "useEmergency": "فكر في استخدام زر الطوارئ في الشاشة الرئيسية",
+    "error": "خطأ في التسجيل",
+    "errorDescription": "تعذر حفظ حالتك على الخادم"
+  }
+}

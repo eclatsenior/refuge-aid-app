@@ -1,0 +1,43 @@
+{
+  "title": "Tracking",
+  "description": "Record your status to track your wellbeing",
+  "todayQuestion": "How are you feeling today?",
+  "todayDescription": "Record your current status to keep track of your wellbeing",
+  "status": {
+    "stable": {
+      "title": "I feel good",
+      "description": "Stable, safe, calm",
+      "label": "Stable"
+    },
+    "anxious": {
+      "title": "A bit anxious",
+      "description": "Restless, worried",
+      "label": "Anxious"
+    },
+    "alert": {
+      "title": "I don't feel safe",
+      "description": "Alert, at risk, need support",
+      "label": "Alert"
+    }
+  },
+  "statusRegistered": "Status registered today",
+  "weeklySummary": {
+    "title": "Weekly Summary",
+    "description": "Last 7 days - {{registered}} of {{total}} days recorded",
+    "stableDays": "Stable days",
+    "anxiousDays": "Anxious days",
+    "alertDays": "Alert days"
+  },
+  "last7Days": "Last 7 days",
+  "recentHistory": "Recent History",
+  "toast": {
+    "stable": "Status recorded as stable",
+    "anxious": "High anxiety level recorded",
+    "alert": "Alert recorded - consider contacting support",
+    "saved": "Your record has been saved securely",
+    "needHelp": "Do you need immediate help?",
+    "useEmergency": "Consider using the emergency button on the home screen",
+    "error": "Error recording",
+    "errorDescription": "Could not save your status to the server"
+  }
+}

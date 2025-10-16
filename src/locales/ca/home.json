@@ -1,0 +1,38 @@
+{
+  "title": "Refugi",
+  "discreetMode": {
+    "title": "Les meves notes",
+    "show": "Mostrar",
+    "hide": "Discret",
+    "description": "Tens accés segur a totes les teves funcions. Prem \"Mostrar\" per tornar al mode normal."
+  },
+  "safetyStatus": {
+    "title": "Estat de Seguretat",
+    "safe": "Segur",
+    "anxious": "Ansietat",
+    "alert": "Alerta",
+    "noRecords": "Sense registre",
+    "lastCheckIn": "Últim registre: {{date}}",
+    "noRecent": "No hi ha registres recents",
+    "registerNow": "Registrar estat actual"
+  },
+  "supportNetwork": {
+    "title": "Xarxa de Suport",
+    "contacts": "{{count}} contactes de confiança configurats",
+    "noContacts": "Configura els teus contactes d'emergència",
+    "manage": "Gestionar contactes",
+    "add": "Afegir contactes"
+  },
+  "emergency": {
+    "callTitle": "Trucada d'emergència",
+    "callDescription": "Obrint marcador per trucar al 112...",
+    "alertSent": "Alerta enviada",
+    "alertDescription": "Notificant als teus contactes de confiança via {{method}}..."
+  },
+  "modeToggle": {
+    "normalActivated": "Mode normal activat",
+    "discreetActivated": "Mode discret activat",
+    "normalDescription": "L'aplicació mostra la seva interfície normal",
+    "discreetDescription": "L'aplicació ara sembla una app de notes"
+  }
+}

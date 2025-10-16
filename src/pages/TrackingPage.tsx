@@ -7,11 +7,13 @@ import { useAppStore, type CheckIn } from "@/store/useAppStore";
 import { useToast } from "@/hooks/use-toast";
 import { ensureDate, safeToDateString, safeToLocaleTimeString, safeToLocaleDateString, safeGetTime } from "@/lib/dateUtils";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 
 export function TrackingPage() {
   const [selectedStatus, setSelectedStatus] = useState<'ok' | 'anxious' | 'alert' | null>(null);
   const { checkIns, addCheckIn, settings, updateEmployeePresence, profile } = useAppStore();
   const { toast } = useToast();
+  const { t, i18n } = useTranslation('tracking');
 
   // Heartbeat system - update presence every 2 minutes while on this page
   useEffect(() => {
@@ -61,8 +63,8 @@ export function TrackingPage() {
       if (error) {
         console.error('Error al guardar check-in:', error);
         toast({
-          title: "Error al registrar",
-          description: "No se pudo guardar tu estado en el servidor",
+          title: t('toast.error'),
+          description: t('toast.errorDescription'),
           variant: "destructive"
         });
         return;
@@ -92,15 +94,9 @@ export function TrackingPage() {
     
     addCheckIn(newCheckIn);
     
-    const messages = {
-      ok: 'Estado registrado como estable',
-      anxious: 'Registrado nivel de ansiedad alto',
-      alert: 'Alerta registrada - considera contactar con apoyo'
-    };
-    
     toast({
-      title: messages[status],
-      description: 'Tu registro ha sido guardado de forma segura',
+      title: t(`toast.${status}`),
+      description: t('toast.saved'),
       variant: status === 'alert' ? 'destructive' : 'default'
     });
     
@@ -108,8 +104,8 @@ export function TrackingPage() {
       // In a real app, this could trigger additional actions
       setTimeout(() => {
         toast({
-          title: "¿Necesitas ayuda inmediata?",
-          description: "Considera usar el botón de emergencia en la pantalla de inicio",
+          title: t('toast.needHelp'),
+          description: t('toast.useEmergency'),
           duration: 8000
         });
       }, 2000);
@@ -132,13 +128,13 @@ export function TrackingPage() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'ok':
-        return 'Estable';
+        return t('status.stable.label');
       case 'anxious':
-        return 'Ansiosa';
+        return t('status.anxious.label');
       case 'alert':
-        return 'Alerta';
+        return t('status.alert.label');
       default:
-        return 'Desconocido';
+        return t('status.stable.label');
     }
   };
   
@@ -190,9 +186,9 @@ export function TrackingPage() {
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
       <header className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Seguimiento</h1>
+        <h1 className="text-2xl font-bold mb-2">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Registra tu estado para llevar un seguimiento de tu bienestar
+          {t('description')}
         </p>
       </header>
       
@@ -203,10 +199,10 @@ export function TrackingPage() {
               <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
                 <Heart className="h-5 w-5 text-primary" />
               </div>
-              ¿Cómo te sientes hoy?
+              {t('todayQuestion')}
             </CardTitle>
             <CardDescription className="text-base">
-              Registra tu estado actual para mantener un seguimiento de tu bienestar
+              {t('todayDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -220,8 +216,8 @@ export function TrackingPage() {
                   <CheckCircle size={24} className="text-white" />
                 </div>
                 <div className="text-left">
-                  <div className="font-bold text-lg text-foreground">Me siento bien</div>
-                  <div className="text-sm text-muted-foreground">Estable, segura, tranquila</div>
+                  <div className="font-bold text-lg text-foreground">{t('status.stable.title')}</div>
+                  <div className="text-sm text-muted-foreground">{t('status.stable.description')}</div>
                 </div>
               </Button>
               
@@ -234,8 +230,8 @@ export function TrackingPage() {
                   <Clock size={24} className="text-white" />
                 </div>
                 <div className="text-left">
-                  <div className="font-bold text-lg text-foreground">Algo ansiosa</div>
-                  <div className="text-sm text-muted-foreground">Intranquila, preocupada</div>
+                  <div className="font-bold text-lg text-foreground">{t('status.anxious.title')}</div>
+                  <div className="text-sm text-muted-foreground">{t('status.anxious.description')}</div>
                 </div>
               </Button>
               
@@ -248,8 +244,8 @@ export function TrackingPage() {
                   <AlertCircle size={24} className="text-white" />
                 </div>
                 <div className="text-left">
-                  <div className="font-bold text-lg text-foreground">No me siento segura</div>
-                  <div className="text-sm text-muted-foreground">Alerta, en riesgo, necesito apoyo</div>
+                  <div className="font-bold text-lg text-foreground">{t('status.alert.title')}</div>
+                  <div className="text-sm text-muted-foreground">{t('status.alert.description')}</div>
                 </div>
               </Button>
             </div>
@@ -274,9 +270,9 @@ export function TrackingPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="font-bold text-lg text-foreground">Estado registrado hoy</div>
+                  <div className="font-bold text-lg text-foreground">{t('statusRegistered')}</div>
                   <div className="text-sm text-muted-foreground">
-                    {safeToLocaleTimeString(todayCheckIn.timestamp, 'es-ES', {
+                    {safeToLocaleTimeString(todayCheckIn.timestamp, i18n.language, {
                       hour: '2-digit',
                       minute: '2-digit'
                     })}
@@ -301,10 +297,13 @@ export function TrackingPage() {
             <div className="h-10 w-10 rounded-full bg-cyan/20 flex items-center justify-center">
               <TrendingUp className="h-5 w-5 text-cyan" />
             </div>
-            Resumen Semanal
+            {t('weeklySummary.title')}
           </CardTitle>
           <CardDescription className="text-base">
-            Últimos 7 días - {stats.okCount + stats.anxiousCount + stats.alertCount} de {stats.totalDays} días registrados
+            {t('weeklySummary.description', { 
+              registered: stats.okCount + stats.anxiousCount + stats.alertCount, 
+              total: stats.totalDays 
+            })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -313,19 +312,19 @@ export function TrackingPage() {
               <div className="h-12 w-12 rounded-full bg-mint/20 flex items-center justify-center">
                 <div className="text-2xl font-bold text-mint">{stats.okCount}</div>
               </div>
-              <div className="text-sm text-muted-foreground font-medium">Días estables</div>
+              <div className="text-sm text-muted-foreground font-medium">{t('weeklySummary.stableDays')}</div>
             </div>
             <div className="flex flex-col items-center gap-2">
               <div className="h-12 w-12 rounded-full bg-coral/20 flex items-center justify-center">
                 <div className="text-2xl font-bold text-coral">{stats.anxiousCount}</div>
               </div>
-              <div className="text-sm text-muted-foreground font-medium">Días ansiosos</div>
+              <div className="text-sm text-muted-foreground font-medium">{t('weeklySummary.anxiousDays')}</div>
             </div>
             <div className="flex flex-col items-center gap-2">
               <div className="h-12 w-12 rounded-full bg-emergency/20 flex items-center justify-center">
                 <div className="text-2xl font-bold text-emergency">{stats.alertCount}</div>
               </div>
-              <div className="text-sm text-muted-foreground font-medium">Días de alerta</div>
+              <div className="text-sm text-muted-foreground font-medium">{t('weeklySummary.alertDays')}</div>
             </div>
           </div>
         </CardContent>
@@ -337,7 +336,7 @@ export function TrackingPage() {
             <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
               <Calendar className="h-5 w-5 text-primary" />
             </div>
-            Últimos 7 días
+            {t('last7Days')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -349,7 +348,7 @@ export function TrackingPage() {
               return (
                 <div key={index} className="text-center">
                   <div className="text-xs text-muted-foreground mb-2 font-medium">
-                    {date.toLocaleDateString('es-ES', { weekday: 'short' })}
+                    {date.toLocaleDateString(i18n.language, { weekday: 'short' })}
                   </div>
                   <div className="text-sm mb-3 font-semibold">
                     {date.getDate()}
@@ -383,7 +382,7 @@ export function TrackingPage() {
       {checkIns.length > 0 && (
         <Card className="mt-8 bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
           <CardHeader>
-            <CardTitle className="text-xl">Historial Reciente</CardTitle>
+            <CardTitle className="text-xl">{t('recentHistory')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -407,7 +406,7 @@ export function TrackingPage() {
                       <div>
                         <div className="font-semibold text-foreground">{getStatusLabel(checkIn.status)}</div>
                         <div className="text-sm text-muted-foreground">
-                          {safeToLocaleDateString(checkIn.timestamp, 'es-ES', {
+                          {safeToLocaleDateString(checkIn.timestamp, i18n.language, {
                             day: '2-digit',
                             month: '2-digit',
                             hour: '2-digit',

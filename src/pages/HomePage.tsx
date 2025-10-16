@@ -18,7 +18,8 @@ interface HomePageProps {
 export function HomePage({ onNavigate }: HomePageProps) {
   const { settings, updateSettings, trustedContacts, checkIns, triggerEmergency } = useAppStore();
   const { toast } = useToast();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('home');
+  const { t: tCommon } = useTranslation('common');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [messageCenterOpen, setMessageCenterOpen] = useState(false);
   
@@ -30,13 +31,14 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const handleEmergencyAction = (action: 'call' | 'whatsapp' | 'sms') => {
     if (action === 'call') {
       toast({
-        title: "Llamada de emergencia",
-        description: "Abriendo marcador para llamar al 112..."
+        title: t('emergency.callTitle'),
+        description: t('emergency.callDescription')
       });
     } else {
+      const method = action === 'whatsapp' ? 'WhatsApp' : 'SMS';
       toast({
-        title: "Alerta enviada",
-        description: `Notificando a tus contactos de confianza vía ${action === 'whatsapp' ? 'WhatsApp' : 'SMS'}...`
+        title: t('emergency.alertSent'),
+        description: t('emergency.alertDescription', { method })
       });
     }
   };
@@ -44,10 +46,10 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const toggleDiscreetMode = () => {
     updateSettings({ isDiscreetMode: !settings.isDiscreetMode });
     toast({
-      title: settings.isDiscreetMode ? "Modo normal activado" : "Modo discreto activado",
+      title: settings.isDiscreetMode ? t('modeToggle.normalActivated') : t('modeToggle.discreetActivated'),
       description: settings.isDiscreetMode 
-        ? "La aplicación muestra su interfaz normal" 
-        : "La aplicación ahora parece una app de notas"
+        ? t('modeToggle.normalDescription') 
+        : t('modeToggle.discreetDescription')
     });
   };
   
@@ -76,7 +78,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
       <div className="min-h-screen bg-background p-4 pb-20">
         <header className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Mis Notas</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t('discreetMode.title')}</h1>
             <p className="text-muted-foreground">
               {currentTime.toLocaleDateString('es-ES', { 
                 weekday: 'long', 
@@ -93,7 +95,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             className="gap-2 border border-border/50"
           >
             <Eye size={16} />
-            Mostrar
+            {t('discreetMode.show')}
           </Button>
         </header>
         
@@ -106,8 +108,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
           <Card className="bg-card/90 border-border/50">
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">
-                Tienes acceso seguro a todas tus funciones. 
-                Pulsa "Mostrar" para volver al modo normal.
+                {t('discreetMode.description')}
               </p>
             </CardContent>
           </Card>
@@ -129,7 +130,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
               alt="Refugi Logo" 
               className="w-8 h-8 object-contain"
             />
-            <h1 className="text-2xl font-bold drop-shadow-lg">Refugi</h1>
+            <h1 className="text-2xl font-bold drop-shadow-lg">{t('title')}</h1>
           </div>
           <p className="text-muted-foreground text-sm drop-shadow-sm">
             {timeFormatter.format(currentTime)} - {currentTime.toLocaleDateString('es-ES', { 
@@ -146,7 +147,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             className="text-foreground hover:bg-secondary/50 gap-2 border border-border/50"
           >
             <EyeOff size={16} />
-            Discreto
+            {t('discreetMode.hide')}
           </Button>
           <Button
             variant="ghost"
@@ -170,7 +171,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
           <Card className="bg-card/90 backdrop-blur-sm border-border/50 shadow-mint">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg text-foreground">Estado de Seguridad</CardTitle>
+                <CardTitle className="text-lg text-foreground">{t('safetyStatus.title')}</CardTitle>
                 <Badge 
                   variant={lastCheckIn?.status === 'ok' ? 'default' : 'destructive'}
                   className={`${
@@ -181,15 +182,15 @@ export function HomePage({ onNavigate }: HomePageProps) {
                         : 'bg-warning/20 text-warning-foreground border-warning/30'
                   }`}
                 >
-                  {lastCheckIn?.status === 'ok' ? 'Seguro' : 
-                   lastCheckIn?.status === 'anxious' ? 'Ansiedad' : 
-                   lastCheckIn?.status === 'alert' ? 'Alerta' : 'Sin registro'}
+                  {lastCheckIn?.status === 'ok' ? t('safetyStatus.safe') : 
+                   lastCheckIn?.status === 'anxious' ? t('safetyStatus.anxious') : 
+                   lastCheckIn?.status === 'alert' ? t('safetyStatus.alert') : t('safetyStatus.noRecords')}
                 </Badge>
               </div>
               <CardDescription className="text-muted-foreground">
                 {lastCheckIn 
-                  ? `Último registro: ${safeToLocaleDateString(lastCheckIn.timestamp, 'es-ES')}`
-                  : 'No hay registros recientes'
+                  ? t('safetyStatus.lastCheckIn', { date: safeToLocaleDateString(lastCheckIn.timestamp, 'es-ES') })
+                  : t('safetyStatus.noRecent')
                 }
               </CardDescription>
             </CardHeader>
@@ -200,7 +201,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 size="sm"
                 className="w-full bg-mint/20 hover:bg-mint/30 text-mint-foreground border-mint/30 shadow-mint"
               >
-                Registrar estado actual
+                {t('safetyStatus.registerNow')}
               </Button>
             </CardContent>
           </Card>
@@ -209,12 +210,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <Shield size={20} className="text-cyan" />
-                <CardTitle className="text-lg text-foreground">Red de Apoyo</CardTitle>
+                <CardTitle className="text-lg text-foreground">{t('supportNetwork.title')}</CardTitle>
               </div>
               <CardDescription className="text-muted-foreground">
                 {trustedContacts.length > 0 
-                  ? `${trustedContacts.length} contactos de confianza configurados`
-                  : 'Configura tus contactos de emergencia'
+                  ? t('supportNetwork.contacts', { count: trustedContacts.length })
+                  : t('supportNetwork.noContacts')
                 }
               </CardDescription>
             </CardHeader>
@@ -225,7 +226,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 size="sm"
                 className="w-full bg-cyan/20 hover:bg-cyan/30 text-cyan-foreground border-cyan/30 shadow-cyan"
               >
-                {trustedContacts.length > 0 ? 'Gestionar contactos' : 'Añadir contactos'}
+                {trustedContacts.length > 0 ? t('supportNetwork.manage') : t('supportNetwork.add')}
               </Button>
             </CardContent>
           </Card>

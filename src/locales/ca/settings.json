@@ -1,0 +1,29 @@
+{
+  "title": "Configuració",
+  "back": "Tornar",
+  "emergencyContacts": {
+    "title": "Contactes d'Emergència",
+    "description": "Aquests contactes rebran la teva alerta en cas d'emergència",
+    "add": "Afegir contacte"
+  },
+  "notifications": {
+    "title": "Notificacions",
+    "vibration": "Vibració del telèfon",
+    "soundAlerts": "Alertes sonores",
+    "vibrationEnabled": "Vibració activada",
+    "vibrationDisabled": "Vibració desactivada",
+    "soundEnabled": "Alertes sonores activades",
+    "soundDisabled": "Alertes sonores desactivades"
+  },
+  "privacy": {
+    "title": "Privacitat",
+    "discreetMode": "Mode discret",
+    "discreetDescription": "L'app es mostra com una aplicació de notes",
+    "discreetEnabled": "Mode discret activat",
+    "discreetDisabled": "Mode discret desactivat",
+    "shareLocation": "Enviar ubicació en alertes",
+    "shareLocationDescription": "Inclou la teva ubicació quan enviïs una alerta",
+    "locationEnabled": "Compartir ubicació activat",
+    "locationDisabled": "Compartir ubicació desactivat"
+  }
+}

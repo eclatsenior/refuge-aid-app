@@ -1,0 +1,43 @@
+{
+  "title": "Seguimiento",
+  "description": "Registra tu estado para llevar un seguimiento de tu bienestar",
+  "todayQuestion": "¿Cómo te sientes hoy?",
+  "todayDescription": "Registra tu estado actual para mantener un seguimiento de tu bienestar",
+  "status": {
+    "stable": {
+      "title": "Me siento bien",
+      "description": "Estable, segura, tranquila",
+      "label": "Estable"
+    },
+    "anxious": {
+      "title": "Algo ansiosa",
+      "description": "Intranquila, preocupada",
+      "label": "Ansiosa"
+    },
+    "alert": {
+      "title": "No me siento segura",
+      "description": "Alerta, en riesgo, necesito apoyo",
+      "label": "Alerta"
+    }
+  },
+  "statusRegistered": "Estado registrado hoy",
+  "weeklySummary": {
+    "title": "Resumen Semanal",
+    "description": "Últimos 7 días - {{registered}} de {{total}} días registrados",
+    "stableDays": "Días estables",
+    "anxiousDays": "Días ansiosos",
+    "alertDays": "Días de alerta"
+  },
+  "last7Days": "Últimos 7 días",
+  "recentHistory": "Historial Reciente",
+  "toast": {
+    "stable": "Estado registrado como estable",
+    "anxious": "Registrado nivel de ansiedad alto",
+    "alert": "Alerta registrada - considera contactar con apoyo",
+    "saved": "Tu registro ha sido guardado de forma segura",
+    "needHelp": "¿Necesitas ayuda inmediata?",
+    "useEmergency": "Considera usar el botón de emergencia en la pantalla de inicio",
+    "error": "Error al registrar",
+    "errorDescription": "No se pudo guardar tu estado en el servidor"
+  }
+}

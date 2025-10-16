@@ -1,0 +1,29 @@
+{
+  "title": "Settings",
+  "back": "Back",
+  "emergencyContacts": {
+    "title": "Emergency Contacts",
+    "description": "These contacts will receive your alert in case of emergency",
+    "add": "Add contact"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "vibration": "Phone vibration",
+    "soundAlerts": "Sound alerts",
+    "vibrationEnabled": "Vibration enabled",
+    "vibrationDisabled": "Vibration disabled",
+    "soundEnabled": "Sound alerts enabled",
+    "soundDisabled": "Sound alerts disabled"
+  },
+  "privacy": {
+    "title": "Privacy",
+    "discreetMode": "Discreet mode",
+    "discreetDescription": "The app appears as a notes application",
+    "discreetEnabled": "Discreet mode enabled",
+    "discreetDisabled": "Discreet mode disabled",
+    "shareLocation": "Send location in alerts",
+    "shareLocationDescription": "Include your location when sending an alert",
+    "locationEnabled": "Share location enabled",
+    "locationDisabled": "Share location disabled"
+  }
+}

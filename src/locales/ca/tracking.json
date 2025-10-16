@@ -1,0 +1,43 @@
+{
+  "title": "Seguiment",
+  "description": "Registra el teu estat per fer un seguiment del teu benestar",
+  "todayQuestion": "Com et sents avui?",
+  "todayDescription": "Registra el teu estat actual per mantenir un seguiment del teu benestar",
+  "status": {
+    "stable": {
+      "title": "Em sento bé",
+      "description": "Estable, segura, tranquil·la",
+      "label": "Estable"
+    },
+    "anxious": {
+      "title": "Una mica ansiosa",
+      "description": "Inquieta, preocupada",
+      "label": "Ansiosa"
+    },
+    "alert": {
+      "title": "No em sento segura",
+      "description": "Alerta, en risc, necessito suport",
+      "label": "Alerta"
+    }
+  },
+  "statusRegistered": "Estat registrat avui",
+  "weeklySummary": {
+    "title": "Resum Setmanal",
+    "description": "Últims 7 dies - {{registered}} de {{total}} dies registrats",
+    "stableDays": "Dies estables",
+    "anxiousDays": "Dies ansiosos",
+    "alertDays": "Dies d'alerta"
+  },
+  "last7Days": "Últims 7 dies",
+  "recentHistory": "Historial Recent",
+  "toast": {
+    "stable": "Estat registrat com a estable",
+    "anxious": "Registrat nivell d'ansietat alt",
+    "alert": "Alerta registrada - considera contactar amb suport",
+    "saved": "El teu registre s'ha guardat de forma segura",
+    "needHelp": "Necessites ajuda immediata?",
+    "useEmergency": "Considera utilitzar el botó d'emergència a la pantalla d'inici",
+    "error": "Error en registrar",
+    "errorDescription": "No s'ha pogut guardar el teu estat al servidor"
+  }
+}

@@ -9,6 +9,7 @@ import { TrustedContactsList } from "@/components/settings/TrustedContactsList";
 import { TrustedContactDialog } from "@/components/settings/TrustedContactDialog";
 import { useAppStore } from "@/store/useAppStore";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface SettingsPageProps {
   onNavigate: (path: string) => void;
@@ -17,25 +18,26 @@ interface SettingsPageProps {
 export default function SettingsPage({ onNavigate }: SettingsPageProps) {
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const { settings, updateSettings } = useAppStore();
+  const { t } = useTranslation('settings');
 
   const handleToggleVibration = (checked: boolean) => {
     updateSettings({ phoneVibration: checked });
-    toast.success(checked ? "Vibración activada" : "Vibración desactivada");
+    toast.success(checked ? t('notifications.vibrationEnabled') : t('notifications.vibrationDisabled'));
   };
 
   const handleToggleSoundAlerts = (checked: boolean) => {
     updateSettings({ soundAlerts: checked });
-    toast.success(checked ? "Alertas sonoras activadas" : "Alertas sonoras desactivadas");
+    toast.success(checked ? t('notifications.soundEnabled') : t('notifications.soundDisabled'));
   };
 
   const handleToggleDiscreetMode = (checked: boolean) => {
     updateSettings({ isDiscreetMode: checked });
-    toast.success(checked ? "Modo discreto activado" : "Modo discreto desactivado");
+    toast.success(checked ? t('privacy.discreetEnabled') : t('privacy.discreetDisabled'));
   };
 
   const handleToggleShareLocation = (checked: boolean) => {
     updateSettings({ locationConsent: checked });
-    toast.success(checked ? "Compartir ubicación activado" : "Compartir ubicación desactivado");
+    toast.success(checked ? t('privacy.locationEnabled') : t('privacy.locationDisabled'));
   };
 
   return (
@@ -47,11 +49,11 @@ export default function SettingsPage({ onNavigate }: SettingsPageProps) {
             variant="ghost"
             size="icon"
             onClick={() => onNavigate("/")}
-            aria-label="Volver"
+            aria-label={t('back')}
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-semibold">Ajustes</h1>
+          <h1 className="text-2xl font-semibold">{t('title')}</h1>
         </div>
       </div>
 
@@ -61,10 +63,10 @@ export default function SettingsPage({ onNavigate }: SettingsPageProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <span className="text-2xl">📞</span>
-              Contactos de Emergencia
+              {t('emergencyContacts.title')}
             </CardTitle>
             <CardDescription>
-              Estos contactos recibirán tu alerta en caso de emergencia
+              {t('emergencyContacts.description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -76,7 +78,7 @@ export default function SettingsPage({ onNavigate }: SettingsPageProps) {
               variant="outline"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Añadir contacto
+              {t('emergencyContacts.add')}
             </Button>
           </CardContent>
         </Card>
@@ -86,13 +88,13 @@ export default function SettingsPage({ onNavigate }: SettingsPageProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              Notificaciones
+              {t('notifications.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <Label htmlFor="vibration" className="flex-1 cursor-pointer">
-                Vibración del teléfono
+                {t('notifications.vibration')}
               </Label>
               <Switch
                 id="vibration"
@@ -105,7 +107,7 @@ export default function SettingsPage({ onNavigate }: SettingsPageProps) {
             
             <div className="flex items-center justify-between">
               <Label htmlFor="sound" className="flex-1 cursor-pointer">
-                Alertas sonoras
+                {t('notifications.soundAlerts')}
               </Label>
               <Switch
                 id="sound"
@@ -121,17 +123,17 @@ export default function SettingsPage({ onNavigate }: SettingsPageProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
-              Privacidad
+              {t('privacy.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <Label htmlFor="discreet" className="cursor-pointer">
-                  Modo discreto
+                  {t('privacy.discreetMode')}
                 </Label>
                 <p className="text-sm text-muted-foreground mt-1">
-                  La app se muestra como una aplicación de notas
+                  {t('privacy.discreetDescription')}
                 </p>
               </div>
               <Switch
@@ -147,10 +149,10 @@ export default function SettingsPage({ onNavigate }: SettingsPageProps) {
               <div className="flex-1">
                 <Label htmlFor="location" className="cursor-pointer flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  Enviar ubicación en alertas
+                  {t('privacy.shareLocation')}
                 </Label>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Incluye tu ubicación cuando envíes una alerta
+                  {t('privacy.shareLocationDescription')}
                 </p>
               </div>
               <Switch

@@ -1,0 +1,38 @@
+{
+  "title": "ريفوجي",
+  "discreetMode": {
+    "title": "ملاحظاتي",
+    "show": "إظهار",
+    "hide": "سري",
+    "description": "لديك وصول آمن لجميع ميزاتك. اضغط على \"إظهار\" للعودة إلى الوضع العادي."
+  },
+  "safetyStatus": {
+    "title": "حالة الأمان",
+    "safe": "آمن",
+    "anxious": "قلق",
+    "alert": "تنبيه",
+    "noRecords": "لا توجد سجلات",
+    "lastCheckIn": "آخر تسجيل: {{date}}",
+    "noRecent": "لا توجد سجلات حديثة",
+    "registerNow": "تسجيل الحالة الحالية"
+  },
+  "supportNetwork": {
+    "title": "شبكة الدعم",
+    "contacts": "تم تكوين {{count}} من جهات الاتصال الموثوقة",
+    "noContacts": "قم بإعداد جهات اتصال الطوارئ الخاصة بك",
+    "manage": "إدارة جهات الاتصال",
+    "add": "إضافة جهات اتصال"
+  },
+  "emergency": {
+    "callTitle": "مكالمة طوارئ",
+    "callDescription": "فتح لوحة الاتصال للاتصال بـ 112...",
+    "alertSent": "تم إرسال التنبيه",
+    "alertDescription": "إخطار جهات الاتصال الموثوقة عبر {{method}}..."
+  },
+  "modeToggle": {
+    "normalActivated": "تم تفعيل الوضع العادي",
+    "discreetActivated": "تم تفعيل الوضع السري",
+    "normalDescription": "يعرض التطبيق واجهته العادية",
+    "discreetDescription": "يبدو التطبيق الآن كتطبيق ملاحظات"
+  }
+}

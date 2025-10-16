@@ -1,0 +1,38 @@
+{
+  "title": "Refugi",
+  "discreetMode": {
+    "title": "Mis Notas",
+    "show": "Mostrar",
+    "hide": "Discreto",
+    "description": "Tienes acceso seguro a todas tus funciones. Pulsa \"Mostrar\" para volver al modo normal."
+  },
+  "safetyStatus": {
+    "title": "Estado de Seguridad",
+    "safe": "Seguro",
+    "anxious": "Ansiedad",
+    "alert": "Alerta",
+    "noRecords": "Sin registro",
+    "lastCheckIn": "Último registro: {{date}}",
+    "noRecent": "No hay registros recientes",
+    "registerNow": "Registrar estado actual"
+  },
+  "supportNetwork": {
+    "title": "Red de Apoyo",
+    "contacts": "{{count}} contactos de confianza configurados",
+    "noContacts": "Configura tus contactos de emergencia",
+    "manage": "Gestionar contactos",
+    "add": "Añadir contactos"
+  },
+  "emergency": {
+    "callTitle": "Llamada de emergencia",
+    "callDescription": "Abriendo marcador para llamar al 112...",
+    "alertSent": "Alerta enviada",
+    "alertDescription": "Notificando a tus contactos de confianza vía {{method}}..."
+  },
+  "modeToggle": {
+    "normalActivated": "Modo normal activado",
+    "discreetActivated": "Modo discreto activado",
+    "normalDescription": "La aplicación muestra su interfaz normal",
+    "discreetDescription": "La aplicación ahora parece una app de notas"
+  }
+}
