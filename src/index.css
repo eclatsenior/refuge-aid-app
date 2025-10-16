@@ -147,3 +147,15 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Navegación móvil responsive - ocultar scrollbar pero mantener funcionalidad */
+nav.navigation-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* iOS smooth scroll */
+}
+
+nav.navigation-scroll::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Edge */
+}
