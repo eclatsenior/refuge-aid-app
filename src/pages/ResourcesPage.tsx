@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from 'react-i18next';
 
 interface Resource {
   id: string;
@@ -19,104 +20,119 @@ interface Resource {
   available24h: boolean;
 }
 
-const resources: Resource[] = [
-  {
-    id: '1',
-    title: 'Teléfono Nacional contra la Violencia de Género',
-    category: 'emergencia',
-    phone: '016',
-    region: 'nacional',
-    description: 'Atención telefónica gratuita y confidencial 24 horas. No deja rastro en la factura.',
-    isVerified: true,
-    available24h: true
-  },
-  {
-    id: '2',
-    title: 'Emergencias - Policía Nacional',
-    category: 'emergencia',
-    phone: '112',
-    region: 'nacional',
-    description: 'Número de emergencias europeo. Disponible 24/7 para situaciones de peligro inmediato.',
-    isVerified: true,
-    available24h: true
-  },
-  {
-    id: '3',
-    title: 'Fundación ANAR - Ayuda a Niños y Adolescentes',
-    category: 'apoyo',
-    phone: '900202010',
-    region: 'nacional',
-    description: 'Atención especializada para menores en situación de riesgo.',
-    isVerified: true,
-    available24h: true
-  },
-  {
-    id: '4',
-    title: 'Delegación del Gobierno contra la Violencia de Género',
-    category: 'informacion',
-    url: 'https://violenciagenero.igualdad.gob.es/',
-    region: 'nacional',
-    description: 'Información oficial, recursos y guías para víctimas de violencia de género.',
-    isVerified: true,
-    available24h: false
-  },
-  {
-    id: '5',
-    title: 'Casa de Acogida - Madrid',
-    category: 'alojamiento',
-    phone: '914804901',
-    region: 'madrid',
-    description: 'Alojamiento temporal y protegido para víctimas y sus hijos.',
-    isVerified: true,
-    available24h: false
-  },
-  {
-    id: '6',
-    title: 'SAREEMHO - Cataluña',
-    category: 'apoyo',
-    phone: '900900120',
-    region: 'cataluña',
-    description: 'Servicio de atención, recuperación y acogida de emergencia.',
-    isVerified: true,
-    available24h: true
-  },
-  {
-    id: '7',
-    title: 'Instituto Andaluz de la Mujer',
-    category: 'apoyo',
-    phone: '900200999',
-    region: 'andalucia',
-    description: 'Atención psicológica y jurídica especializada.',
-    isVerified: true,
-    available24h: false
-  }
-];
+const useResources = () => {
+  const { t } = useTranslation('resources');
+  
+  return [
+    {
+      id: '1',
+      title: t('resources.1.title'),
+      category: 'emergencia',
+      phone: '016',
+      region: 'nacional',
+      description: t('resources.1.description'),
+      isVerified: true,
+      available24h: true
+    },
+    {
+      id: '2',
+      title: t('resources.2.title'),
+      category: 'emergencia',
+      phone: '112',
+      region: 'nacional',
+      description: t('resources.2.description'),
+      isVerified: true,
+      available24h: true
+    },
+    {
+      id: '3',
+      title: t('resources.3.title'),
+      category: 'apoyo',
+      phone: '900202010',
+      region: 'nacional',
+      description: t('resources.3.description'),
+      isVerified: true,
+      available24h: true
+    },
+    {
+      id: '4',
+      title: t('resources.4.title'),
+      category: 'informacion',
+      url: 'https://violenciagenero.igualdad.gob.es/',
+      region: 'nacional',
+      description: t('resources.4.description'),
+      isVerified: true,
+      available24h: false
+    },
+    {
+      id: '5',
+      title: t('resources.5.title'),
+      category: 'alojamiento',
+      phone: '914804901',
+      region: 'madrid',
+      description: t('resources.5.description'),
+      isVerified: true,
+      available24h: false
+    },
+    {
+      id: '6',
+      title: t('resources.6.title'),
+      category: 'apoyo',
+      phone: '900900120',
+      region: 'cataluña',
+      description: t('resources.6.description'),
+      isVerified: true,
+      available24h: true
+    },
+    {
+      id: '7',
+      title: t('resources.7.title'),
+      category: 'apoyo',
+      phone: '900200999',
+      region: 'andalucia',
+      description: t('resources.7.description'),
+      isVerified: true,
+      available24h: false
+    }
+  ];
+};
 
-const categories = [
-  { value: 'todos', label: 'Todas las categorías' },
-  { value: 'emergencia', label: 'Emergencias' },
-  { value: 'apoyo', label: 'Apoyo y atención' },
-  { value: 'alojamiento', label: 'Alojamiento' },
-  { value: 'informacion', label: 'Información' }
-];
+const useCategories = () => {
+  const { t } = useTranslation('resources');
+  return [
+    { value: 'todos', label: t('categories.all') },
+    { value: 'emergencia', label: t('categories.emergency') },
+    { value: 'apoyo', label: t('categories.support') },
+    { value: 'alojamiento', label: t('categories.housing') },
+    { value: 'informacion', label: t('categories.information') }
+  ];
+};
 
-const regions = [
-  { value: 'todas', label: 'Todas las regiones' },
-  { value: 'nacional', label: 'Nacional' },
-  { value: 'madrid', label: 'Madrid' },
-  { value: 'cataluña', label: 'Cataluña' },
-  { value: 'andalucia', label: 'Andalucía' },
-  { value: 'valencia', label: 'Valencia' },
-  { value: 'galicia', label: 'Galicia' },
-  { value: 'pais-vasco', label: 'País Vasco' }
-];
+const useRegions = () => {
+  const { t } = useTranslation('resources');
+  return [
+    { value: 'todas', label: t('regions.all') },
+    { value: 'nacional', label: t('regions.national') },
+    { value: 'madrid', label: t('regions.madrid') },
+    { value: 'cataluña', label: t('regions.cataluña') },
+    { value: 'andalucia', label: t('regions.andalucia') },
+    { value: 'valencia', label: t('regions.valencia') },
+    { value: 'galicia', label: t('regions.galicia') },
+    { value: 'pais-vasco', label: t('regions.pais-vasco') }
+  ];
+};
 
 export function ResourcesPage() {
+  const { t } = useTranslation('resources');
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("todos");
   const [selectedRegion, setSelectedRegion] = useState("todas");
   const [favorites, setFavorites] = useState<string[]>([]);
   const { toast } = useToast();
+  
+  const resources = useResources();
+  const categories = useCategories();
+  const regions = useRegions();
   
   const filteredResources = resources.filter(resource => {
     const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -128,11 +144,11 @@ export function ResourcesPage() {
   });
   
   const handleCall = (phone: string, title: string) => {
-    if (confirm(`¿Deseas llamar a ${title}?\nNúmero: ${phone}`)) {
+    if (confirm(`${t('toast.callConfirm', { title })}\n${t('toast.callNumber', { phone })}`)) {
       window.open(`tel:${phone}`);
       toast({
-        title: "Abriendo marcador",
-        description: `Llamando a ${phone}`
+        title: t('toast.calling'),
+        description: t('toast.callingDescription', { phone })
       });
     }
   };
@@ -140,8 +156,8 @@ export function ResourcesPage() {
   const handleOpenUrl = (url: string, title: string) => {
     window.open(url, '_blank');
     toast({
-      title: "Abriendo enlace",
-      description: `Accediendo a ${title}`
+      title: t('toast.openingLink'),
+      description: t('toast.accessingDescription', { title })
     });
   };
   
@@ -149,8 +165,8 @@ export function ResourcesPage() {
     const info = `${resource.title}\n${resource.phone ? `Tel: ${resource.phone}\n` : ''}${resource.url ? `Web: ${resource.url}\n` : ''}${resource.description}`;
     navigator.clipboard.writeText(info);
     toast({
-      title: "Información copiada",
-      description: "Puedes pegar esta información donde necesites"
+      title: t('toast.copied'),
+      description: t('toast.copiedDescription')
     });
   };
   
@@ -185,9 +201,9 @@ export function ResourcesPage() {
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
       <header className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Recursos de Apoyo</h1>
+        <h1 className="text-2xl font-bold mb-2">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Encuentra ayuda profesional y servicios especializados
+          {t('description')}
         </p>
       </header>
       
@@ -195,7 +211,7 @@ export function ResourcesPage() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
           <Input
-            placeholder="Buscar recursos..."
+            placeholder={t('search.placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -205,7 +221,7 @@ export function ResourcesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger>
-              <SelectValue placeholder="Categoría" />
+              <SelectValue placeholder={t('filters.category')} />
             </SelectTrigger>
             <SelectContent>
               {categories.map(category => (
@@ -218,7 +234,7 @@ export function ResourcesPage() {
           
           <Select value={selectedRegion} onValueChange={setSelectedRegion}>
             <SelectTrigger>
-              <SelectValue placeholder="Región" />
+              <SelectValue placeholder={t('filters.region')} />
             </SelectTrigger>
             <SelectContent>
               {regions.map(region => (
@@ -234,9 +250,9 @@ export function ResourcesPage() {
       {filteredResources.length === 0 ? (
         <div className="text-center py-12">
           <MapPin className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No se encontraron recursos</h3>
+          <h3 className="text-lg font-semibold mb-2">{t('empty.title')}</h3>
           <p className="text-muted-foreground">
-            Prueba con otros filtros o términos de búsqueda
+            {t('empty.description')}
           </p>
         </div>
       ) : (
@@ -268,7 +284,7 @@ export function ResourcesPage() {
                         </CardTitle>
                         {resource.isVerified && (
                           <Badge variant="secondary" className="text-xs bg-safe/10 text-safe border-safe/20">
-                            ✓ Verificado
+                            ✓ {t('badges.verified')}
                           </Badge>
                         )}
                       </div>
@@ -284,7 +300,7 @@ export function ResourcesPage() {
                         
                         {resource.available24h && (
                           <Badge variant="secondary" className="text-xs">
-                            24h
+                            {t('badges.24h')}
                           </Badge>
                         )}
                       </div>
@@ -331,7 +347,7 @@ export function ResourcesPage() {
                         size="sm"
                       >
                         <ExternalLink size={14} className="mr-1" />
-                        Web
+                        {t('buttons.web')}
                       </Button>
                     )}
                     
@@ -341,7 +357,7 @@ export function ResourcesPage() {
                       size="sm"
                     >
                       <Copy size={14} className="mr-1" />
-                      Copiar
+                      {t('buttons.copy')}
                     </Button>
                   </div>
                 </CardContent>
@@ -354,11 +370,11 @@ export function ResourcesPage() {
         <div className="flex items-start gap-3">
           <Heart className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium mb-1">Recuerda</p>
-            <p className="text-sm text-muted-foreground">
-              En caso de emergencia inmediata, llama al <strong>112</strong> o al <strong>016</strong>. 
-              Estos números no aparecen en la factura telefónica.
-            </p>
+            <p className="text-sm font-medium mb-1">{t('reminder.title')}</p>
+            <p 
+              className="text-sm text-muted-foreground"
+              dangerouslySetInnerHTML={{ __html: t('reminder.description') }}
+            />
           </div>
         </div>
       </div>

@@ -1,0 +1,85 @@
+{
+  "title": "Recursos de Suport",
+  "description": "Troba ajuda professional i serveis especialitzats",
+  "search": {
+    "placeholder": "Cercar recursos..."
+  },
+  "filters": {
+    "category": "Categoria",
+    "region": "Regió"
+  },
+  "categories": {
+    "all": "Totes les categories",
+    "emergency": "Emergències",
+    "support": "Suport i atenció",
+    "housing": "Allotjament",
+    "information": "Informació"
+  },
+  "regions": {
+    "all": "Totes les regions",
+    "national": "Nacional",
+    "madrid": "Madrid",
+    "cataluña": "Catalunya",
+    "andalucia": "Andalusia",
+    "valencia": "València",
+    "galicia": "Galícia",
+    "pais-vasco": "País Basc"
+  },
+  "resources": {
+    "1": {
+      "title": "Telèfon Nacional contra la Violència de Gènere",
+      "description": "Atenció telefònica gratuïta i confidencial 24 hores. No deixa rastre a la factura."
+    },
+    "2": {
+      "title": "Emergències - Policia Nacional",
+      "description": "Número d'emergències europeu. Disponible 24/7 per a situacions de perill immediat."
+    },
+    "3": {
+      "title": "Fundació ANAR - Ajuda a Nens i Adolescents",
+      "description": "Atenció especialitzada per a menors en situació de risc."
+    },
+    "4": {
+      "title": "Delegació del Govern contra la Violència de Gènere",
+      "description": "Informació oficial, recursos i guies per a víctimes de violència de gènere."
+    },
+    "5": {
+      "title": "Casa d'Acollida - Madrid",
+      "description": "Allotjament temporal i protegit per a víctimes i els seus fills."
+    },
+    "6": {
+      "title": "SAREEMHO - Catalunya",
+      "description": "Servei d'atenció, recuperació i acollida d'emergència."
+    },
+    "7": {
+      "title": "Institut Andalús de la Dona",
+      "description": "Atenció psicològica i jurídica especialitzada."
+    }
+  },
+  "badges": {
+    "verified": "Verificat",
+    "24h": "24h"
+  },
+  "buttons": {
+    "call": "Trucar",
+    "web": "Web",
+    "copy": "Copiar"
+  },
+  "toast": {
+    "callConfirm": "Vols trucar a {{title}}?",
+    "callNumber": "Número: {{phone}}",
+    "calling": "Obrint marcador",
+    "callingDescription": "Trucant a {{phone}}",
+    "openingLink": "Obrint enllaç",
+    "accessingDescription": "Accedint a {{title}}",
+    "copied": "Informació copiada",
+    "copiedDescription": "Pots enganxar aquesta informació on necessitis"
+  },
+  "empty": {
+    "title": "No s'han trobat recursos",
+    "description": "Prova amb altres filtres o termes de cerca"
+  },
+  "reminder": {
+    "title": "Recorda",
+    "description": "En cas d'emergència immediata, truca al <strong>112</strong> o al <strong>016</strong>. Aquests números no apareixen a la factura telefònica."
+  }
+}

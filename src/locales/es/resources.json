@@ -1,0 +1,85 @@
+{
+  "title": "Recursos de Apoyo",
+  "description": "Encuentra ayuda profesional y servicios especializados",
+  "search": {
+    "placeholder": "Buscar recursos..."
+  },
+  "filters": {
+    "category": "Categoría",
+    "region": "Región"
+  },
+  "categories": {
+    "all": "Todas las categorías",
+    "emergency": "Emergencias",
+    "support": "Apoyo y atención",
+    "housing": "Alojamiento",
+    "information": "Información"
+  },
+  "regions": {
+    "all": "Todas las regiones",
+    "national": "Nacional",
+    "madrid": "Madrid",
+    "cataluña": "Cataluña",
+    "andalucia": "Andalucía",
+    "valencia": "Valencia",
+    "galicia": "Galicia",
+    "pais-vasco": "País Vasco"
+  },
+  "resources": {
+    "1": {
+      "title": "Teléfono Nacional contra la Violencia de Género",
+      "description": "Atención telefónica gratuita y confidencial 24 horas. No deja rastro en la factura."
+    },
+    "2": {
+      "title": "Emergencias - Policía Nacional",
+      "description": "Número de emergencias europeo. Disponible 24/7 para situaciones de peligro inmediato."
+    },
+    "3": {
+      "title": "Fundación ANAR - Ayuda a Niños y Adolescentes",
+      "description": "Atención especializada para menores en situación de riesgo."
+    },
+    "4": {
+      "title": "Delegación del Gobierno contra la Violencia de Género",
+      "description": "Información oficial, recursos y guías para víctimas de violencia de género."
+    },
+    "5": {
+      "title": "Casa de Acogida - Madrid",
+      "description": "Alojamiento temporal y protegido para víctimas y sus hijos."
+    },
+    "6": {
+      "title": "SAREEMHO - Cataluña",
+      "description": "Servicio de atención, recuperación y acogida de emergencia."
+    },
+    "7": {
+      "title": "Instituto Andaluz de la Mujer",
+      "description": "Atención psicológica y jurídica especializada."
+    }
+  },
+  "badges": {
+    "verified": "Verificado",
+    "24h": "24h"
+  },
+  "buttons": {
+    "call": "Llamar",
+    "web": "Web",
+    "copy": "Copiar"
+  },
+  "toast": {
+    "callConfirm": "¿Deseas llamar a {{title}}?",
+    "callNumber": "Número: {{phone}}",
+    "calling": "Abriendo marcador",
+    "callingDescription": "Llamando a {{phone}}",
+    "openingLink": "Abriendo enlace",
+    "accessingDescription": "Accediendo a {{title}}",
+    "copied": "Información copiada",
+    "copiedDescription": "Puedes pegar esta información donde necesites"
+  },
+  "empty": {
+    "title": "No se encontraron recursos",
+    "description": "Prueba con otros filtros o términos de búsqueda"
+  },
+  "reminder": {
+    "title": "Recuerda",
+    "description": "En caso de emergencia inmediata, llama al <strong>112</strong> o al <strong>016</strong>. Estos números no aparecen en la factura telefónica."
+  }
+}

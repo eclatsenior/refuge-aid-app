@@ -1,0 +1,85 @@
+{
+  "title": "Support Resources",
+  "description": "Find professional help and specialized services",
+  "search": {
+    "placeholder": "Search resources..."
+  },
+  "filters": {
+    "category": "Category",
+    "region": "Region"
+  },
+  "categories": {
+    "all": "All categories",
+    "emergency": "Emergency",
+    "support": "Support & care",
+    "housing": "Housing",
+    "information": "Information"
+  },
+  "regions": {
+    "all": "All regions",
+    "national": "National",
+    "madrid": "Madrid",
+    "cataluña": "Catalonia",
+    "andalucia": "Andalusia",
+    "valencia": "Valencia",
+    "galicia": "Galicia",
+    "pais-vasco": "Basque Country"
+  },
+  "resources": {
+    "1": {
+      "title": "National Helpline Against Gender Violence",
+      "description": "Free and confidential phone service 24/7. Doesn't appear on phone bill."
+    },
+    "2": {
+      "title": "Emergency - National Police",
+      "description": "European emergency number. Available 24/7 for immediate danger situations."
+    },
+    "3": {
+      "title": "ANAR Foundation - Help for Children and Adolescents",
+      "description": "Specialized attention for minors at risk."
+    },
+    "4": {
+      "title": "Government Office Against Gender Violence",
+      "description": "Official information, resources and guides for victims of gender violence."
+    },
+    "5": {
+      "title": "Shelter - Madrid",
+      "description": "Temporary and protected accommodation for victims and their children."
+    },
+    "6": {
+      "title": "SAREEMHO - Catalonia",
+      "description": "Service for care, recovery and emergency shelter."
+    },
+    "7": {
+      "title": "Andalusian Women's Institute",
+      "description": "Specialized psychological and legal care."
+    }
+  },
+  "badges": {
+    "verified": "Verified",
+    "24h": "24h"
+  },
+  "buttons": {
+    "call": "Call",
+    "web": "Web",
+    "copy": "Copy"
+  },
+  "toast": {
+    "callConfirm": "Do you want to call {{title}}?",
+    "callNumber": "Number: {{phone}}",
+    "calling": "Opening dialer",
+    "callingDescription": "Calling {{phone}}",
+    "openingLink": "Opening link",
+    "accessingDescription": "Accessing {{title}}",
+    "copied": "Information copied",
+    "copiedDescription": "You can paste this information wherever you need"
+  },
+  "empty": {
+    "title": "No resources found",
+    "description": "Try other filters or search terms"
+  },
+  "reminder": {
+    "title": "Remember",
+    "description": "In case of immediate emergency, call <strong>112</strong> or <strong>016</strong>. These numbers don't appear on your phone bill."
+  }
+}

@@ -31,6 +31,11 @@ import arHome from '@/locales/ar/home.json';
 import arTracking from '@/locales/ar/tracking.json';
 import arSettings from '@/locales/ar/settings.json';
 
+import esResources from '@/locales/es/resources.json';
+import caResources from '@/locales/ca/resources.json';
+import enResources from '@/locales/en/resources.json';
+import arResources from '@/locales/ar/resources.json';
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -42,7 +47,8 @@ i18n
         messages: esMessages,
         home: esHome,
         tracking: esTracking,
-        settings: esSettings
+        settings: esSettings,
+        resources: esResources
       },
       ca: {
         common: caCommon,
@@ -50,7 +56,8 @@ i18n
         messages: caMessages,
         home: caHome,
         tracking: caTracking,
-        settings: caSettings
+        settings: caSettings,
+        resources: caResources
       },
       en: {
         common: enCommon,
@@ -58,7 +65,8 @@ i18n
         messages: enMessages,
         home: enHome,
         tracking: enTracking,
-        settings: enSettings
+        settings: enSettings,
+        resources: enResources
       },
       ar: {
         common: arCommon,
@@ -66,7 +74,8 @@ i18n
         messages: arMessages,
         home: arHome,
         tracking: arTracking,
-        settings: arSettings
+        settings: arSettings,
+        resources: arResources
       }
     },
     fallbackLng: 'es',
