@@ -13,7 +13,6 @@ const useNavigationItems = () => {
     { icon: NotebookPen, label: t('nav.notes'), path: "/notas" },
     { icon: Shield, label: t('nav.path'), path: "/camino" },
     { icon: MapPin, label: t('nav.resources'), path: "/recursos" },
-    { icon: User, label: t('nav.profile'), path: "/perfil" },
   ];
 };
 

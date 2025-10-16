@@ -25,5 +25,13 @@
     "saved": "Guardat correctament",
     "loading": "Carregant...",
     "noData": "No hi ha dades disponibles"
+  },
+  "userMenu": {
+    "viewProfile": "Veure Perfil",
+    "settings": "Configuració",
+    "language": "Idioma",
+    "logout": "Tancar sessió",
+    "user": "Usuari",
+    "menu": "Menú d'usuari"
   }
 }

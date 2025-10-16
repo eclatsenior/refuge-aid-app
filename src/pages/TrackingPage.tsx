@@ -8,8 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 import { ensureDate, safeToDateString, safeToLocaleTimeString, safeToLocaleDateString, safeGetTime } from "@/lib/dateUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
+import { UserMenu } from "@/components/layout/UserMenu";
 
-export function TrackingPage() {
+interface TrackingPageProps {
+  onNavigate: (path: string) => void;
+}
+
+export function TrackingPage({ onNavigate }: TrackingPageProps) {
   const [selectedStatus, setSelectedStatus] = useState<'ok' | 'anxious' | 'alert' | null>(null);
   const { checkIns, addCheckIn, settings, updateEmployeePresence, profile } = useAppStore();
   const { toast } = useToast();
@@ -185,11 +190,14 @@ export function TrackingPage() {
   
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">{t('title')}</h1>
-        <p className="text-muted-foreground">
-          {t('description')}
-        </p>
+      <header className="flex items-center justify-between mb-6">
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold mb-2">{t('title')}</h1>
+          <p className="text-muted-foreground">
+            {t('description')}
+          </p>
+        </div>
+        <UserMenu onNavigate={onNavigate} />
       </header>
       
       {!todayCheckIn && (

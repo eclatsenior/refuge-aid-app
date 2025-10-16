@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Shield, Settings, Eye, EyeOff } from "lucide-react";
+import { Shield, Eye, EyeOff } from "lucide-react";
 import { EmergencyButton } from "@/components/emergency/EmergencyButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { safeToLocaleDateString } from "@/lib/dateUtils";
 import { MessagingButton } from "@/components/messaging/MessagingButton";
 import { MessageCenter } from "@/components/messaging/MessageCenter";
 import { useTranslation } from "react-i18next";
+import { UserMenu } from "@/components/layout/UserMenu";
 
 interface HomePageProps {
   onNavigate: (path: string) => void;
@@ -149,14 +150,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             <EyeOff size={16} />
             {t('discreetMode.hide')}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onNavigate('/ajustes')}
-            className="text-foreground hover:bg-secondary/50 border border-border/50"
-          >
-            <Settings size={20} />
-          </Button>
+          <UserMenu onNavigate={onNavigate} />
         </div>
       </header>
       

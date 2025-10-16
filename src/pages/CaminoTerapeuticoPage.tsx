@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { UserMenu } from "@/components/layout/UserMenu";
 
 interface CaminoTerapeuticoPageProps {
   onNavigate: (path: string) => void;
@@ -358,6 +359,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
           <ArrowLeft size={20} />
           Volver
         </Button>
+        <UserMenu onNavigate={onNavigate} />
       </header>
       
       <div className="max-w-2xl mx-auto">

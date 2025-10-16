@@ -7,6 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from 'react-i18next';
+import { UserMenu } from "@/components/layout/UserMenu";
+
+interface ResourcesPageProps {
+  onNavigate: (path: string) => void;
+}
 
 interface Resource {
   id: string;
@@ -122,7 +127,7 @@ const useRegions = () => {
   ];
 };
 
-export function ResourcesPage() {
+export function ResourcesPage({ onNavigate }: ResourcesPageProps) {
   const { t } = useTranslation('resources');
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("todos");
@@ -200,11 +205,14 @@ export function ResourcesPage() {
   
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">{t('title')}</h1>
-        <p className="text-muted-foreground">
-          {t('description')}
-        </p>
+      <header className="flex items-center justify-between mb-6">
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold mb-2">{t('title')}</h1>
+          <p className="text-muted-foreground">
+            {t('description')}
+          </p>
+        </div>
+        <UserMenu onNavigate={onNavigate} />
       </header>
       
       <div className="space-y-4 mb-6">

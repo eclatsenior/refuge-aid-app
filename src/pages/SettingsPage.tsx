@@ -10,6 +10,7 @@ import { TrustedContactDialog } from "@/components/settings/TrustedContactDialog
 import { useAppStore } from "@/store/useAppStore";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { UserMenu } from "@/components/layout/UserMenu";
 
 interface SettingsPageProps {
   onNavigate: (path: string) => void;
@@ -44,16 +45,19 @@ export default function SettingsPage({ onNavigate }: SettingsPageProps) {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="bg-card border-b sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onNavigate("/")}
-            aria-label={t('back')}
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-2xl font-semibold">{t('title')}</h1>
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onNavigate("/")}
+              aria-label={t('back')}
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-2xl font-semibold">{t('title')}</h1>
+          </div>
+          <UserMenu onNavigate={onNavigate} />
         </div>
       </div>
 

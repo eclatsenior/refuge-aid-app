@@ -117,7 +117,7 @@ const App = () => {
   const renderCurrentPage = () => {
     switch (currentPath) {
       case "/seguimiento":
-        return <TrackingPage />;
+        return <TrackingPage onNavigate={handleNavigate} />;
       case "/notas":
         return <NotesPage onNavigate={handleNavigate} />;
       case "/camino":
@@ -125,7 +125,7 @@ const App = () => {
       case "/calma":
         return <CalmPage />;
       case "/recursos":
-        return <ResourcesPage />;
+        return <ResourcesPage onNavigate={handleNavigate} />;
       case "/carta":
         return <CartaBienvenidaPage onNavigate={handleNavigate} isOverlay={false} />;
       case "/ajustes":

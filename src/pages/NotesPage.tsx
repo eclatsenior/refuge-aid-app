@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/store/useAppStore";
 import { useToast } from "@/hooks/use-toast";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface NotesPageProps {
@@ -313,15 +314,18 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
               Un espacio protegido para lo que pesa y para lo que salva
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleEmergencyHide}
-            className="gap-2 text-muted-foreground"
-          >
-            <Shield size={16} />
-            Ocultar
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleEmergencyHide}
+              className="gap-2 text-muted-foreground"
+            >
+              <Shield size={16} />
+              Ocultar
+            </Button>
+            <UserMenu onNavigate={onNavigate} />
+          </div>
         </div>
       </header>
 

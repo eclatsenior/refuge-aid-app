@@ -25,5 +25,13 @@
     "saved": "Saved successfully",
     "loading": "Loading...",
     "noData": "No data available"
+  },
+  "userMenu": {
+    "viewProfile": "View Profile",
+    "settings": "Settings",
+    "language": "Language",
+    "logout": "Log out",
+    "user": "User",
+    "menu": "User menu"
   }
 }
