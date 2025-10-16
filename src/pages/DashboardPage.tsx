@@ -9,7 +9,8 @@ import {
   Filter,
   RefreshCw,
   Volume2,
-  VolumeX
+  VolumeX,
+  Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,9 +45,11 @@ export function DashboardPage() {
     assignedEmployees, 
     emergencyAlerts, 
     subscription,
+    leadSettings,
     loadEmployeeData, 
     loadEmergencyAlerts,
     loadSubscriptionStatus,
+    loadLeadSettings,
     canAddEmployee,
     setupRealtimeSubscriptions,
     logout 
@@ -187,7 +190,8 @@ export function DashboardPage() {
     try {
       await Promise.all([
         loadEmployeeData(),
-        loadEmergencyAlerts()
+        loadEmergencyAlerts(),
+        loadLeadSettings()
       ]);
       toast({
         title: "Datos actualizados",
@@ -196,7 +200,7 @@ export function DashboardPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "No se pudieron actualizar los datos",
+        description: "No se pudo actualizar la información",
         variant: "destructive"
       });
     } finally {
@@ -272,6 +276,13 @@ export function DashboardPage() {
                 disabled={isLoading}
               >
                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => window.location.href = '/dashboard/settings'}
+              >
+                <Settings className="h-4 w-4" />
               </Button>
               <Button 
                 variant="ghost" 

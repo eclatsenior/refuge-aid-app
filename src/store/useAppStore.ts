@@ -99,6 +99,27 @@ export interface InternalMessage {
   updated_at: string;
 }
 
+export interface LeadSettings {
+  id: string;
+  user_id: string;
+  audio_alerts_enabled: boolean;
+  push_notifications_enabled: boolean;
+  email_notifications_enabled: boolean;
+  quiet_hours_start: string;
+  quiet_hours_end: string;
+  auto_refresh_interval: number;
+  show_kpis_section: boolean;
+  show_reports_section: boolean;
+  show_attention_queue: boolean;
+  risk_threshold_medium: number;
+  risk_threshold_high: number;
+  default_report_format: string;
+  welcome_message_template: string;
+  two_factor_enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export type UserRole = 'employee' | 'refugi_lead';
 
 // Prevent duplicate alert notifications
@@ -158,6 +179,9 @@ interface AppState {
     employee_limit: number;
   } | null;
   
+  // Refugi Lead Settings
+  leadSettings: LeadSettings | null;
+  
   // Paywall & Access Control
   accessType: 'managed' | 'individual' | 'refugi_lead' | 'none' | null;
   showPaywall: boolean;
@@ -207,6 +231,10 @@ interface AppState {
   sendMessage: (recipientId: string, message: string, relatedAlertId?: string) => Promise<void>;
   markMessageAsRead: (messageId: string) => Promise<void>;
   
+  // Refugi Lead Settings actions
+  loadLeadSettings: () => Promise<void>;
+  updateLeadSettings: (updates: Partial<LeadSettings>) => Promise<void>;
+  
   // Trusted Contacts actions
   addTrustedContact: (contact: Omit<TrustedContact, 'id'>) => void;
   updateTrustedContact: (id: string, contact: Partial<TrustedContact>) => void;
@@ -246,6 +274,7 @@ export const useAppStore = create<AppState>()(
       messages: [],
       unreadMessageCount: 0,
       subscription: null,
+      leadSettings: null,
       accessType: null,
       showPaywall: false,
       vaultLocked: false,
@@ -1196,6 +1225,60 @@ export const useAppStore = create<AppState>()(
           ),
           unreadMessageCount: Math.max(0, state.unreadMessageCount - 1),
         }));
+      },
+      
+      // Refugi Lead Settings actions
+      loadLeadSettings: async () => {
+        const state = get();
+        if (!state.user) return;
+
+        const { data, error } = await supabase
+          .from('lead_settings')
+          .select('*')
+          .eq('user_id', state.user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error loading lead settings:', error);
+          return;
+        }
+
+        if (data) {
+          set({ leadSettings: data });
+        } else {
+          // Create default settings
+          const { data: newSettings, error: insertError } = await supabase
+            .from('lead_settings')
+            .insert({ user_id: state.user.id })
+            .select()
+            .single();
+
+          if (!insertError && newSettings) {
+            set({ leadSettings: newSettings });
+          }
+        }
+      },
+
+      updateLeadSettings: async (updates: Partial<LeadSettings>) => {
+        const state = get();
+        if (!state.user || !state.leadSettings) return;
+
+        const { error } = await supabase
+          .from('lead_settings')
+          .update(updates)
+          .eq('user_id', state.user.id);
+
+        if (error) {
+          console.error('Error updating lead settings:', error);
+          return;
+        }
+
+        set({ 
+          leadSettings: { 
+            ...state.leadSettings, 
+            ...updates 
+          } 
+        });
       },
       
       // Security actions

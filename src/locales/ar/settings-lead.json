@@ -1,0 +1,68 @@
+{
+  "title": "الإعدادات",
+  "backToDashboard": "العودة إلى لوحة التحكم",
+  "tabs": {
+    "account": "الحساب",
+    "notifications": "الإشعارات",
+    "subscription": "الاشتراك",
+    "dashboard": "لوحة التحكم",
+    "team": "الفريق"
+  },
+  "account": {
+    "title": "معلومات الحساب",
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "language": "اللغة",
+    "timezone": "المنطقة الزمنية",
+    "changePassword": "تغيير كلمة المرور",
+    "save": "حفظ التغييرات",
+    "saved": "تم حفظ التغييرات بنجاح"
+  },
+  "notifications": {
+    "title": "تفضيلات الإشعارات",
+    "audioAlerts": "التنبيهات الصوتية للطوارئ",
+    "audioAlertsDesc": "تشغيل الصوت عند وصول تنبيه SOS",
+    "pushNotifications": "إشعارات الدفع",
+    "pushNotificationsDesc": "تلقي الإشعارات في المتصفح",
+    "emailNotifications": "إشعارات البريد الإلكتروني",
+    "emailNotificationsDesc": "تلقي ملخصات البريد الإلكتروني",
+    "quietHours": "ساعات عدم الإزعاج",
+    "quietHoursStart": "وقت البدء",
+    "quietHoursEnd": "وقت الانتهاء",
+    "saved": "تم حفظ التفضيلات"
+  },
+  "subscription": {
+    "title": "اشتراكك",
+    "currentPlan": "الخطة الحالية",
+    "renewalDate": "تاريخ التجديد",
+    "employeeLimit": "حد الموظفات",
+    "employeesUsed": "الموظفات المسجلات",
+    "manageSubscription": "إدارة الاشتراك",
+    "viewPlans": "عرض الخطط المتاحة",
+    "manageInStripe": "إدارة في Stripe"
+  },
+  "dashboard": {
+    "title": "تفضيلات لوحة التحكم",
+    "autoRefresh": "التحديث التلقائي",
+    "autoRefreshDesc": "فترة التحديث التلقائي (بالثواني)",
+    "sections": "الأقسام المرئية",
+    "showKpis": "إظهار مؤشرات الأداء",
+    "showReports": "إظهار التقارير",
+    "showQueue": "إظهار قائمة الانتظار",
+    "riskThresholds": "عتبات المخاطر",
+    "mediumRisk": "خطر متوسط (0-100)",
+    "highRisk": "خطر عالي (0-100)",
+    "reportFormat": "تنسيق التقرير الافتراضي",
+    "saved": "تم حفظ التفضيلات"
+  },
+  "team": {
+    "title": "إعداد الفريق",
+    "currentLimit": "الحد الحالي للموظفات",
+    "used": "مستخدم",
+    "available": "متاح",
+    "welcomeMessage": "رسالة الترحيب",
+    "welcomeMessageDesc": "سيتم إرسال هذه الرسالة إلى الموظفات الجدد عند التسجيل",
+    "saved": "تم حفظ الإعداد"
+  }
+}

@@ -22,6 +22,7 @@ import { SubscriptionCanceledPage } from "@/pages/SubscriptionCanceledPage";
 import ProfilePage from "@/pages/ProfilePage";
 import PaywallPage from "@/pages/PaywallPage";
 import SettingsPage from "@/pages/SettingsPage";
+import SettingsLeadPage from "@/pages/SettingsLeadPage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 import "@/i18n/config";
@@ -131,6 +132,8 @@ const App = () => {
         return <SettingsPage onNavigate={handleNavigate} />;
       case "/perfil":
         return <ProfilePage />;
+      case "/dashboard/settings":
+        return <SettingsLeadPage />;
       case "/stripe-test-secret":
         return <StripeTestPage />;
       case "/payment-success":

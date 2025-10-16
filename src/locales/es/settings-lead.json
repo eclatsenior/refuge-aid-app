@@ -1,0 +1,68 @@
+{
+  "title": "Configuraciones",
+  "backToDashboard": "Volver al Dashboard",
+  "tabs": {
+    "account": "Cuenta",
+    "notifications": "Notificaciones",
+    "subscription": "Suscripción",
+    "dashboard": "Dashboard",
+    "team": "Equipo"
+  },
+  "account": {
+    "title": "Información de Cuenta",
+    "fullName": "Nombre completo",
+    "email": "Email",
+    "phone": "Teléfono",
+    "language": "Idioma",
+    "timezone": "Zona horaria",
+    "changePassword": "Cambiar contraseña",
+    "save": "Guardar cambios",
+    "saved": "Cambios guardados correctamente"
+  },
+  "notifications": {
+    "title": "Preferencias de Notificaciones",
+    "audioAlerts": "Alertas sonoras de emergencia",
+    "audioAlertsDesc": "Reproducir sonido cuando llega una alerta SOS",
+    "pushNotifications": "Notificaciones push",
+    "pushNotificationsDesc": "Recibir notificaciones en el navegador",
+    "emailNotifications": "Notificaciones por email",
+    "emailNotificationsDesc": "Recibir resúmenes por correo electrónico",
+    "quietHours": "Horario No Molestar",
+    "quietHoursStart": "Hora de inicio",
+    "quietHoursEnd": "Hora de fin",
+    "saved": "Preferencias guardadas"
+  },
+  "subscription": {
+    "title": "Tu Suscripción",
+    "currentPlan": "Plan actual",
+    "renewalDate": "Fecha de renovación",
+    "employeeLimit": "Límite de empleadas",
+    "employeesUsed": "Empleadas registradas",
+    "manageSubscription": "Gestionar suscripción",
+    "viewPlans": "Ver planes disponibles",
+    "manageInStripe": "Gestionar en Stripe"
+  },
+  "dashboard": {
+    "title": "Preferencias del Dashboard",
+    "autoRefresh": "Auto-actualización",
+    "autoRefreshDesc": "Intervalo de actualización automática (segundos)",
+    "sections": "Secciones visibles",
+    "showKpis": "Mostrar KPIs",
+    "showReports": "Mostrar Reportes",
+    "showQueue": "Mostrar Cola de Atención",
+    "riskThresholds": "Umbrales de Riesgo",
+    "mediumRisk": "Riesgo medio (0-100)",
+    "highRisk": "Riesgo alto (0-100)",
+    "reportFormat": "Formato reportes por defecto",
+    "saved": "Preferencias guardadas"
+  },
+  "team": {
+    "title": "Configuración del Equipo",
+    "currentLimit": "Límite actual de empleadas",
+    "used": "Usadas",
+    "available": "Disponibles",
+    "welcomeMessage": "Mensaje de bienvenida",
+    "welcomeMessageDesc": "Este mensaje se enviará a las nuevas empleadas al registrarse",
+    "saved": "Configuración guardada"
+  }
+}

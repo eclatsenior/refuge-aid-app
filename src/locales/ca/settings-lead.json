@@ -1,0 +1,68 @@
+{
+  "title": "Configuracions",
+  "backToDashboard": "Tornar al Dashboard",
+  "tabs": {
+    "account": "Compte",
+    "notifications": "Notificacions",
+    "subscription": "Subscripció",
+    "dashboard": "Dashboard",
+    "team": "Equip"
+  },
+  "account": {
+    "title": "Informació del Compte",
+    "fullName": "Nom complet",
+    "email": "Email",
+    "phone": "Telèfon",
+    "language": "Idioma",
+    "timezone": "Zona horària",
+    "changePassword": "Canviar contrasenya",
+    "save": "Guardar canvis",
+    "saved": "Canvis guardats correctament"
+  },
+  "notifications": {
+    "title": "Preferències de Notificacions",
+    "audioAlerts": "Alertes sonores d'emergència",
+    "audioAlertsDesc": "Reproduir so quan arriba una alerta SOS",
+    "pushNotifications": "Notificacions push",
+    "pushNotificationsDesc": "Rebre notificacions al navegador",
+    "emailNotifications": "Notificacions per email",
+    "emailNotificationsDesc": "Rebre resums per correu electrònic",
+    "quietHours": "Horari No Molestar",
+    "quietHoursStart": "Hora d'inici",
+    "quietHoursEnd": "Hora de fi",
+    "saved": "Preferències guardades"
+  },
+  "subscription": {
+    "title": "La teva Subscripció",
+    "currentPlan": "Pla actual",
+    "renewalDate": "Data de renovació",
+    "employeeLimit": "Límit d'empleades",
+    "employeesUsed": "Empleades registrades",
+    "manageSubscription": "Gestionar subscripció",
+    "viewPlans": "Veure plans disponibles",
+    "manageInStripe": "Gestionar a Stripe"
+  },
+  "dashboard": {
+    "title": "Preferències del Dashboard",
+    "autoRefresh": "Auto-actualització",
+    "autoRefreshDesc": "Interval d'actualització automàtica (segons)",
+    "sections": "Seccions visibles",
+    "showKpis": "Mostrar KPIs",
+    "showReports": "Mostrar Reportes",
+    "showQueue": "Mostrar Cua d'Atenció",
+    "riskThresholds": "Llindars de Risc",
+    "mediumRisk": "Risc mitjà (0-100)",
+    "highRisk": "Risc alt (0-100)",
+    "reportFormat": "Format reportes per defecte",
+    "saved": "Preferències guardades"
+  },
+  "team": {
+    "title": "Configuració de l'Equip",
+    "currentLimit": "Límit actual d'empleades",
+    "used": "Utilitzades",
+    "available": "Disponibles",
+    "welcomeMessage": "Missatge de benvinguda",
+    "welcomeMessageDesc": "Aquest missatge s'enviarà a les noves empleades en registrar-se",
+    "saved": "Configuració guardada"
+  }
+}

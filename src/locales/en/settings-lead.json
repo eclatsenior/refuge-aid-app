@@ -1,0 +1,68 @@
+{
+  "title": "Settings",
+  "backToDashboard": "Back to Dashboard",
+  "tabs": {
+    "account": "Account",
+    "notifications": "Notifications",
+    "subscription": "Subscription",
+    "dashboard": "Dashboard",
+    "team": "Team"
+  },
+  "account": {
+    "title": "Account Information",
+    "fullName": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "language": "Language",
+    "timezone": "Timezone",
+    "changePassword": "Change password",
+    "save": "Save changes",
+    "saved": "Changes saved successfully"
+  },
+  "notifications": {
+    "title": "Notification Preferences",
+    "audioAlerts": "Emergency audio alerts",
+    "audioAlertsDesc": "Play sound when an SOS alert arrives",
+    "pushNotifications": "Push notifications",
+    "pushNotificationsDesc": "Receive browser notifications",
+    "emailNotifications": "Email notifications",
+    "emailNotificationsDesc": "Receive email summaries",
+    "quietHours": "Do Not Disturb Hours",
+    "quietHoursStart": "Start time",
+    "quietHoursEnd": "End time",
+    "saved": "Preferences saved"
+  },
+  "subscription": {
+    "title": "Your Subscription",
+    "currentPlan": "Current plan",
+    "renewalDate": "Renewal date",
+    "employeeLimit": "Employee limit",
+    "employeesUsed": "Registered employees",
+    "manageSubscription": "Manage subscription",
+    "viewPlans": "View available plans",
+    "manageInStripe": "Manage in Stripe"
+  },
+  "dashboard": {
+    "title": "Dashboard Preferences",
+    "autoRefresh": "Auto-refresh",
+    "autoRefreshDesc": "Automatic refresh interval (seconds)",
+    "sections": "Visible sections",
+    "showKpis": "Show KPIs",
+    "showReports": "Show Reports",
+    "showQueue": "Show Attention Queue",
+    "riskThresholds": "Risk Thresholds",
+    "mediumRisk": "Medium risk (0-100)",
+    "highRisk": "High risk (0-100)",
+    "reportFormat": "Default report format",
+    "saved": "Preferences saved"
+  },
+  "team": {
+    "title": "Team Configuration",
+    "currentLimit": "Current employee limit",
+    "used": "Used",
+    "available": "Available",
+    "welcomeMessage": "Welcome message",
+    "welcomeMessageDesc": "This message will be sent to new employees upon registration",
+    "saved": "Configuration saved"
+  }
+}

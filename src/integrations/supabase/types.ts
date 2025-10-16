@@ -364,6 +364,69 @@ export type Database = {
           },
         ]
       }
+      lead_settings: {
+        Row: {
+          audio_alerts_enabled: boolean | null
+          auto_refresh_interval: number | null
+          created_at: string | null
+          default_report_format: string | null
+          email_notifications_enabled: boolean | null
+          id: string
+          push_notifications_enabled: boolean | null
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          risk_threshold_high: number | null
+          risk_threshold_medium: number | null
+          show_attention_queue: boolean | null
+          show_kpis_section: boolean | null
+          show_reports_section: boolean | null
+          two_factor_enabled: boolean | null
+          updated_at: string | null
+          user_id: string
+          welcome_message_template: string | null
+        }
+        Insert: {
+          audio_alerts_enabled?: boolean | null
+          auto_refresh_interval?: number | null
+          created_at?: string | null
+          default_report_format?: string | null
+          email_notifications_enabled?: boolean | null
+          id?: string
+          push_notifications_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          risk_threshold_high?: number | null
+          risk_threshold_medium?: number | null
+          show_attention_queue?: boolean | null
+          show_kpis_section?: boolean | null
+          show_reports_section?: boolean | null
+          two_factor_enabled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          welcome_message_template?: string | null
+        }
+        Update: {
+          audio_alerts_enabled?: boolean | null
+          auto_refresh_interval?: number | null
+          created_at?: string | null
+          default_report_format?: string | null
+          email_notifications_enabled?: boolean | null
+          id?: string
+          push_notifications_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          risk_threshold_high?: number | null
+          risk_threshold_medium?: number | null
+          show_attention_queue?: boolean | null
+          show_kpis_section?: boolean | null
+          show_reports_section?: boolean | null
+          two_factor_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          welcome_message_template?: string | null
+        }
+        Relationships: []
+      }
       mood_check_ins: {
         Row: {
           created_at: string
@@ -415,6 +478,7 @@ export type Database = {
           phone: string | null
           preferred_language: string | null
           role: Database["public"]["Enums"]["app_role"]
+          timezone: string | null
           updated_at: string
           user_id: string
         }
@@ -435,6 +499,7 @@ export type Database = {
           phone?: string | null
           preferred_language?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -455,6 +520,7 @@ export type Database = {
           phone?: string | null
           preferred_language?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
