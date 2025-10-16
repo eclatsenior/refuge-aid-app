@@ -19,10 +19,12 @@ import { PaymentSuccessPage } from "@/pages/PaymentSuccessPage";
 import { PaymentCanceledPage } from "@/pages/PaymentCanceledPage";
 import { SubscriptionSuccessPage } from "@/pages/SubscriptionSuccessPage";
 import { SubscriptionCanceledPage } from "@/pages/SubscriptionCanceledPage";
+import ProfilePage from "@/pages/ProfilePage";
 import PaywallPage from "@/pages/PaywallPage";
 import SettingsPage from "@/pages/SettingsPage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
+import "@/i18n/config";
 
 const queryClient = new QueryClient();
 
@@ -127,6 +129,8 @@ const App = () => {
         return <CartaBienvenidaPage onNavigate={handleNavigate} isOverlay={false} />;
       case "/ajustes":
         return <SettingsPage onNavigate={handleNavigate} />;
+      case "/perfil":
+        return <ProfilePage />;
       case "/stripe-test-secret":
         return <StripeTestPage />;
       case "/payment-success":

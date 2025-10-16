@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "home": "Home",
+    "tracking": "Tracking",
+    "notes": "Notes",
+    "path": "Path",
+    "resources": "Resources",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "send": "Send",
+    "close": "Close",
+    "back": "Back",
+    "confirm": "Confirm",
+    "loading": "Loading..."
+  },
+  "messages": {
+    "success": "Operation successful",
+    "error": "An error occurred",
+    "saved": "Saved successfully",
+    "loading": "Loading...",
+    "noData": "No data available"
+  }
+}

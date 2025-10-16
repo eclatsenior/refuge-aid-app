@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "home": "Inici",
+    "tracking": "Seguiment",
+    "notes": "Notes",
+    "path": "Camí",
+    "resources": "Recursos",
+    "profile": "Perfil",
+    "settings": "Configuració"
+  },
+  "buttons": {
+    "save": "Guardar",
+    "cancel": "Cancel·lar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "send": "Enviar",
+    "close": "Tancar",
+    "back": "Tornar",
+    "confirm": "Confirmar",
+    "loading": "Carregant..."
+  },
+  "messages": {
+    "success": "Operació exitosa",
+    "error": "S'ha produït un error",
+    "saved": "Guardat correctament",
+    "loading": "Carregant...",
+    "noData": "No hi ha dades disponibles"
+  }
+}

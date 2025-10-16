@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/store/useAppStore";
 import { useToast } from "@/hooks/use-toast";
 import { safeToLocaleDateString } from "@/lib/dateUtils";
+import { MessagingButton } from "@/components/messaging/MessagingButton";
+import { MessageCenter } from "@/components/messaging/MessageCenter";
+import { useTranslation } from "react-i18next";
 
 interface HomePageProps {
   onNavigate: (path: string) => void;
@@ -15,7 +18,9 @@ interface HomePageProps {
 export function HomePage({ onNavigate }: HomePageProps) {
   const { settings, updateSettings, trustedContacts, checkIns, triggerEmergency } = useAppStore();
   const { toast } = useToast();
+  const { t } = useTranslation('common');
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [messageCenterOpen, setMessageCenterOpen] = useState(false);
   
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -107,6 +112,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
             </CardContent>
           </Card>
         </div>
+        
+        <MessagingButton onClick={() => setMessageCenterOpen(true)} />
+        <MessageCenter open={messageCenterOpen} onOpenChange={setMessageCenterOpen} />
       </div>
     );
   }
@@ -223,6 +231,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
           </Card>
         </div>
       </main>
+      
+      <MessagingButton onClick={() => setMessageCenterOpen(true)} />
+      <MessageCenter open={messageCenterOpen} onOpenChange={setMessageCenterOpen} />
     </div>
   );
 }

@@ -1,0 +1,18 @@
+{
+  "title": "Messages",
+  "newMessage": "New Message",
+  "noMessages": "You have no messages",
+  "conversationWith": "Conversation with",
+  "typeMessage": "Type a message...",
+  "send": "Send",
+  "unread": "Unread",
+  "messagesCenter": "Messages Center",
+  "yourMessages": "Your Messages",
+  "lastMessage": "Last message",
+  "now": "Now",
+  "minutesAgo": "{{count}} min ago",
+  "hoursAgo": "{{count}} h ago",
+  "daysAgo": "{{count}} d ago",
+  "messageFrom": "Message from",
+  "loadingMessages": "Loading messages..."
+}

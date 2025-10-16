@@ -1,0 +1,30 @@
+{
+  "title": "ملفي الشخصي",
+  "personalInfo": "المعلومات الشخصية",
+  "fullName": "الاسم الكامل",
+  "email": "البريد الإلكتروني",
+  "phone": "الهاتف",
+  "dateOfBirth": "تاريخ الميلاد",
+  "address": "العنوان",
+  "bio": "السيرة الذاتية",
+  "language": "اللغة",
+  "selectLanguage": "اختر اللغة",
+  "refugiLead": "قائد ريفوجي الخاص بك",
+  "noLeadAssigned": "ليس لديك قائد ريفوجي معين",
+  "sendMessage": "إرسال رسالة",
+  "emergencyContacts": "جهات اتصال الطوارئ",
+  "contact1": "جهة الاتصال 1",
+  "contact2": "جهة الاتصال 2",
+  "contactName": "اسم جهة الاتصال",
+  "contactPhone": "هاتف جهة الاتصال",
+  "editProfile": "تعديل الملف الشخصي",
+  "saveChanges": "حفظ التغييرات",
+  "profileUpdated": "تم تحديث الملف الشخصي بنجاح",
+  "updateError": "خطأ في تحديث الملف الشخصي",
+  "languages": {
+    "es": "Español",
+    "ca": "Català",
+    "en": "English",
+    "ar": "العربية"
+  }
+}

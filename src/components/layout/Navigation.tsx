@@ -1,14 +1,20 @@
 import { useState } from "react";
-import { Home, Calendar, NotebookPen, Heart, MapPin, Settings, Shield } from "lucide-react";
+import { Home, Calendar, NotebookPen, Heart, MapPin, Settings, Shield, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
-const navigationItems = [
-  { icon: Home, label: "Inicio", path: "/" },
-  { icon: Calendar, label: "Seguimiento", path: "/seguimiento" },
-  { icon: NotebookPen, label: "Notas", path: "/notas" },
-  { icon: Shield, label: "Camino", path: "/camino" },
-  { icon: MapPin, label: "Recursos", path: "/recursos" },
-];
+const useNavigationItems = () => {
+  const { t } = useTranslation('common');
+  
+  return [
+    { icon: Home, label: t('nav.home'), path: "/" },
+    { icon: Calendar, label: t('nav.tracking'), path: "/seguimiento" },
+    { icon: NotebookPen, label: t('nav.notes'), path: "/notas" },
+    { icon: Shield, label: t('nav.path'), path: "/camino" },
+    { icon: MapPin, label: t('nav.resources'), path: "/recursos" },
+    { icon: User, label: t('nav.profile'), path: "/perfil" },
+  ];
+};
 
 interface NavigationProps {
   currentPath: string;
@@ -17,6 +23,8 @@ interface NavigationProps {
 }
 
 export function Navigation({ currentPath, onNavigate, isDiscreetMode }: NavigationProps) {
+  const navigationItems = useNavigationItems();
+  
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
       <div className="flex justify-around items-center py-2 px-4 max-w-md mx-auto">

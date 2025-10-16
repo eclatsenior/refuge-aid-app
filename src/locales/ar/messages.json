@@ -1,0 +1,18 @@
+{
+  "title": "الرسائل",
+  "newMessage": "رسالة جديدة",
+  "noMessages": "ليس لديك رسائل",
+  "conversationWith": "محادثة مع",
+  "typeMessage": "اكتب رسالة...",
+  "send": "إرسال",
+  "unread": "غير مقروءة",
+  "messagesCenter": "مركز الرسائل",
+  "yourMessages": "رسائلك",
+  "lastMessage": "آخر رسالة",
+  "now": "الآن",
+  "minutesAgo": "منذ {{count}} دقيقة",
+  "hoursAgo": "منذ {{count}} ساعة",
+  "daysAgo": "منذ {{count}} يوم",
+  "messageFrom": "رسالة من",
+  "loadingMessages": "جاري تحميل الرسائل..."
+}

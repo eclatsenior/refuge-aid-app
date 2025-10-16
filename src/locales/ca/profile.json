@@ -1,0 +1,30 @@
+{
+  "title": "El Meu Perfil",
+  "personalInfo": "Informació Personal",
+  "fullName": "Nom Complet",
+  "email": "Correu Electrònic",
+  "phone": "Telèfon",
+  "dateOfBirth": "Data de Naixement",
+  "address": "Adreça",
+  "bio": "Biografia",
+  "language": "Idioma",
+  "selectLanguage": "Seleccionar idioma",
+  "refugiLead": "El Teu Refugi Lead",
+  "noLeadAssigned": "No tens un Refugi Lead assignat",
+  "sendMessage": "Enviar Missatge",
+  "emergencyContacts": "Contactes d'Emergència",
+  "contact1": "Contacte 1",
+  "contact2": "Contacte 2",
+  "contactName": "Nom del Contacte",
+  "contactPhone": "Telèfon del Contacte",
+  "editProfile": "Editar Perfil",
+  "saveChanges": "Guardar Canvis",
+  "profileUpdated": "Perfil actualitzat correctament",
+  "updateError": "Error en actualitzar el perfil",
+  "languages": {
+    "es": "Español",
+    "ca": "Català",
+    "en": "English",
+    "ar": "العربية"
+  }
+}

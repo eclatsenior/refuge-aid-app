@@ -1,0 +1,18 @@
+{
+  "title": "Missatges",
+  "newMessage": "Nou Missatge",
+  "noMessages": "No tens missatges",
+  "conversationWith": "Conversa amb",
+  "typeMessage": "Escriu un missatge...",
+  "send": "Enviar",
+  "unread": "No llegit",
+  "messagesCenter": "Centre de Missatges",
+  "yourMessages": "Els Teus Missatges",
+  "lastMessage": "Últim missatge",
+  "now": "Ara",
+  "minutesAgo": "fa {{count}} min",
+  "hoursAgo": "fa {{count}} h",
+  "daysAgo": "fa {{count}} d",
+  "messageFrom": "Missatge de",
+  "loadingMessages": "Carregant missatges..."
+}

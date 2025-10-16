@@ -1,0 +1,30 @@
+{
+  "title": "Mi Perfil",
+  "personalInfo": "Información Personal",
+  "fullName": "Nombre Completo",
+  "email": "Correo Electrónico",
+  "phone": "Teléfono",
+  "dateOfBirth": "Fecha de Nacimiento",
+  "address": "Dirección",
+  "bio": "Biografía",
+  "language": "Idioma",
+  "selectLanguage": "Seleccionar idioma",
+  "refugiLead": "Tu Refugi Lead",
+  "noLeadAssigned": "No tienes un Refugi Lead asignado",
+  "sendMessage": "Enviar Mensaje",
+  "emergencyContacts": "Contactos de Emergencia",
+  "contact1": "Contacto 1",
+  "contact2": "Contacto 2",
+  "contactName": "Nombre del Contacto",
+  "contactPhone": "Teléfono del Contacto",
+  "editProfile": "Editar Perfil",
+  "saveChanges": "Guardar Cambios",
+  "profileUpdated": "Perfil actualizado correctamente",
+  "updateError": "Error al actualizar el perfil",
+  "languages": {
+    "es": "Español",
+    "ca": "Català",
+    "en": "English",
+    "ar": "العربية"
+  }
+}

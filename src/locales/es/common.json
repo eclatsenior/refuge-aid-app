@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "tracking": "Seguimiento",
+    "notes": "Notas",
+    "path": "Camino",
+    "resources": "Recursos",
+    "profile": "Perfil",
+    "settings": "Ajustes"
+  },
+  "buttons": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "send": "Enviar",
+    "close": "Cerrar",
+    "back": "Volver",
+    "confirm": "Confirmar",
+    "loading": "Cargando..."
+  },
+  "messages": {
+    "success": "Operación exitosa",
+    "error": "Ha ocurrido un error",
+    "saved": "Guardado correctamente",
+    "loading": "Cargando...",
+    "noData": "No hay datos disponibles"
+  }
+}

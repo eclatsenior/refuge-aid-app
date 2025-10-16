@@ -399,34 +399,61 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
+          avatar_url: string | null
+          bio: string | null
           created_at: string
+          date_of_birth: string | null
           email: string
+          emergency_contact_1_name: string | null
+          emergency_contact_1_phone: string | null
+          emergency_contact_2_name: string | null
+          emergency_contact_2_phone: string | null
           full_name: string
           id: string
           managed_by_lead: boolean | null
           phone: string | null
+          preferred_language: string | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email: string
+          emergency_contact_1_name?: string | null
+          emergency_contact_1_phone?: string | null
+          emergency_contact_2_name?: string | null
+          emergency_contact_2_phone?: string | null
           full_name: string
           id?: string
           managed_by_lead?: boolean | null
           phone?: string | null
+          preferred_language?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          address?: string | null
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string
+          emergency_contact_1_name?: string | null
+          emergency_contact_1_phone?: string | null
+          emergency_contact_2_name?: string | null
+          emergency_contact_2_phone?: string | null
           full_name?: string
           id?: string
           managed_by_lead?: boolean | null
           phone?: string | null
+          preferred_language?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id?: string
@@ -629,6 +656,16 @@ export type Database = {
           score: number
           trend_30d: number
           trend_7d: number
+        }[]
+      }
+      get_assigned_refugi_lead: {
+        Args: { emp_id: string }
+        Returns: {
+          avatar_url: string
+          email: string
+          full_name: string
+          phone: string
+          user_id: string
         }[]
       }
       get_current_user_role: {
