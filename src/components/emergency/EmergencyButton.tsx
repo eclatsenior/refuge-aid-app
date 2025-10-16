@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useNativeFeatures } from "@/hooks/useNativeFeatures";
 import { useAppStore } from "@/store/useAppStore";
+import { useTranslation } from 'react-i18next';
 
 interface EmergencyButtonProps {
   isDiscreetMode?: boolean;
@@ -21,6 +22,7 @@ interface EmergencyButtonProps {
 }
 
 export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: EmergencyButtonProps) {
+  const { t } = useTranslation('home');
   const [isPressed, setIsPressed] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const { isNative, openExternalApp } = useNativeFeatures();
@@ -46,7 +48,7 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
     
     // CRITICAL: Create emergency alert in database FIRST
     console.log('🚨 Creating emergency alert in database...');
-    await triggerEmergency('Emergencia activada desde el botón de ayuda', null);
+    await triggerEmergency(t('emergencyButton.messages.databaseAlert'), null);
     console.log('✅ Emergency alert created successfully');
     
     // Llamada automática al 112
@@ -75,7 +77,7 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
   const handleContactTrusted = async () => {
     onEmergencyAction('whatsapp');
     
-    const message = encodeURIComponent("Te escribo desde Refugi, y necesito tu ayuda");
+    const message = encodeURIComponent(t('emergencyButton.messages.whatsapp'));
     await openExternalApp(`https://wa.me/?text=${message}`);
   };
 
@@ -88,8 +90,8 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
               <Shield className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-foreground">Modo Privado</h3>
-              <p className="text-sm text-muted-foreground">Acceso seguro activado</p>
+              <h3 className="font-semibold text-foreground">{t('emergencyButton.discreetMode.title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('emergencyButton.discreetMode.subtitle')}</p>
             </div>
           </div>
         </CardContent>
@@ -112,11 +114,11 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
           isPressed && "scale-95"
         )}
         onClick={handleEmergencyPress}
-        aria-label="Botón de emergencia - pulsa para obtener ayuda inmediata"
+        aria-label={t('emergencyButton.button.ariaLabel')}
       >
         <div className="flex flex-col items-center gap-3 relative z-10">
           <AlertTriangle size={36} className="drop-shadow-sm" />
-          <span className="text-lg font-bold tracking-wide drop-shadow-sm">AYUDA</span>
+          <span className="text-lg font-bold tracking-wide drop-shadow-sm">{t('emergencyButton.button.label')}</span>
         </div>
       </Button>
       
@@ -125,10 +127,10 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
         <SheetContent side="bottom" className="h-auto bg-gradient-card backdrop-blur-sm border-t border-white/20">
           <SheetHeader>
             <SheetTitle className="text-center text-xl font-bold text-foreground">
-              Llamada al 112 iniciada
+              {t('emergencyButton.sheet.title')}
             </SheetTitle>
             <SheetDescription className="text-center text-muted-foreground">
-              Se está conectando con emergencias. ¿Deseas avisar también a tus contactos de confianza?
+              {t('emergencyButton.sheet.description')}
             </SheetDescription>
           </SheetHeader>
           
@@ -143,8 +145,8 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
                 <MessageSquare className="h-6 w-6 text-cyan" />
               </div>
               <div>
-                <div className="font-bold text-lg text-foreground">Avisar contactos de confianza</div>
-                <div className="text-sm text-muted-foreground">Envía: "Te escribo desde Refugi, y necesito tu ayuda"</div>
+                <div className="font-bold text-lg text-foreground">{t('emergencyButton.sheet.contactButton.title')}</div>
+                <div className="text-sm text-muted-foreground">{t('emergencyButton.sheet.contactButton.message')}</div>
               </div>
             </Button>
           </div>
@@ -153,8 +155,7 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
       
       <div className="text-center max-w-xs">
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Pulsa el botón rojo para llamar automáticamente al 112 y acceder a más opciones de ayuda. 
-          Tu ubicación puede ser compartida solo si das tu consentimiento.
+          {t('emergencyButton.description')}
         </p>
       </div>
     </div>

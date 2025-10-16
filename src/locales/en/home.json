@@ -34,5 +34,28 @@
     "discreetActivated": "Discreet mode activated",
     "normalDescription": "The app shows its normal interface",
     "discreetDescription": "The app now looks like a notes app"
+  },
+  "emergencyButton": {
+    "button": {
+      "label": "HELP",
+      "ariaLabel": "Emergency button - press for immediate help"
+    },
+    "discreetMode": {
+      "title": "Private Mode",
+      "subtitle": "Secure access enabled"
+    },
+    "sheet": {
+      "title": "Call to 112 initiated",
+      "description": "Connecting with emergency services. Do you also want to notify your trusted contacts?",
+      "contactButton": {
+        "title": "Notify trusted contacts",
+        "message": "Sends: \"I'm writing from Refugi, and I need your help\""
+      }
+    },
+    "description": "Press the red button to automatically call 112 and access more help options. Your location can be shared only if you give your consent.",
+    "messages": {
+      "whatsapp": "I'm writing from Refugi, and I need your help",
+      "databaseAlert": "Emergency activated from help button"
+    }
   }
 }

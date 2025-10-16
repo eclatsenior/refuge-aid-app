@@ -34,5 +34,28 @@
     "discreetActivated": "Modo discreto activado",
     "normalDescription": "La aplicación muestra su interfaz normal",
     "discreetDescription": "La aplicación ahora parece una app de notas"
+  },
+  "emergencyButton": {
+    "button": {
+      "label": "AYUDA",
+      "ariaLabel": "Botón de emergencia - pulsa para obtener ayuda inmediata"
+    },
+    "discreetMode": {
+      "title": "Modo Privado",
+      "subtitle": "Acceso seguro activado"
+    },
+    "sheet": {
+      "title": "Llamada al 112 iniciada",
+      "description": "Se está conectando con emergencias. ¿Deseas avisar también a tus contactos de confianza?",
+      "contactButton": {
+        "title": "Avisar contactos de confianza",
+        "message": "Envía: \"Te escribo desde Refugi, y necesito tu ayuda\""
+      }
+    },
+    "description": "Pulsa el botón rojo para llamar automáticamente al 112 y acceder a más opciones de ayuda. Tu ubicación puede ser compartida solo si das tu consentimiento.",
+    "messages": {
+      "whatsapp": "Te escribo desde Refugi, y necesito tu ayuda",
+      "databaseAlert": "Emergencia activada desde el botón de ayuda"
+    }
   }
 }

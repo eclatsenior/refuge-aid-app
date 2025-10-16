@@ -34,5 +34,28 @@
     "discreetActivated": "Mode discret activat",
     "normalDescription": "L'aplicació mostra la seva interfície normal",
     "discreetDescription": "L'aplicació ara sembla una app de notes"
+  },
+  "emergencyButton": {
+    "button": {
+      "label": "AJUDA",
+      "ariaLabel": "Botó d'emergència - prem per obtenir ajuda immediata"
+    },
+    "discreetMode": {
+      "title": "Mode Privat",
+      "subtitle": "Accés segur activat"
+    },
+    "sheet": {
+      "title": "Trucada al 112 iniciada",
+      "description": "S'està connectant amb emergències. Vols avisar també als teus contactes de confiança?",
+      "contactButton": {
+        "title": "Avisar contactes de confiança",
+        "message": "Envia: \"T'escric des de Refugi, i necessito la teva ajuda\""
+      }
+    },
+    "description": "Prem el botó vermell per trucar automàticament al 112 i accedir a més opcions d'ajuda. La teva ubicació pot ser compartida només si dones el teu consentiment.",
+    "messages": {
+      "whatsapp": "T'escric des de Refugi, i necessito la teva ajuda",
+      "databaseAlert": "Emergència activada des del botó d'ajuda"
+    }
   }
 }
