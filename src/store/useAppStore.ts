@@ -1244,16 +1244,24 @@ export const useAppStore = create<AppState>()(
         }
 
         if (data) {
+          console.log('✅ Lead settings loaded:', data);
           set({ leadSettings: data });
         } else {
           // Create default settings
+          console.log('📝 Creating default lead_settings for user:', state.user.id);
           const { data: newSettings, error: insertError } = await supabase
             .from('lead_settings')
             .insert({ user_id: state.user.id })
             .select()
             .single();
 
-          if (!insertError && newSettings) {
+          if (insertError) {
+            console.error('❌ Error creating lead_settings:', insertError);
+            return;
+          }
+
+          if (newSettings) {
+            console.log('✅ Lead settings created successfully:', newSettings);
             set({ leadSettings: newSettings });
           }
         }

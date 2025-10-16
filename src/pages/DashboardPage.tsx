@@ -64,7 +64,9 @@ export function DashboardPage() {
       try {
         await Promise.all([
           loadEmployeeData(),
-          loadEmergencyAlerts()
+          loadEmergencyAlerts(),
+          loadLeadSettings(),
+          loadSubscriptionStatus()
         ]);
         
         toast({

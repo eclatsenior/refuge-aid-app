@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,13 +8,39 @@ import { NotificationsSettingsSection } from "@/components/dashboard/settings/No
 import { SubscriptionSettingsSection } from "@/components/dashboard/settings/SubscriptionSettingsSection";
 import { DashboardPreferences } from "@/components/dashboard/settings/DashboardPreferences";
 import { TeamSettingsSection } from "@/components/dashboard/settings/TeamSettingsSection";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { useAppStore } from "@/store/useAppStore";
 
 export default function SettingsLeadPage() {
   const { t } = useTranslation();
+  const { leadSettings, loadLeadSettings } = useAppStore();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      await loadLeadSettings();
+      setIsLoading(false);
+    };
+    
+    if (!leadSettings) {
+      loadData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [leadSettings, loadLeadSettings]);
 
   const handleBack = () => {
     window.location.href = '/dashboard';
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-hero">
