@@ -211,9 +211,16 @@ const App = () => {
       return <AuthPage />;
     }
     
-    // If Refugi Lead, show DashboardPage
+    // If Refugi Lead, handle dashboard routes
     if (userRole === 'refugi_lead') {
-      return <DashboardPage />;
+      if (currentPath === '/dashboard/settings') {
+        return <SettingsLeadPage onNavigate={handleNavigate} />;
+      }
+      // Default to dashboard for any other route
+      if (currentPath !== '/dashboard') {
+        handleNavigate('/dashboard');
+      }
+      return <DashboardPage onNavigate={handleNavigate} />;
     }
     
   // If employee, show main app with navigation

@@ -32,7 +32,11 @@ import { ReportingSection } from "@/components/dashboard/ReportingSection";
 import { AlertPermissionDialog } from "@/components/dashboard/AlertPermissionDialog";
 import { audioManager, requestNotificationPermission } from "@/lib/audioManager";
 
-export function DashboardPage() {
+interface DashboardPageProps {
+  onNavigate?: (path: string) => void;
+}
+
+export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<'all' | 'online' | 'alert' | 'offline'>('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -282,7 +286,7 @@ export function DashboardPage() {
               <Button 
                 variant="ghost" 
                 size="sm"
-                onClick={() => window.location.href = '/dashboard/settings'}
+                onClick={() => onNavigate?.('/dashboard/settings')}
               >
                 <Settings className="h-4 w-4" />
               </Button>

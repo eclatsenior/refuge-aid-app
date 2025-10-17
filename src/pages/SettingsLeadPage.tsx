@@ -11,7 +11,11 @@ import { TeamSettingsSection } from "@/components/dashboard/settings/TeamSetting
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 
-export default function SettingsLeadPage() {
+interface SettingsLeadPageProps {
+  onNavigate?: (path: string) => void;
+}
+
+export default function SettingsLeadPage({ onNavigate }: SettingsLeadPageProps = {}) {
   const { t } = useTranslation();
   const { leadSettings, loadLeadSettings } = useAppStore();
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +35,11 @@ export default function SettingsLeadPage() {
   }, [leadSettings, loadLeadSettings]);
 
   const handleBack = () => {
-    window.location.href = '/dashboard';
+    if (onNavigate) {
+      onNavigate('/dashboard');
+    } else {
+      window.location.href = '/dashboard';
+    }
   };
 
   if (isLoading) {
