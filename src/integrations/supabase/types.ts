@@ -724,6 +724,10 @@ export type Database = {
           trend_7d: number
         }[]
       }
+      can_send_message: {
+        Args: { recipient_id_param: string; sender_id_param: string }
+        Returns: boolean
+      }
       get_assigned_refugi_lead: {
         Args: { emp_id: string }
         Returns: {
