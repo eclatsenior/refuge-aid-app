@@ -92,6 +92,17 @@ export function UserMenu({ onNavigate }: UserMenuProps) {
         <div className="px-2 py-1">
           <LanguageSelector />
         </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem 
+          onClick={() => {
+            setOpen(false);
+            logout();
+          }}
+          className="cursor-pointer text-destructive focus:text-destructive"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>{t('userMenu.logout')}</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
