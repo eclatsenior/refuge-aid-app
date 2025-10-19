@@ -719,6 +719,84 @@ export type Database = {
         }
         Relationships: []
       }
+      vault_passwords: {
+        Row: {
+          created_at: string
+          id: string
+          password_hash: string
+          reset_approved_at: string | null
+          reset_approved_by: string | null
+          reset_requested_at: string | null
+          salt: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          password_hash: string
+          reset_approved_at?: string | null
+          reset_approved_by?: string | null
+          reset_requested_at?: string | null
+          salt: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          password_hash?: string
+          reset_approved_at?: string | null
+          reset_approved_by?: string | null
+          reset_requested_at?: string | null
+          salt?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vault_reset_requests: {
+        Row: {
+          created_at: string
+          id: string
+          id_document_url: string | null
+          notes: string | null
+          request_type: string
+          requested_at: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          id_document_url?: string | null
+          notes?: string | null
+          request_type: string
+          requested_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          id_document_url?: string | null
+          notes?: string | null
+          request_type?: string
+          requested_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

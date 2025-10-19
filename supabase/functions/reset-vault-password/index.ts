@@ -1,0 +1,108 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
+import { verify } from "https://deno.land/x/djwt@v3.0.1/mod.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const JWT_SECRET = new TextEncoder().encode(
+  Deno.env.get('SUPABASE_JWT_SECRET') || 'your-secret-key'
+);
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
+    );
+
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      throw new Error('No autorizado');
+    }
+
+    const { resetToken, newPassword } = await req.json();
+
+    if (!resetToken || !newPassword) {
+      throw new Error('Token y nueva contraseña requeridos');
+    }
+
+    if (newPassword.length < 8) {
+      throw new Error('La contraseña debe tener al menos 8 caracteres');
+    }
+
+    // Verificar token de reset
+    let payload;
+    try {
+      payload = await verify(resetToken, JWT_SECRET);
+      
+      if (!payload.vault_reset || payload.sub !== user.id) {
+        throw new Error('Token inválido');
+      }
+    } catch (error) {
+      console.error('Error al verificar token:', error);
+      throw new Error('Token de reset inválido o expirado');
+    }
+
+    // Generar nuevo salt y hash
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(newPassword, salt);
+
+    // Actualizar contraseña
+    const { error: updateError } = await supabaseClient
+      .from('vault_passwords')
+      .update({
+        password_hash: passwordHash,
+        salt: salt,
+        reset_approved_at: new Date().toISOString(),
+      })
+      .eq('user_id', user.id);
+
+    if (updateError) {
+      console.error('Error al actualizar contraseña:', updateError);
+      throw updateError;
+    }
+
+    // IMPORTANTE: Las notas cifradas con la contraseña antigua ya no podrán descifrarse
+    // Opcionalmente, marcar las notas antiguas de la caja fuerte como no descifrables
+    // O simplemente eliminarlas (más seguro)
+
+    console.log('Contraseña de caja fuerte reseteada para usuario:', user.id);
+
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: 'Contraseña actualizada correctamente',
+        warning: 'Las notas antiguas de tu Caja Fuerte no podrán descifrarse con la nueva contraseña'
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.error('Error en reset-vault-password:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      }
+    );
+  }
+});

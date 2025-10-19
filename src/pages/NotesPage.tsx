@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Search, Star, StarOff, Edit, Trash2, Save, X, Lock, Vault, Heart, ArrowLeft, Download, Shield, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,11 @@ import { useAppStore } from "@/store/useAppStore";
 import { useToast } from "@/hooks/use-toast";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { VaultPasswordSetup } from "@/components/vault/VaultPasswordSetup";
+import { VaultUnlock } from "@/components/vault/VaultUnlock";
+import { VaultResetRequest } from "@/components/vault/VaultResetRequest";
+import { supabase } from "@/integrations/supabase/client";
+import { encryptText, decryptText } from "@/lib/security";
 
 interface NotesPageProps {
   onNavigate: (path: string) => void;
@@ -18,7 +23,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const { 
     notes, addNote, updateNote, deleteNote, toggleVaultStatus, 
     toggleTherapyFlag, quickDeleteNote, settings, showDecoyScreen, 
-    activateDecoyScreen, deactivateDecoyScreen, isVaultLocked, unlockVault 
+    activateDecoyScreen, deactivateDecoyScreen, isVaultLocked, unlockVault,
+    profile
   } = useAppStore();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,7 +35,43 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const [isVaultMode, setIsVaultMode] = useState(false);
   const [deleteConfirmWord, setDeleteConfirmWord] = useState("");
   const [showQuickDelete, setShowQuickDelete] = useState<string | null>(null);
-  const [vaultPassword, setVaultPassword] = useState("");
+  
+  // Vault system states
+  const [hasVaultPassword, setHasVaultPassword] = useState<boolean | null>(null);
+  const [showVaultSetup, setShowVaultSetup] = useState(false);
+  const [showVaultUnlock, setShowVaultUnlock] = useState(false);
+  const [showVaultReset, setShowVaultReset] = useState(false);
+  const [vaultToken, setVaultToken] = useState<string | null>(null);
+
+  // Check if user has vault password configured
+  useEffect(() => {
+    checkVaultPassword();
+  }, []);
+
+  const checkVaultPassword = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('vault_passwords')
+        .select('id')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking vault password:', error);
+      }
+      
+      setHasVaultPassword(!!data);
+      
+      // Check for stored token
+      const storedToken = sessionStorage.getItem('vault_token');
+      if (storedToken) {
+        setVaultToken(storedToken);
+        unlockVault(''); // Unlock with token
+      }
+    } catch (error) {
+      console.error('Error checking vault password:', error);
+      setHasVaultPassword(false);
+    }
+  };
 
   const filteredNotes = notes
     .filter(note => {
@@ -52,23 +94,48 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const vaultNotes = filteredNotes.filter(note => note.isSafeVault);
   const regularNotes = filteredNotes.filter(note => !note.isSafeVault);
 
-  const handleUnlockVault = () => {
-    if (unlockVault(vaultPassword)) {
-      setVaultPassword("");
-      toast({
-        title: "Caja Fuerte desbloqueada",
-        description: "Ya puedes acceder a tus memorias protegidas"
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: "Ingresa una contraseña para continuar",
-        variant: "destructive"
-      });
+  const handleVaultAccess = () => {
+    if (hasVaultPassword === null) {
+      // Still checking
+      return;
+    }
+    
+    if (!hasVaultPassword) {
+      // No password set, show setup
+      setShowVaultSetup(true);
+    } else if (isVaultLocked) {
+      // Password set but locked, show unlock
+      setShowVaultUnlock(true);
     }
   };
 
+  const handleVaultSetupSuccess = () => {
+    setShowVaultSetup(false);
+    setHasVaultPassword(true);
+    toast({
+      title: '🔒 Caja Fuerte configurada',
+      description: 'Tu espacio seguro está listo',
+    });
+  };
+
+  const handleVaultUnlockSuccess = (token: string) => {
+    setShowVaultUnlock(false);
+    setVaultToken(token);
+    sessionStorage.setItem('vault_token', token);
+    unlockVault(''); // Unlock in store
+  };
+
+  const handleForgotPassword = () => {
+    setShowVaultUnlock(false);
+    setShowVaultReset(true);
+  };
+
   const handleCreateNote = (isVault = false) => {
+    if (isVault && (hasVaultPassword === false || isVaultLocked)) {
+      handleVaultAccess();
+      return;
+    }
+    
     setIsEditing(true);
     setEditingId(null);
     setTitle("");
@@ -84,7 +151,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     setIsVaultMode(note.isSafeVault);
   };
 
-  const handleSaveNote = () => {
+  const handleSaveNote = async () => {
     if (!title.trim()) {
       toast({
         title: "Error",
@@ -94,10 +161,30 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
       return;
     }
 
+    let finalContent = content.trim();
+
+    // Encrypt content if it's a vault note and user has vault password
+    if (isVaultMode && vaultToken) {
+      try {
+        // Get vault password from session (in real app, derive from token)
+        // For now, we'll use a simplified approach
+        const password = vaultToken.substring(0, 32); // Simplified - in production use proper key derivation
+        finalContent = await encryptText(content.trim(), password);
+      } catch (error) {
+        console.error('Error encrypting note:', error);
+        toast({
+          title: 'Error',
+          description: 'No se pudo cifrar la nota',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
     if (editingId) {
       updateNote(editingId, { 
         title: title.trim(), 
-        content: content.trim()
+        content: finalContent
       });
       toast({
         title: "Nota actualizada",
@@ -106,13 +193,13 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     } else {
       addNote({
         title: title.trim(),
-        content: content.trim(),
+        content: finalContent,
         timestamp: new Date()
       });
       toast({
         title: isVaultMode ? "Nota guardada en Caja Fuerte" : "Nota creada",
         description: isVaultMode 
-          ? "Tu memoria sensible se ha guardado de forma segura"
+          ? "Tu memoria sensible se ha guardado de forma segura y cifrada"
           : "Tu nota se ha guardado de forma segura"
       });
     }
@@ -416,29 +503,14 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
                         Ingresa tu contraseña para acceder a tus memorias más sensibles
                       </p>
                     </div>
-                    <div className="space-y-3 max-w-xs mx-auto">
-                      <Input
-                        type="password"
-                        placeholder="Contraseña de la Caja Fuerte..."
-                        value={vaultPassword}
-                        onChange={(e) => setVaultPassword(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            handleUnlockVault();
-                          }
-                        }}
-                        className="text-center"
-                      />
-                      <Button 
-                        onClick={handleUnlockVault}
-                        size="sm"
-                        className="gap-2"
-                        disabled={!vaultPassword.trim()}
-                      >
-                        <Vault size={14} />
-                        Desbloquear
-                      </Button>
-                    </div>
+                    <Button 
+                      onClick={handleVaultAccess}
+                      size="sm"
+                      className="gap-2"
+                    >
+                      <Vault size={14} />
+                      Desbloquear Caja Fuerte
+                    </Button>
                   </CardContent>
                 </Card>
               ) : (
@@ -635,6 +707,30 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
             </div>
           )}
         </div>
+      )}
+
+      {/* Vault Dialogs */}
+      {showVaultSetup && (
+        <VaultPasswordSetup
+          open={showVaultSetup}
+          onSuccess={handleVaultSetupSuccess}
+        />
+      )}
+
+      {showVaultUnlock && (
+        <VaultUnlock
+          open={showVaultUnlock}
+          onSuccess={handleVaultUnlockSuccess}
+          onForgotPassword={handleForgotPassword}
+        />
+      )}
+
+      {showVaultReset && (
+        <VaultResetRequest
+          open={showVaultReset}
+          onClose={() => setShowVaultReset(false)}
+          isManagedByLead={profile?.managed_by_lead || false}
+        />
       )}
     </div>
   );

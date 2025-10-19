@@ -6,30 +6,111 @@
  */
 
 /**
- * Simula el cifrado de una cadena de texto
- * En producción, usar AES-GCM con Web Crypto API
+ * Cifra una cadena de texto usando AES-GCM con Web Crypto API
  */
-export function encryptText(text: string, _key?: string): string {
-  // Simulación - en producción usar cifrado real
+export async function encryptText(text: string, password: string): Promise<string> {
   try {
-    return btoa(encodeURIComponent(text));
+    const encoder = new TextEncoder();
+    
+    // Derivar clave de cifrado desde la contraseña
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits", "deriveKey"]
+    );
+    
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    
+    const key = await crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: salt,
+        iterations: 100000,
+        hash: "SHA-256"
+      },
+      keyMaterial,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["encrypt"]
+    );
+    
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv: iv
+      },
+      key,
+      encoder.encode(text)
+    );
+    
+    // Combinar salt, iv y datos cifrados
+    const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
+    combined.set(salt, 0);
+    combined.set(iv, salt.length);
+    combined.set(new Uint8Array(encrypted), salt.length + iv.length);
+    
+    // Convertir a base64
+    return btoa(String.fromCharCode(...combined));
   } catch (error) {
     console.error('Error al cifrar texto:', error);
-    return text;
+    throw error;
   }
 }
 
 /**
- * Simula el descifrado de una cadena de texto
- * En producción, usar AES-GCM con Web Crypto API
+ * Descifra una cadena de texto usando AES-GCM con Web Crypto API
  */
-export function decryptText(encryptedText: string, _key?: string): string {
-  // Simulación - en producción usar descifrado real
+export async function decryptText(encryptedText: string, password: string): Promise<string> {
   try {
-    return decodeURIComponent(atob(encryptedText));
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    
+    // Decodificar desde base64
+    const combined = Uint8Array.from(atob(encryptedText), c => c.charCodeAt(0));
+    
+    // Extraer salt, iv y datos cifrados
+    const salt = combined.slice(0, 16);
+    const iv = combined.slice(16, 28);
+    const encrypted = combined.slice(28);
+    
+    // Derivar clave desde contraseña
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits", "deriveKey"]
+    );
+    
+    const key = await crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: salt,
+        iterations: 100000,
+        hash: "SHA-256"
+      },
+      keyMaterial,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["decrypt"]
+    );
+    
+    const decrypted = await crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: iv
+      },
+      key,
+      encrypted
+    );
+    
+    return decoder.decode(decrypted);
   } catch (error) {
     console.error('Error al descifrar texto:', error);
-    return encryptedText;
+    throw new Error('No se pudo descifrar el texto. Contraseña incorrecta.');
   }
 }
 
