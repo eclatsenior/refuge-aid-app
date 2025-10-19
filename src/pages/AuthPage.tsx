@@ -29,6 +29,9 @@ export function AuthPage() {
   const [activeTab, setActiveTab] = useState("login");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
+  const [companyRole, setCompanyRole] = useState("");
   
   const { signIn, signUp, user, profile } = useAppStore();
   const { toast } = useToast();
@@ -108,6 +111,45 @@ export function AuthPage() {
       return;
     }
 
+    // Validar campos de empresa si es Refugi Lead
+    if (isRefugiLead) {
+      if (!companyName.trim()) {
+        toast({
+          title: "Error",
+          description: "Por favor ingresa el nombre de la empresa",
+          variant: "destructive"
+        });
+        return;
+      }
+      if (!companyWebsite.trim()) {
+        toast({
+          title: "Error",
+          description: "Por favor ingresa el website de la empresa",
+          variant: "destructive"
+        });
+        return;
+      }
+      if (!companyRole.trim()) {
+        toast({
+          title: "Error",
+          description: "Por favor ingresa tu rol en la empresa",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Validar formato URL
+      const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+      if (!urlPattern.test(companyWebsite.trim())) {
+        toast({
+          title: "Error",
+          description: "Por favor ingresa un website válido",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
     if (normalizedPassword.length < 6) {
       toast({
         title: "Error",
@@ -120,7 +162,13 @@ export function AuthPage() {
     setIsLoading(true);
     try {
       const role = isRefugiLead ? 'refugi_lead' : 'employee';
-      const { error } = await signUp(normalizedEmail, normalizedPassword, normalizedFullName, role);
+      const companyData = isRefugiLead ? {
+        company_name: companyName.trim(),
+        company_website: companyWebsite.trim(),
+        company_role: companyRole.trim()
+      } : undefined;
+
+      const { error } = await signUp(normalizedEmail, normalizedPassword, normalizedFullName, role, companyData);
       
       if (error) {
         toast({
@@ -406,7 +454,47 @@ export function AuthPage() {
                     />
                   </div>
 
-                  <Button 
+                  {isRefugiLead && (
+                    <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
+                      <div className="space-y-2">
+                        <Label htmlFor="company-name">Nombre de la Empresa *</Label>
+                        <Input
+                          id="company-name"
+                          type="text"
+                          placeholder="ej. Refugi Solutions"
+                          value={companyName}
+                          onChange={(e) => setCompanyName(e.target.value)}
+                          disabled={isLoading}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="company-website">Website de la Empresa *</Label>
+                        <Input
+                          id="company-website"
+                          type="url"
+                          placeholder="ej. https://www.ejemplo.com"
+                          value={companyWebsite}
+                          onChange={(e) => setCompanyWebsite(e.target.value)}
+                          disabled={isLoading}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="company-role">Tu Rol en la Empresa *</Label>
+                        <Input
+                          id="company-role"
+                          type="text"
+                          placeholder="ej. Gerente de RRHH"
+                          value={companyRole}
+                          onChange={(e) => setCompanyRole(e.target.value)}
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <Button
                     type="submit" 
                     className="w-full bg-primary hover:bg-primary/90"
                     disabled={isLoading}

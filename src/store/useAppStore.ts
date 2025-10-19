@@ -196,7 +196,7 @@ interface AppState {
   setAuth: (user: User | null, session: Session | null) => void;
   setProfile: (profile: any) => void;
   logout: () => void;
-  signUp: (email: string, password: string, fullName: string, role: UserRole) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, role: UserRole, companyData?: { company_name: string; company_website: string; company_role: string }) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   initializeAuth: () => Promise<void>;
   
@@ -312,7 +312,7 @@ export const useAppStore = create<AppState>()(
         });
       },
       
-      signUp: async (email, password, fullName, role) => {
+      signUp: async (email, password, fullName, role, companyData) => {
         try {
           const { error } = await supabase.auth.signUp({
             email,
@@ -321,7 +321,12 @@ export const useAppStore = create<AppState>()(
               emailRedirectTo: `${window.location.origin}/`,
               data: {
                 full_name: fullName,
-                role: role
+                role: role,
+                ...(companyData && {
+                  company_name: companyData.company_name,
+                  company_website: companyData.company_website,
+                  company_role: companyData.company_role
+                })
               }
             }
           });

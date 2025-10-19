@@ -465,6 +465,9 @@ export type Database = {
           address: string | null
           avatar_url: string | null
           bio: string | null
+          company_name: string | null
+          company_role: string | null
+          company_website: string | null
           created_at: string
           date_of_birth: string | null
           email: string
@@ -486,6 +489,9 @@ export type Database = {
           address?: string | null
           avatar_url?: string | null
           bio?: string | null
+          company_name?: string | null
+          company_role?: string | null
+          company_website?: string | null
           created_at?: string
           date_of_birth?: string | null
           email: string
@@ -507,6 +513,9 @@ export type Database = {
           address?: string | null
           avatar_url?: string | null
           bio?: string | null
+          company_name?: string | null
+          company_role?: string | null
+          company_website?: string | null
           created_at?: string
           date_of_birth?: string | null
           email?: string
