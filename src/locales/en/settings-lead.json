@@ -17,7 +17,12 @@
     "timezone": "Timezone",
     "changePassword": "Change password",
     "save": "Save changes",
-    "saved": "Changes saved successfully"
+    "saved": "Changes saved successfully",
+    "companySection": "Company Information",
+    "companyName": "Company",
+    "companyWebsite": "Company website",
+    "companyRole": "Your role at the company",
+    "companyInfoNote": "This information was registered when you created your account and cannot be modified"
   },
   "notifications": {
     "title": "Notification Preferences",

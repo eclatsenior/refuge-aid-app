@@ -36,6 +36,11 @@ import caResources from '@/locales/ca/resources.json';
 import enResources from '@/locales/en/resources.json';
 import arResources from '@/locales/ar/resources.json';
 
+import esSettingsLead from '@/locales/es/settings-lead.json';
+import caSettingsLead from '@/locales/ca/settings-lead.json';
+import enSettingsLead from '@/locales/en/settings-lead.json';
+import arSettingsLead from '@/locales/ar/settings-lead.json';
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -48,7 +53,8 @@ i18n
         home: esHome,
         tracking: esTracking,
         settings: esSettings,
-        resources: esResources
+        resources: esResources,
+        'settings-lead': esSettingsLead
       },
       ca: {
         common: caCommon,
@@ -57,7 +63,8 @@ i18n
         home: caHome,
         tracking: caTracking,
         settings: caSettings,
-        resources: caResources
+        resources: caResources,
+        'settings-lead': caSettingsLead
       },
       en: {
         common: enCommon,
@@ -66,7 +73,8 @@ i18n
         home: enHome,
         tracking: enTracking,
         settings: enSettings,
-        resources: enResources
+        resources: enResources,
+        'settings-lead': enSettingsLead
       },
       ar: {
         common: arCommon,
@@ -75,7 +83,8 @@ i18n
         home: arHome,
         tracking: arTracking,
         settings: arSettings,
-        resources: arResources
+        resources: arResources,
+        'settings-lead': arSettingsLead
       }
     },
     fallbackLng: 'es',

@@ -17,7 +17,12 @@
     "timezone": "Zona horària",
     "changePassword": "Canviar contrasenya",
     "save": "Guardar canvis",
-    "saved": "Canvis guardats correctament"
+    "saved": "Canvis guardats correctament",
+    "companySection": "Informació de l'Empresa",
+    "companyName": "Empresa",
+    "companyWebsite": "Lloc web de l'empresa",
+    "companyRole": "El teu rol a l'empresa",
+    "companyInfoNote": "Aquesta informació es va registrar en crear el teu compte i no es pot modificar"
   },
   "notifications": {
     "title": "Preferències de Notificacions",

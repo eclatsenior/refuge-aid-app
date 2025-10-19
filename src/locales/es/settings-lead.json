@@ -17,7 +17,12 @@
     "timezone": "Zona horaria",
     "changePassword": "Cambiar contraseña",
     "save": "Guardar cambios",
-    "saved": "Cambios guardados correctamente"
+    "saved": "Cambios guardados correctamente",
+    "companySection": "Información de la Empresa",
+    "companyName": "Empresa",
+    "companyWebsite": "Sitio web de la empresa",
+    "companyRole": "Tu rol en la empresa",
+    "companyInfoNote": "Esta información se registró al crear tu cuenta y no puede modificarse"
   },
   "notifications": {
     "title": "Preferencias de Notificaciones",

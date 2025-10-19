@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 import { LanguageSelector } from "@/components/profile/LanguageSelector";
 import { useAppStore } from "@/store/useAppStore";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ExternalLink } from "lucide-react";
 
 export function AccountSettingsSection() {
   const { t } = useTranslation();
@@ -119,6 +121,64 @@ export function AccountSettingsSection() {
             onChange={(e) => setTimezone(e.target.value)}
           />
         </div>
+
+        <Separator className="my-6" />
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">{t('settings-lead:account.companySection')}</h3>
+          
+          {profile.company_name && (
+            <div className="space-y-2">
+              <Label htmlFor="companyName">{t('settings-lead:account.companyName')}</Label>
+              <Input
+                id="companyName"
+                value={profile.company_name}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+          )}
+
+          {profile.company_website && (
+            <div className="space-y-2">
+              <Label htmlFor="companyWebsite">{t('settings-lead:account.companyWebsite')}</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="companyWebsite"
+                  value={profile.company_website}
+                  disabled
+                  className="bg-muted flex-1"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => window.open(profile.company_website, '_blank')}
+                  title="Abrir sitio web"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {profile.company_role && (
+            <div className="space-y-2">
+              <Label htmlFor="companyRole">{t('settings-lead:account.companyRole')}</Label>
+              <Input
+                id="companyRole"
+                value={profile.company_role}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+          )}
+
+          <p className="text-sm text-muted-foreground">
+            {t('settings-lead:account.companyInfoNote')}
+          </p>
+        </div>
+
+        <Separator className="my-6" />
 
         <Button 
           onClick={handleSave} 
