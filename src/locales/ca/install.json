@@ -20,6 +20,35 @@
   "instructions": {
     "title": "Instruccions d'instal·lació",
     "subtitle": "Selecciona el teu dispositiu per veure instruccions específiques",
+    "manual": {
+      "title": "Instal·lació Manual",
+      "chrome": {
+        "intro": "Per instal·lar Refugi a Chrome:",
+        "step1": "Fes clic a la icona <strong>⋮</strong> (tres punts) a la cantonada superior dreta",
+        "step2": "Selecciona <strong>\"Desa i comparteix\"</strong> o <strong>\"Més eines\"</strong>",
+        "step3": "Fes clic a <strong>\"Instal·la Refugi...\"</strong> o <strong>\"Crea una drecera...\"</strong>",
+        "step4": "Marca la casella <strong>\"Obre com a finestra\"</strong>",
+        "step5": "Fes clic a <strong>\"Instal·la\"</strong>"
+      },
+      "edge": {
+        "intro": "Per instal·lar Refugi a Edge:",
+        "step1": "Fes clic a la icona <strong>⋯</strong> (tres punts) a la cantonada superior dreta",
+        "step2": "Selecciona <strong>\"Aplicacions\"</strong>",
+        "step3": "Fes clic a <strong>\"Instal·la Refugi\"</strong>",
+        "step4": "Confirma al diàleg que apareix"
+      },
+      "brave": {
+        "intro": "Per instal·lar Refugi a Brave:",
+        "step1": "Fes clic a la icona <strong>☰</strong> (menú) a la cantonada superior dreta",
+        "step2": "Selecciona <strong>\"Més eines\"</strong>",
+        "step3": "Fes clic a <strong>\"Instal·la Refugi...\"</strong>",
+        "step4": "Confirma la instal·lació"
+      },
+      "note": {
+        "title": "Nota:",
+        "text": "Si no veus l'opció d'instal·lar, assegura't d'estar utilitzant l'última versió del navegador."
+      }
+    },
     "desktop": {
       "chrome": {
         "step1": "Fes clic a la icona d'instal·lació (⊕) a la barra d'adreces",

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { PlatformInstructions } from "@/components/installation/PlatformInstructions";
 import { useTranslation } from "react-i18next";
@@ -13,12 +14,22 @@ interface InstallPageProps {
 }
 
 export function InstallPage({ onNavigate }: InstallPageProps) {
-  const { canInstall, isInstalled, install, platform, browser } = usePWAInstall();
+  const { canInstall, isInstalled, install, platform, browser, hasNativePrompt } = usePWAInstall();
   const [isInstalling, setIsInstalling] = useState(false);
+  const [showManualInstructions, setShowManualInstructions] = useState(false);
   const { t } = useTranslation(['install', 'common']);
 
   const handleInstall = async () => {
     setIsInstalling(true);
+    
+    if (!hasNativePrompt) {
+      // Si no hay prompt nativo, mostrar instrucciones manuales
+      console.warn('⚠️ No native install prompt available. Showing manual instructions.');
+      setShowManualInstructions(true);
+      setIsInstalling(false);
+      return;
+    }
+    
     const success = await install();
     setIsInstalling(false);
     
@@ -256,6 +267,59 @@ export function InstallPage({ onNavigate }: InstallPageProps) {
           </div>
         </div>
       </div>
+
+      {/* Dialog con instrucciones manuales */}
+      <Dialog open={showManualInstructions} onOpenChange={setShowManualInstructions}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('install:instructions.manual.title')}</DialogTitle>
+            <DialogDescription>
+              {browser === 'Chrome' && platform.isDesktop && (
+                <div className="space-y-3 pt-4">
+                  <p className="text-foreground">{t('install:instructions.manual.chrome.intro')}</p>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-foreground">
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.chrome.step1') }} />
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.chrome.step2') }} />
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.chrome.step3') }} />
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.chrome.step4') }} />
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.chrome.step5') }} />
+                  </ol>
+                </div>
+              )}
+              
+              {browser === 'Edge' && platform.isDesktop && (
+                <div className="space-y-3 pt-4">
+                  <p className="text-foreground">{t('install:instructions.manual.edge.intro')}</p>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-foreground">
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.edge.step1') }} />
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.edge.step2') }} />
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.edge.step3') }} />
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.edge.step4') }} />
+                  </ol>
+                </div>
+              )}
+
+              {browser === 'Brave' && platform.isDesktop && (
+                <div className="space-y-3 pt-4">
+                  <p className="text-foreground">{t('install:instructions.manual.brave.intro')}</p>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-foreground">
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.brave.step1') }} />
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.brave.step2') }} />
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.brave.step3') }} />
+                    <li dangerouslySetInnerHTML={{ __html: t('install:instructions.manual.brave.step4') }} />
+                  </ol>
+                </div>
+              )}
+              
+              <div className="bg-muted p-3 rounded-lg mt-4">
+                <p className="text-xs text-muted-foreground">
+                  💡 <strong>{t('install:instructions.manual.note.title')}</strong> {t('install:instructions.manual.note.text')}
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -20,6 +20,35 @@
   "instructions": {
     "title": "Instrucciones de instalación",
     "subtitle": "Selecciona tu dispositivo para ver instrucciones específicas",
+    "manual": {
+      "title": "Instalación Manual",
+      "chrome": {
+        "intro": "Para instalar Refugi en Chrome:",
+        "step1": "Haz clic en el icono <strong>⋮</strong> (tres puntos) en la esquina superior derecha",
+        "step2": "Selecciona <strong>\"Guardar y compartir\"</strong> o <strong>\"Más herramientas\"</strong>",
+        "step3": "Haz clic en <strong>\"Instalar Refugi...\"</strong> o <strong>\"Crear acceso directo...\"</strong>",
+        "step4": "Marca la casilla <strong>\"Abrir como ventana\"</strong>",
+        "step5": "Haz clic en <strong>\"Instalar\"</strong>"
+      },
+      "edge": {
+        "intro": "Para instalar Refugi en Edge:",
+        "step1": "Haz clic en el icono <strong>⋯</strong> (tres puntos) en la esquina superior derecha",
+        "step2": "Selecciona <strong>\"Aplicaciones\"</strong>",
+        "step3": "Haz clic en <strong>\"Instalar Refugi\"</strong>",
+        "step4": "Confirma en el diálogo que aparece"
+      },
+      "brave": {
+        "intro": "Para instalar Refugi en Brave:",
+        "step1": "Haz clic en el icono <strong>☰</strong> (menú) en la esquina superior derecha",
+        "step2": "Selecciona <strong>\"Más herramientas\"</strong>",
+        "step3": "Haz clic en <strong>\"Instalar Refugi...\"</strong>",
+        "step4": "Confirma la instalación"
+      },
+      "note": {
+        "title": "Nota:",
+        "text": "Si no ves la opción de instalar, asegúrate de estar usando la última versión del navegador."
+      }
+    },
     "desktop": {
       "chrome": {
         "step1": "Haz clic en el icono de instalación (⊕) en la barra de direcciones",

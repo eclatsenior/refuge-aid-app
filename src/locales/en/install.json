@@ -20,6 +20,35 @@
   "instructions": {
     "title": "Installation instructions",
     "subtitle": "Select your device to see specific instructions",
+    "manual": {
+      "title": "Manual Installation",
+      "chrome": {
+        "intro": "To install Refugi on Chrome:",
+        "step1": "Click the <strong>⋮</strong> (three dots) icon in the top right corner",
+        "step2": "Select <strong>\"Save and share\"</strong> or <strong>\"More tools\"</strong>",
+        "step3": "Click <strong>\"Install Refugi...\"</strong> or <strong>\"Create shortcut...\"</strong>",
+        "step4": "Check the <strong>\"Open as window\"</strong> box",
+        "step5": "Click <strong>\"Install\"</strong>"
+      },
+      "edge": {
+        "intro": "To install Refugi on Edge:",
+        "step1": "Click the <strong>⋯</strong> (three dots) icon in the top right corner",
+        "step2": "Select <strong>\"Apps\"</strong>",
+        "step3": "Click <strong>\"Install Refugi\"</strong>",
+        "step4": "Confirm in the dialog that appears"
+      },
+      "brave": {
+        "intro": "To install Refugi on Brave:",
+        "step1": "Click the <strong>☰</strong> (menu) icon in the top right corner",
+        "step2": "Select <strong>\"More tools\"</strong>",
+        "step3": "Click <strong>\"Install Refugi...\"</strong>",
+        "step4": "Confirm the installation"
+      },
+      "note": {
+        "title": "Note:",
+        "text": "If you don't see the install option, make sure you're using the latest browser version."
+      }
+    },
     "desktop": {
       "chrome": {
         "step1": "Click the install icon (⊕) in the address bar",

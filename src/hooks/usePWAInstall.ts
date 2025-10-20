@@ -31,6 +31,8 @@ export const usePWAInstall = () => {
   const [browser, setBrowser] = useState('Desconocido');
 
   useEffect(() => {
+    console.log('🔍 PWA Install Hook initialized');
+    
     // Detectar si ya está instalado
     const checkIfInstalled = () => {
       // PWA instalada
@@ -97,19 +99,34 @@ export const usePWAInstall = () => {
       return /iphone|ipad|ipod/.test(userAgent);
     };
 
-    setIsInstalled(checkIfInstalled());
+    const detectedPlatform = detectPlatform();
+    const detectedBrowser = detectBrowser();
+    const installed = checkIfInstalled();
+
+    setIsInstalled(installed);
     setIsIOS(checkIfIOS());
-    setPlatform(detectPlatform());
-    setBrowser(detectBrowser());
+    setPlatform(detectedPlatform);
+    setBrowser(detectedBrowser);
+
+    // Log current status
+    console.log('📊 Current PWA Status:', {
+      isInstalled: installed,
+      browser: detectedBrowser,
+      platform: detectedPlatform,
+      protocol: window.location.protocol,
+      hostname: window.location.hostname
+    });
 
     // Capturar evento de instalación (solo Android/Chrome)
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('✅ beforeinstallprompt event fired!', e);
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
     };
 
     // Detectar cuando se instala
     const handleAppInstalled = () => {
+      console.log('✅ App installed successfully!');
       setIsInstalled(true);
       setInstallPrompt(null);
     };
@@ -146,11 +163,17 @@ export const usePWAInstall = () => {
   };
 
   return {
-    canInstall: !isInstalled && (!!installPrompt || isIOS),
+    // Mostrar botón en desktop Chrome/Edge/Brave SIEMPRE (aunque no haya prompt)
+    canInstall: !isInstalled && (
+      !!installPrompt || 
+      isIOS || 
+      (platform.isDesktop && ['Chrome', 'Edge', 'Brave'].includes(browser))
+    ),
     isInstalled,
     isIOS,
     platform,
     browser,
-    install
+    install,
+    hasNativePrompt: !!installPrompt // Indica si hay prompt nativo disponible
   };
 };
