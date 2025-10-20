@@ -29,6 +29,8 @@ export const usePWAInstall = () => {
     name: 'Desconocido'
   });
   const [browser, setBrowser] = useState('Desconocido');
+  const [isPreparingInstall, setIsPreparingInstall] = useState(true);
+  const [engagementProgress, setEngagementProgress] = useState(0);
 
   useEffect(() => {
     console.log('🔍 PWA Install Hook initialized');
@@ -131,12 +133,39 @@ export const usePWAInstall = () => {
       setInstallPrompt(null);
     };
 
+    // Engagement tracking para simular progreso
+    let engagementScore = 0;
+    
+    const trackEngagement = () => {
+      engagementScore = Math.min(engagementScore + 10, 100);
+      setEngagementProgress(engagementScore);
+      
+      if (engagementScore >= 50 && !installPrompt) {
+        setIsPreparingInstall(true);
+      }
+    };
+
+    // Timeout: si después de 10 segundos no hay prompt, mostrar instrucciones manuales
+    const timeout = setTimeout(() => {
+      if (!installPrompt && detectedPlatform.isDesktop && ['Chrome', 'Edge', 'Brave'].includes(detectedBrowser)) {
+        console.warn('⏰ beforeinstallprompt timeout - showing manual instructions fallback');
+        setIsPreparingInstall(false);
+      }
+    }, 10000);
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
+    window.addEventListener('scroll', trackEngagement, { passive: true });
+    window.addEventListener('click', trackEngagement);
+    window.addEventListener('mousemove', trackEngagement);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
+      window.removeEventListener('scroll', trackEngagement);
+      window.removeEventListener('click', trackEngagement);
+      window.removeEventListener('mousemove', trackEngagement);
+      clearTimeout(timeout);
     };
   }, []);
 
@@ -174,6 +203,8 @@ export const usePWAInstall = () => {
     platform,
     browser,
     install,
-    hasNativePrompt: !!installPrompt // Indica si hay prompt nativo disponible
+    hasNativePrompt: !!installPrompt, // Indica si hay prompt nativo disponible
+    isPreparingInstall, // Estado de preparación
+    engagementProgress // Progreso de engagement 0-100
   };
 };

@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Shield, Download, Check, Smartphone, Monitor, Chrome, Apple, Globe, Share2 } from "lucide-react";
+import { Shield, Download, Check, Smartphone, Monitor, Chrome, Apple, Globe, Share2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { PlatformInstructions } from "@/components/installation/PlatformInstructions";
 import { useTranslation } from "react-i18next";
@@ -14,7 +16,7 @@ interface InstallPageProps {
 }
 
 export function InstallPage({ onNavigate }: InstallPageProps) {
-  const { canInstall, isInstalled, install, platform, browser, hasNativePrompt } = usePWAInstall();
+  const { canInstall, isInstalled, install, platform, browser, hasNativePrompt, isPreparingInstall, engagementProgress } = usePWAInstall();
   const [isInstalling, setIsInstalling] = useState(false);
   const [showManualInstructions, setShowManualInstructions] = useState(false);
   const { t } = useTranslation(['install', 'common']);
@@ -103,20 +105,84 @@ export function InstallPage({ onNavigate }: InstallPageProps) {
               </CardContent>
             </Card>
           ) : canInstall && !platform.isIOS ? (
-            <div className="flex flex-col items-center gap-4">
-              <Button 
-                size="lg"
-                onClick={handleInstall}
-                disabled={isInstalling}
-                className="gap-2 text-lg px-8 py-6"
-              >
-                <Download className="h-5 w-5" />
-                {isInstalling ? t('install:installing', 'Instalando...') : t('install:installNow', 'Instalar ahora')}
-              </Button>
-              <p className="text-sm text-muted-foreground">
-                {t('install:detected', 'Detectamos:')} <Badge variant="secondary">{browser} en {platform.name}</Badge>
-              </p>
-            </div>
+            <Card className="max-w-md mx-auto">
+              <CardContent className="pt-6 space-y-4">
+                {hasNativePrompt ? (
+                  // Estado 2: Listo para instalar
+                  <>
+                    <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 mb-2">
+                      <Check className="h-6 w-6" />
+                      <p className="font-semibold text-lg">¡Listo para instalar!</p>
+                    </div>
+                    <Button 
+                      size="lg"
+                      onClick={handleInstall}
+                      disabled={isInstalling}
+                      className="w-full gap-2 text-lg py-6"
+                    >
+                      <Download className="h-5 w-5" />
+                      {isInstalling ? t('install:installing', 'Instalando...') : t('install:installNow', 'Instalar ahora')}
+                    </Button>
+                    <p className="text-sm text-muted-foreground text-center">
+                      {t('install:detected', 'Detectamos:')} <Badge variant="secondary">{browser} en {platform.name}</Badge>
+                    </p>
+                  </>
+                ) : isPreparingInstall ? (
+                  // Estado 1: Preparando instalación
+                  <>
+                    <div className="flex items-center justify-center gap-3 mb-3">
+                      <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                      <p className="font-semibold text-lg">Preparando instalación...</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Progress value={engagementProgress} className="h-2" />
+                      <p className="text-sm text-center text-muted-foreground">
+                        {engagementProgress}%
+                      </p>
+                    </div>
+                    
+                    <Alert>
+                      <AlertDescription>
+                        💡 <strong>Consejo:</strong> Interactúa con la página (haz scroll o clic) 
+                        para que el navegador active la instalación automática.
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <Button 
+                      variant="outline"
+                      onClick={() => setShowManualInstructions(true)}
+                      className="w-full"
+                    >
+                      Ver instrucciones manuales
+                    </Button>
+                  </>
+                ) : (
+                  // Estado 3: Instalación manual disponible
+                  <>
+                    <div className="flex items-center justify-center gap-3 mb-3">
+                      <Smartphone className="h-6 w-6 text-primary" />
+                      <p className="font-semibold text-lg">Instalación disponible</p>
+                    </div>
+                    
+                    <Alert>
+                      <AlertDescription>
+                        Tu navegador requiere instalación manual. Sigue los pasos a continuación 
+                        para instalar Refugi en tu dispositivo.
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <Button 
+                      onClick={() => setShowManualInstructions(true)}
+                      className="w-full gap-2"
+                    >
+                      <Download className="h-5 w-5" />
+                      Ver cómo instalar
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           ) : null}
         </div>
 
