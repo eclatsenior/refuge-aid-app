@@ -29,7 +29,7 @@ export const usePWAInstall = () => {
     name: 'Desconocido'
   });
   const [browser, setBrowser] = useState('Desconocido');
-  const [isPreparingInstall, setIsPreparingInstall] = useState(true);
+  const [isPreparingInstall, setIsPreparingInstall] = useState(false);
   const [engagementProgress, setEngagementProgress] = useState(0);
 
   useEffect(() => {
@@ -124,6 +124,7 @@ export const usePWAInstall = () => {
       console.log('✅ beforeinstallprompt event fired!', e);
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
+      setIsPreparingInstall(false); // Dejar de preparar, ya tenemos el prompt
     };
 
     // Detectar cuando se instala
@@ -145,13 +146,31 @@ export const usePWAInstall = () => {
       }
     };
 
-    // Timeout: si después de 10 segundos no hay prompt, mostrar instrucciones manuales
+    // Solo mostrar "preparando" en navegadores compatibles
+    if (!installed && detectedPlatform.isDesktop && ['Chrome', 'Edge', 'Brave'].includes(detectedBrowser)) {
+      setIsPreparingInstall(true);
+      console.log('⏳ Iniciando estado de preparación para instalación...');
+    }
+
+    // Timeout: si después de 3 segundos no hay prompt, mostrar instrucciones manuales
     const timeout = setTimeout(() => {
       if (!installPrompt && detectedPlatform.isDesktop && ['Chrome', 'Edge', 'Brave'].includes(detectedBrowser)) {
-        console.warn('⏰ beforeinstallprompt timeout - showing manual instructions fallback');
+        console.warn('⏰ beforeinstallprompt timeout (3s) - showing manual instructions fallback');
         setIsPreparingInstall(false);
       }
-    }, 10000);
+    }, 3000);
+
+    // Debug info después del timeout
+    setTimeout(() => {
+      console.log('🔧 PWA Install Diagnosis:', {
+        hasInstallPrompt: !!installPrompt,
+        isPreparingInstall,
+        engagementProgress,
+        canShowInstallUI: !installed && detectedPlatform.isDesktop,
+        browser: detectedBrowser,
+        platform: detectedPlatform.name
+      });
+    }, 3500);
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);

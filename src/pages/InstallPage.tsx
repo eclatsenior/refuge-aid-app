@@ -167,8 +167,18 @@ export function InstallPage({ onNavigate }: InstallPageProps) {
                     
                     <Alert>
                       <AlertDescription>
-                        Tu navegador requiere instalación manual. Sigue los pasos a continuación 
-                        para instalar Refugi en tu dispositivo.
+                        <strong>Tu navegador requiere instalación manual.</strong>
+                        <br />
+                        {browser === 'Chrome' || browser === 'Edge' || browser === 'Brave' ? (
+                          <>
+                            {browser} puede instalar PWAs, pero el navegador aún no ha activado 
+                            la instalación automática. Usa el menú del navegador (⋮) para instalar.
+                          </>
+                        ) : (
+                          <>
+                            Puedes instalar Refugi manualmente siguiendo estos pasos.
+                          </>
+                        )}
                       </AlertDescription>
                     </Alert>
                     
