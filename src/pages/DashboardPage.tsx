@@ -31,6 +31,7 @@ import { SubscriptionStatus } from "@/components/dashboard/SubscriptionStatus";
 import { ReportingSection } from "@/components/dashboard/ReportingSection";
 import { AlertPermissionDialog } from "@/components/dashboard/AlertPermissionDialog";
 import { audioManager, requestNotificationPermission } from "@/lib/audioManager";
+import { InstallAppBanner } from "@/components/dashboard/InstallAppBanner";
 
 interface DashboardPageProps {
   onNavigate?: (path: string) => void;
@@ -304,6 +305,9 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
       </header>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
+        {/* Install App Banner */}
+        <InstallAppBanner />
+        
         {/* Subscription Section */}
         <div className="space-y-4">
           <SubscriptionStatus

@@ -29,18 +29,6 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // Registrar Service Worker para funcionamiento offline
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/sw.js')
-            .then(function(registration) {
-              console.log('SW registered: ', registration);
-            }, function(registrationError) {
-              console.log('SW registration failed: ', registrationError);
-            });
-        });
-      }
-
       // Evitar zoom en inputs en iOS
       if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
         document.addEventListener('touchstart', function(event) {

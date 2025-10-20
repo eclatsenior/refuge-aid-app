@@ -8,6 +8,7 @@ import { NotificationsSettingsSection } from "@/components/dashboard/settings/No
 import { SubscriptionSettingsSection } from "@/components/dashboard/settings/SubscriptionSettingsSection";
 import { DashboardPreferences } from "@/components/dashboard/settings/DashboardPreferences";
 import { TeamSettingsSection } from "@/components/dashboard/settings/TeamSettingsSection";
+import { InstallationSettingsSection } from "@/components/dashboard/settings/InstallationSettingsSection";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -73,12 +74,13 @@ export default function SettingsLeadPage({ onNavigate }: SettingsLeadPageProps =
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="account" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="account">{t('settings-lead:tabs.account')}</TabsTrigger>
             <TabsTrigger value="notifications">{t('settings-lead:tabs.notifications')}</TabsTrigger>
             <TabsTrigger value="subscription">{t('settings-lead:tabs.subscription')}</TabsTrigger>
             <TabsTrigger value="dashboard">{t('settings-lead:tabs.dashboard')}</TabsTrigger>
             <TabsTrigger value="team">{t('settings-lead:tabs.team')}</TabsTrigger>
+            <TabsTrigger value="installation">Instalación</TabsTrigger>
           </TabsList>
 
           <TabsContent value="account">
@@ -99,6 +101,10 @@ export default function SettingsLeadPage({ onNavigate }: SettingsLeadPageProps =
 
           <TabsContent value="team">
             <TeamSettingsSection />
+          </TabsContent>
+
+          <TabsContent value="installation">
+            <InstallationSettingsSection />
           </TabsContent>
         </Tabs>
       </div>
