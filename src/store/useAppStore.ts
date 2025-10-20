@@ -352,6 +352,15 @@ export const useAppStore = create<AppState>()(
           
           if (error) {
             console.error('❌ Login error:', error.message);
+            
+            // Detectar si es por email no verificado
+            if (error.message?.includes('Email not confirmed')) {
+              return { 
+                error: { 
+                  message: 'Por favor verifica tu email antes de iniciar sesión. Revisa tu bandeja de entrada y haz clic en el enlace de verificación.' 
+                } 
+              };
+            }
           } else {
             console.log('✅ Login successful');
           }

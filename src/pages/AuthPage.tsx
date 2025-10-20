@@ -178,8 +178,9 @@ export function AuthPage() {
         });
       } else {
         toast({
-          title: "Cuenta creada",
-          description: "Por favor verifica tu email antes de iniciar sesión."
+          title: "✅ Cuenta creada exitosamente",
+          description: "Te hemos enviado un email de verificación. Por favor revisa tu bandeja de entrada (y carpeta de spam) y haz clic en el enlace para activar tu cuenta.",
+          duration: 8000
         });
         setActiveTab("login");
       }
@@ -187,6 +188,45 @@ export function AuthPage() {
       toast({
         title: "Error",
         description: "Ha ocurrido un error inesperado",
+        variant: "destructive"
+      });
+    }
+    setIsLoading(false);
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      toast({
+        title: "Error",
+        description: "Por favor ingresa tu email",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim().toLowerCase()
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Email reenviado",
+          description: "Revisa tu bandeja de entrada (y spam)"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo reenviar el email",
         variant: "destructive"
       });
     }
@@ -353,15 +393,32 @@ export function AuthPage() {
                     )}
                   </Button>
 
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotPassword(true)}
-                    className="text-sm text-primary hover:underline text-center w-full"
-                    disabled={isLoading}
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </button>
+                  <div className="flex justify-between items-center">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(true)}
+                      className="text-sm text-primary hover:underline"
+                      disabled={isLoading}
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleResendVerification}
+                      className="text-sm text-muted-foreground hover:text-foreground"
+                      disabled={isLoading}
+                    >
+                      Reenviar verificación
+                    </button>
+                  </div>
                 </form>
+
+                <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+                  <p className="text-xs text-blue-800 dark:text-blue-200">
+                    ℹ️ <strong>¿Cuenta nueva?</strong> Debes verificar tu email antes de iniciar sesión. 
+                    Revisa tu bandeja de entrada (y spam).
+                  </p>
+                </div>
 
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
