@@ -1,0 +1,74 @@
+{
+  "title": "Instal·la Refugi",
+  "subtitle": "El teu espai segur, sempre amb tu. Accés ràpid des de qualsevol dispositiu.",
+  "alreadyInstalled": "App ja instal·lada!",
+  "openApp": "Obrir aplicació",
+  "installNow": "Instal·lar ara",
+  "installing": "Instal·lant...",
+  "detected": "Detectem",
+  "benefits": {
+    "title": "Beneficis d'instal·lar",
+    "quickAccess": "Accés ràpid",
+    "quickAccessDesc": "Obre des del teu escriptori o pantalla d'inici",
+    "offline": "Funciona offline",
+    "offlineDesc": "Accedeix a la teva informació sense connexió a internet",
+    "notifications": "Notificacions instantànies",
+    "notificationsDesc": "Rep alertes importants en temps real",
+    "updates": "Actualitzacions automàtiques",
+    "updatesDesc": "Sempre tindràs la versió més recent"
+  },
+  "instructions": {
+    "title": "Instruccions d'instal·lació",
+    "subtitle": "Selecciona el teu dispositiu per veure instruccions específiques",
+    "desktop": {
+      "chrome": {
+        "step1": "Fes clic a la icona d'instal·lació (⊕) a la barra d'adreces",
+        "step2": "O vés a Menú (⋮) → \"Instal·lar Refugi...\"",
+        "step3": "Confirma la instal·lació",
+        "step4": "L'app s'obrirà automàticament i apareixerà al teu escriptori"
+      },
+      "safari": {
+        "note": "Safari a macOS té suport limitat per a PWAs. Recomanem usar Chrome o Edge per a la millor experiència."
+      },
+      "firefox": {
+        "note": "Firefox no suporta instal·lació de PWAs a l'escriptori. Recomanem usar Chrome, Edge o Brave."
+      },
+      "generic": {
+        "title": "Navegador no detectat",
+        "description": "Per instal·lar l'app, recomanem usar Google Chrome, Microsoft Edge o Brave. Descarrega un d'aquests navegadors i torna a aquesta pàgina."
+      }
+    },
+    "mobile": {
+      "ios": {
+        "step1": "Obre aquesta pàgina a Safari (no Chrome)",
+        "step2": "Toca el botó de compartir (□↑) a la part inferior",
+        "step3": "Desplaça't i selecciona \"Afegeix a la pantalla d'inici\"",
+        "step4": "Toca \"Afegeix\" al racó superior dret",
+        "step5": "L'app apareixerà a la teva pantalla d'inici",
+        "tip": "Important: A iOS, només Safari permet instal·lar apps web. Si fas servir Chrome, copia aquest enllaç i obre'l a Safari."
+      },
+      "android": {
+        "step1": "Toca el botó d'instal·lació que apareix a la part superior",
+        "step2": "O vés a Menú (⋮) → \"Instal·lar aplicació\"",
+        "step3": "Confirma la instal·lació",
+        "step4": "L'app s'afegirà a la teva pantalla d'inici automàticament"
+      },
+      "firefox": {
+        "note": "Firefox a Android té suport limitat. Recomanem usar Chrome o Edge per instal·lar l'app."
+      }
+    }
+  },
+  "tabs": {
+    "desktop": "Ordinador",
+    "mobile": "Mòbil"
+  },
+  "share": {
+    "title": "Comparteix amb el teu equip",
+    "subtitle": "Envia aquest enllaç a les teves empleades perquè instal·lin l'app"
+  },
+  "cta": {
+    "ready": "Llesta per començar?",
+    "register": "Registrar-me ara",
+    "login": "Ja tinc compte"
+  }
+}

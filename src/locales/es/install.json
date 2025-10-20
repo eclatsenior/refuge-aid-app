@@ -1,0 +1,74 @@
+{
+  "title": "Instala Refugi",
+  "subtitle": "Tu espacio seguro, siempre contigo. Acceso rápido desde cualquier dispositivo.",
+  "alreadyInstalled": "¡App ya instalada!",
+  "openApp": "Abrir aplicación",
+  "installNow": "Instalar ahora",
+  "installing": "Instalando...",
+  "detected": "Detectamos",
+  "benefits": {
+    "title": "Beneficios de instalar",
+    "quickAccess": "Acceso rápido",
+    "quickAccessDesc": "Abre desde tu escritorio o pantalla de inicio",
+    "offline": "Funciona offline",
+    "offlineDesc": "Accede a tu información sin conexión a internet",
+    "notifications": "Notificaciones instantáneas",
+    "notificationsDesc": "Recibe alertas importantes en tiempo real",
+    "updates": "Actualizaciones automáticas",
+    "updatesDesc": "Siempre tendrás la versión más reciente"
+  },
+  "instructions": {
+    "title": "Instrucciones de instalación",
+    "subtitle": "Selecciona tu dispositivo para ver instrucciones específicas",
+    "desktop": {
+      "chrome": {
+        "step1": "Haz clic en el icono de instalación (⊕) en la barra de direcciones",
+        "step2": "O ve a Menú (⋮) → \"Instalar Refugi...\"",
+        "step3": "Confirma la instalación",
+        "step4": "La app se abrirá automáticamente y aparecerá en tu escritorio"
+      },
+      "safari": {
+        "note": "Safari en macOS tiene soporte limitado para PWAs. Recomendamos usar Chrome o Edge para la mejor experiencia."
+      },
+      "firefox": {
+        "note": "Firefox no soporta instalación de PWAs en escritorio. Recomendamos usar Chrome, Edge o Brave."
+      },
+      "generic": {
+        "title": "Navegador no detectado",
+        "description": "Para instalar la app, recomendamos usar Google Chrome, Microsoft Edge o Brave. Descarga uno de estos navegadores y vuelve a esta página."
+      }
+    },
+    "mobile": {
+      "ios": {
+        "step1": "Abre esta página en Safari (no Chrome)",
+        "step2": "Toca el botón de compartir (□↑) en la parte inferior",
+        "step3": "Desplázate y selecciona \"Añadir a pantalla de inicio\"",
+        "step4": "Toca \"Añadir\" en la esquina superior derecha",
+        "step5": "La app aparecerá en tu pantalla de inicio",
+        "tip": "Importante: En iOS, solo Safari permite instalar apps web. Si usas Chrome, copia este enlace y ábrelo en Safari."
+      },
+      "android": {
+        "step1": "Toca el botón de instalación que aparece en la parte superior",
+        "step2": "O ve a Menú (⋮) → \"Instalar aplicación\"",
+        "step3": "Confirma la instalación",
+        "step4": "La app se agregará a tu pantalla de inicio automáticamente"
+      },
+      "firefox": {
+        "note": "Firefox en Android tiene soporte limitado. Recomendamos usar Chrome o Edge para instalar la app."
+      }
+    }
+  },
+  "tabs": {
+    "desktop": "Ordenador",
+    "mobile": "Móvil"
+  },
+  "share": {
+    "title": "Comparte con tu equipo",
+    "subtitle": "Envía este enlace a tus empleadas para que instalen la app"
+  },
+  "cta": {
+    "ready": "¿Lista para empezar?",
+    "register": "Registrarme ahora",
+    "login": "Ya tengo cuenta"
+  }
+}

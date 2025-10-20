@@ -1,0 +1,74 @@
+{
+  "title": "Install Refugi",
+  "subtitle": "Your safe space, always with you. Quick access from any device.",
+  "alreadyInstalled": "App already installed!",
+  "openApp": "Open app",
+  "installNow": "Install now",
+  "installing": "Installing...",
+  "detected": "Detected",
+  "benefits": {
+    "title": "Benefits of installing",
+    "quickAccess": "Quick access",
+    "quickAccessDesc": "Open from your desktop or home screen",
+    "offline": "Works offline",
+    "offlineDesc": "Access your information without internet",
+    "notifications": "Instant notifications",
+    "notificationsDesc": "Get important alerts in real time",
+    "updates": "Automatic updates",
+    "updatesDesc": "You'll always have the latest version"
+  },
+  "instructions": {
+    "title": "Installation instructions",
+    "subtitle": "Select your device to see specific instructions",
+    "desktop": {
+      "chrome": {
+        "step1": "Click the install icon (⊕) in the address bar",
+        "step2": "Or go to Menu (⋮) → \"Install Refugi...\"",
+        "step3": "Confirm installation",
+        "step4": "The app will open automatically and appear on your desktop"
+      },
+      "safari": {
+        "note": "Safari on macOS has limited PWA support. We recommend using Chrome or Edge for the best experience."
+      },
+      "firefox": {
+        "note": "Firefox doesn't support PWA installation on desktop. We recommend using Chrome, Edge, or Brave."
+      },
+      "generic": {
+        "title": "Browser not detected",
+        "description": "To install the app, we recommend using Google Chrome, Microsoft Edge, or Brave. Download one of these browsers and return to this page."
+      }
+    },
+    "mobile": {
+      "ios": {
+        "step1": "Open this page in Safari (not Chrome)",
+        "step2": "Tap the share button (□↑) at the bottom",
+        "step3": "Scroll and select \"Add to Home Screen\"",
+        "step4": "Tap \"Add\" in the top right corner",
+        "step5": "The app will appear on your home screen",
+        "tip": "Important: On iOS, only Safari allows installing web apps. If using Chrome, copy this link and open it in Safari."
+      },
+      "android": {
+        "step1": "Tap the install button at the top",
+        "step2": "Or go to Menu (⋮) → \"Install app\"",
+        "step3": "Confirm installation",
+        "step4": "The app will be added to your home screen automatically"
+      },
+      "firefox": {
+        "note": "Firefox on Android has limited support. We recommend using Chrome or Edge to install the app."
+      }
+    }
+  },
+  "tabs": {
+    "desktop": "Computer",
+    "mobile": "Mobile"
+  },
+  "share": {
+    "title": "Share with your team",
+    "subtitle": "Send this link to your employees to install the app"
+  },
+  "cta": {
+    "ready": "Ready to start?",
+    "register": "Register now",
+    "login": "I already have an account"
+  }
+}

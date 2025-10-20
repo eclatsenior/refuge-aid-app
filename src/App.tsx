@@ -14,6 +14,7 @@ import { CaminoTerapeuticoPage } from "@/pages/CaminoTerapeuticoPage";
 import { CartaBienvenidaPage } from "@/pages/CartaBienvenidaPage";
 import { AuthPage } from "@/pages/AuthPage";
 import { DashboardPage } from "@/pages/DashboardPage";
+import { InstallPage } from "@/pages/InstallPage";
 import { StripeTestPage } from "@/pages/StripeTestPage";
 import { PaymentSuccessPage } from "@/pages/PaymentSuccessPage";
 import { PaymentCanceledPage } from "@/pages/PaymentCanceledPage";
@@ -134,6 +135,8 @@ const App = () => {
         return <ProfilePage />;
       case "/dashboard/settings":
         return <SettingsLeadPage />;
+      case "/instalar":
+        return <InstallPage onNavigate={handleNavigate} />;
       case "/stripe-test-secret":
         return <StripeTestPage />;
       case "/payment-success":
@@ -201,7 +204,7 @@ const App = () => {
     }
     
     // Special routes that don't require authentication
-    const publicRoutes = ["/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled"];
+    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled"];
     if (publicRoutes.includes(currentPath)) {
       return renderCurrentPage();
     }
