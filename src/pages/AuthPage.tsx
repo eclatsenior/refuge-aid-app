@@ -150,13 +150,30 @@ export function AuthPage() {
       }
     }
 
-    if (normalizedPassword.length < 6) {
+    // Validación de contraseña: mínimo 8 caracteres
+    if (normalizedPassword.length < 8) {
       toast({
-        title: "Error",
-        description: "La contraseña debe tener al menos 6 caracteres",
+        title: "Contraseña débil",
+        description: "La contraseña debe tener al menos 8 caracteres",
         variant: "destructive"
       });
       return;
+    }
+
+    // Validación adicional para Refugi Leads: mayúsculas, minúsculas y números
+    if (isRefugiLead) {
+      const hasUpperCase = /[A-Z]/.test(normalizedPassword);
+      const hasLowerCase = /[a-z]/.test(normalizedPassword);
+      const hasNumber = /\d/.test(normalizedPassword);
+
+      if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+        toast({
+          title: "Contraseña débil",
+          description: "Para cuentas empresariales, la contraseña debe incluir mayúsculas, minúsculas y números",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -259,6 +276,17 @@ export function AuthPage() {
       return;
     }
 
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor ingresa un email válido",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
@@ -273,8 +301,9 @@ export function AuthPage() {
         });
       } else {
         toast({
-          title: "Email enviado",
-          description: "Revisa tu correo para restablecer tu contraseña"
+          title: "✅ Email enviado",
+          description: "Revisa tu correo para restablecer tu contraseña (también en spam)",
+          duration: 8000
         });
         setShowForgotPassword(false);
         setResetEmail("");
@@ -415,8 +444,9 @@ export function AuthPage() {
 
                 <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
                   <p className="text-xs text-blue-800 dark:text-blue-200">
-                    ℹ️ <strong>¿Cuenta nueva?</strong> Debes verificar tu email antes de iniciar sesión. 
-                    Revisa tu bandeja de entrada (y spam).
+                    ℹ️ <strong>¿Cuenta nueva?</strong> Si te autoregistraste como empresa o particular, 
+                    debes verificar tu email antes de iniciar sesión. Si fuiste registrada por tu empresa, 
+                    puedes acceder inmediatamente. Revisa tu bandeja de entrada (y spam).
                   </p>
                 </div>
 
@@ -444,8 +474,19 @@ export function AuthPage() {
               <TabsContent value="register" className="space-y-4">
                 <div className="mb-3 p-3 rounded-lg bg-muted/50 border border-border">
                   <p className="text-xs text-muted-foreground">
-                    ⚠️ Si te registras aquí, debes verificar tu email antes de iniciar sesión. 
-                    Los empleados registrados desde el dashboard tienen acceso inmediato.
+                    {isRefugiLead ? (
+                      <>
+                        🏢 <strong>Registro empresarial:</strong> Deberás verificar tu email empresarial 
+                        antes de poder acceder a tu dashboard y registrar empleados. La contraseña debe 
+                        tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números.
+                      </>
+                    ) : (
+                      <>
+                        👤 <strong>Registro individual:</strong> Deberás verificar tu email antes de 
+                        iniciar sesión. Los empleados registrados por empresas tienen acceso inmediato.
+                        La contraseña debe tener al menos 8 caracteres.
+                      </>
+                    )}
                   </p>
                 </div>
                 

@@ -75,11 +75,12 @@ serve(async (req) => {
 
     console.log('✅ Validations passed, creating user...');
 
-    // Step 1: Create user in auth.users
+    // Step 1: Create user in auth.users with email pre-confirmed
+    // Employees registered by Refugi Leads get immediate access without email verification
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // Auto-confirm email
+      email_confirm: true, // ✅ CRITICAL: Pre-confirm email for employee onboarding
       user_metadata: {
         full_name: fullName,
         role: 'employee'
