@@ -345,7 +345,7 @@ export const useAppStore = create<AppState>()(
           
           console.log('🔐 Attempting login with normalized email:', normalizedEmail);
           
-          const { error } = await supabase.auth.signInWithPassword({
+          const { data, error } = await supabase.auth.signInWithPassword({
             email: normalizedEmail,
             password: normalizedPassword
           });
@@ -353,19 +353,58 @@ export const useAppStore = create<AppState>()(
           if (error) {
             console.error('❌ Login error:', error.message);
             
-            // Detectar si es por email no verificado
+            // Detectar si es por email no verificado (error explícito de Supabase)
             if (error.message?.includes('Email not confirmed')) {
               return { 
                 error: { 
-                  message: 'Por favor verifica tu email antes de iniciar sesión. Revisa tu bandeja de entrada y haz clic en el enlace de verificación.' 
+                  message: '⚠️ Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada (y spam) y haz clic en el enlace de verificación.' 
                 } 
               };
             }
-          } else {
-            console.log('✅ Login successful');
+            
+            return { error };
           }
           
-          return { error };
+          // ✅ NUEVO: Verificación explícita del estado de confirmación
+          // Esto previene el caso donde Supabase permite login pero el email no está confirmado
+          if (data?.user) {
+            const emailConfirmedAt = data.user.email_confirmed_at;
+            const userRole = data.user.user_metadata?.role || 'employee';
+            
+            console.log('🔍 Email confirmation check:', {
+              email: data.user.email,
+              role: userRole,
+              email_confirmed_at: emailConfirmedAt,
+              is_confirmed: !!emailConfirmedAt
+            });
+            
+            // Solo verificar confirmación para Refugi Leads y particulares autoregistrados
+            // Los empleados (managed_by_lead: true) ya tienen email_confirm: true desde el registro
+            if (!emailConfirmedAt && userRole !== 'employee') {
+              console.warn('⚠️ Email not confirmed, forcing logout');
+              
+              // Forzar logout inmediato
+              await supabase.auth.signOut();
+              
+              return {
+                error: {
+                  message: '⚠️ Tu email no ha sido verificado. Por favor revisa tu bandeja de entrada (y spam) y haz clic en el enlace de verificación antes de iniciar sesión.'
+                }
+              };
+            }
+            
+            // Para empleados, verificar que tengan el flag managed_by_lead
+            // (esto se establece automáticamente por el edge function register-employee)
+            if (userRole === 'employee') {
+              console.log('👤 Employee login - checking managed status...');
+              // Los empleados registrados por el edge function ya tienen email_confirm: true
+              // así que este check es solo para logging
+            }
+          }
+          
+          console.log('✅ Login successful and email verified');
+          return { error: null };
+          
         } catch (error) {
           console.error('❌ Login exception:', error);
           return { error };

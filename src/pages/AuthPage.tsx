@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -29,6 +30,8 @@ export function AuthPage() {
   const [activeTab, setActiveTab] = useState("login");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [showResendVerification, setShowResendVerification] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [companyWebsite, setCompanyWebsite] = useState("");
   const [companyRole, setCompanyRole] = useState("");
@@ -212,10 +215,22 @@ export function AuthPage() {
   };
 
   const handleResendVerification = async () => {
-    if (!email) {
+    const normalizedEmail = resendEmail.trim().toLowerCase();
+    
+    if (!normalizedEmail) {
       toast({
         title: "Error",
         description: "Por favor ingresa tu email",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor ingresa un email válido",
         variant: "destructive"
       });
       return;
@@ -225,25 +240,31 @@ export function AuthPage() {
     try {
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email: email.trim().toLowerCase()
+        email: normalizedEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`
+        }
       });
 
       if (error) {
         toast({
           title: "Error",
-          description: error.message,
+          description: error.message || "No se pudo reenviar el email de verificación",
           variant: "destructive"
         });
       } else {
         toast({
-          title: "Email reenviado",
-          description: "Revisa tu bandeja de entrada (y spam)"
+          title: "✅ Email reenviado",
+          description: "Revisa tu correo para verificar tu cuenta (también en spam)",
+          duration: 8000
         });
+        setShowResendVerification(false);
+        setResendEmail("");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "No se pudo reenviar el email",
+        description: "Ha ocurrido un error inesperado",
         variant: "destructive"
       });
     }
@@ -336,6 +357,15 @@ export function AuthPage() {
         setResetEmail={setResetEmail}
         isLoading={isLoading}
         onSubmit={handleForgotPassword}
+      />
+      
+      <ResendVerificationDialog
+        open={showResendVerification}
+        onOpenChange={setShowResendVerification}
+        resendEmail={resendEmail}
+        setResendEmail={setResendEmail}
+        isLoading={isLoading}
+        onSubmit={handleResendVerification}
       />
       
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
@@ -431,14 +461,6 @@ export function AuthPage() {
                     >
                       ¿Olvidaste tu contraseña?
                     </button>
-                    <button
-                      type="button"
-                      onClick={handleResendVerification}
-                      className="text-sm text-muted-foreground hover:text-foreground"
-                      disabled={isLoading}
-                    >
-                      Reenviar verificación
-                    </button>
                   </div>
                 </form>
 
@@ -449,6 +471,15 @@ export function AuthPage() {
                     puedes acceder inmediatamente. Revisa tu bandeja de entrada (y spam).
                   </p>
                 </div>
+
+                <Button
+                  type="button"
+                  variant="link"
+                  className="text-xs mt-2 p-0 h-auto"
+                  onClick={() => setShowResendVerification(true)}
+                >
+                  ¿No recibiste el email de verificación? Reenviar →
+                </Button>
 
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
@@ -673,6 +704,67 @@ function ForgotPasswordDialog({
                 </>
               ) : (
                 "Enviar enlace"
+              )}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ResendVerificationDialog({ 
+  open, 
+  onOpenChange, 
+  resendEmail, 
+  setResendEmail, 
+  isLoading, 
+  onSubmit 
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void;
+  resendEmail: string;
+  setResendEmail: (email: string) => void;
+  isLoading: boolean;
+  onSubmit: () => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Reenviar email de verificación</DialogTitle>
+          <DialogDescription>
+            Ingresa tu email y te enviaremos nuevamente el enlace de verificación.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <Label htmlFor="resend-email">Email</Label>
+            <Input
+              id="resend-email"
+              type="email"
+              placeholder="tu@email.com"
+              value={resendEmail}
+              onChange={(e) => setResendEmail(e.target.value)}
+              disabled={isLoading}
+            />
+          </div>
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={onSubmit} disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Reenviando...
+                </>
+              ) : (
+                "Reenviar email"
               )}
             </Button>
           </div>

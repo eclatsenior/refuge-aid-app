@@ -24,3 +24,6 @@ verify_jwt = true
 [functions.create-individual-checkout]
 verify_jwt = true
 
+[functions.admin-unlock-account]
+verify_jwt = false
+
