@@ -6,6 +6,7 @@ import { SUBSCRIPTION_PLANS } from "@/lib/subscriptionPlans";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface SubscriptionPlansProps {
   currentProductId?: string | null;
@@ -14,6 +15,7 @@ interface SubscriptionPlansProps {
 
 export function SubscriptionPlans({ currentProductId, onCheckoutStart }: SubscriptionPlansProps) {
   const { toast } = useToast();
+  const { t } = useTranslation('subscription');
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
   const handleSubscribe = async (priceId: string, planName: string) => {

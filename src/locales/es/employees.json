@@ -1,0 +1,63 @@
+{
+  "register": {
+    "title": "Registrar Nueva Empleada",
+    "subtitle": "Añade una nueva empleada a tu equipo",
+    "fullName": "Nombre Completo",
+    "fullNamePlaceholder": "María García López",
+    "email": "Email",
+    "emailPlaceholder": "maria@ejemplo.com",
+    "phone": "Teléfono",
+    "phonePlaceholder": "+34 600 123 456",
+    "password": "Contraseña Temporal",
+    "passwordPlaceholder": "Genera una contraseña segura",
+    "generate": "Generar automática",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "submit": "Registrar Empleada",
+    "cancel": "Cancelar",
+    "registering": "Registrando...",
+    "limitReached": "Límite de empleadas alcanzado",
+    "upgradeRequired": "Mejora tu plan para añadir más empleadas"
+  },
+  "card": {
+    "status": {
+      "emergency": "Emergencia",
+      "offline": "Desconectada",
+      "needsAttention": "Necesita atención",
+      "good": "Bien",
+      "online": "En línea",
+      "noData": "Sin datos"
+    },
+    "mood": "Estado de ánimo",
+    "therapy": "Progreso terapéutico",
+    "lastCheckIn": "Último check-in",
+    "connected": "Conectada",
+    "actions": {
+      "call": "Llamar",
+      "sms": "Enviar SMS",
+      "whatsapp": "WhatsApp",
+      "internalMessage": "Mensaje interno",
+      "viewDetails": "Ver detalles",
+      "flagForFollowUp": "Marcar para seguimiento",
+      "unflagForFollowUp": "Quitar marca de seguimiento"
+    },
+    "toast": {
+      "callInitiated": "Llamada iniciada",
+      "callInitiatedDesc": "Abriendo aplicación de teléfono...",
+      "smsInitiated": "SMS iniciado",
+      "smsInitiatedDesc": "Abriendo aplicación de mensajes...",
+      "whatsappInitiated": "WhatsApp iniciado",
+      "whatsappInitiatedDesc": "Abriendo WhatsApp...",
+      "flagged": "Marcada para seguimiento",
+      "flaggedDesc": "La empleada ha sido marcada para seguimiento",
+      "unflagged": "Marca eliminada",
+      "unflaggedDesc": "Se ha quitado la marca de seguimiento"
+    }
+  },
+  "notifications": {
+    "registered": "Empleada registrada",
+    "registeredDesc": "La empleada ha sido registrada correctamente",
+    "error": "Error al registrar",
+    "errorDesc": "No se pudo registrar la empleada. Intenta de nuevo."
+  }
+}

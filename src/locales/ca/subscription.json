@@ -1,0 +1,34 @@
+{
+  "status": {
+    "noSubscription": "Sense Subscripció Activa",
+    "noSubscriptionDesc": "Necessites contractar un pla per utilitzar Refugi i gestionar empleades",
+    "viewPlans": "Veure Plans Disponibles",
+    "active": "Actiu",
+    "renewal": "Renovació",
+    "employeesRegistered": "Empleades Registrades",
+    "manage": "Gestionar Subscripció",
+    "opening": "Obrint...",
+    "viewOtherPlans": "Veure Altres Plans",
+    "nearLimit": "T'estàs acostant al límit del teu pla",
+    "atLimit": "Has assolit el límit del teu pla",
+    "error": "Error",
+    "errorDesc": "No s'ha pogut obrir el portal de gestió. Torna-ho a provar."
+  },
+  "plans": {
+    "current": "El Teu Pla Actual",
+    "popular": "Més Popular",
+    "perMonth": "/mes",
+    "maxEmployees": "empleades màxim",
+    "subscribe": "Contractar Pla",
+    "processing": "Processant...",
+    "currentPlan": "Pla Actual",
+    "errorTitle": "Error",
+    "errorDesc": "No s'ha pogut iniciar el procés de pagament. Torna-ho a provar."
+  },
+  "planNames": {
+    "basic": "Pla Bàsic",
+    "standard": "Pla Estàndard",
+    "premium": "Pla Premium",
+    "individual": "Pla Individual"
+  }
+}

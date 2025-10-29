@@ -1,0 +1,34 @@
+{
+  "status": {
+    "noSubscription": "Sin Suscripción Activa",
+    "noSubscriptionDesc": "Necesitas contratar un plan para usar Refugi y gestionar empleadas",
+    "viewPlans": "Ver Planes Disponibles",
+    "active": "Activo",
+    "renewal": "Renovación",
+    "employeesRegistered": "Empleadas Registradas",
+    "manage": "Gestionar Suscripción",
+    "opening": "Abriendo...",
+    "viewOtherPlans": "Ver Otros Planes",
+    "nearLimit": "Te estás acercando al límite de tu plan",
+    "atLimit": "Has alcanzado el límite de tu plan",
+    "error": "Error",
+    "errorDesc": "No se pudo abrir el portal de gestión. Intenta de nuevo."
+  },
+  "plans": {
+    "current": "Tu Plan Actual",
+    "popular": "Más Popular",
+    "perMonth": "/mes",
+    "maxEmployees": "empleadas máximo",
+    "subscribe": "Contratar Plan",
+    "processing": "Procesando...",
+    "currentPlan": "Plan Actual",
+    "errorTitle": "Error",
+    "errorDesc": "No se pudo iniciar el proceso de pago. Intenta de nuevo."
+  },
+  "planNames": {
+    "basic": "Plan Básico",
+    "standard": "Plan Estándar",
+    "premium": "Plan Premium",
+    "individual": "Plan Individual"
+  }
+}

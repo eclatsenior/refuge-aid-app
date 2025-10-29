@@ -1,0 +1,66 @@
+{
+  "title": "Dashboard Refugi Lead",
+  "welcome": "Bienvenido",
+  "logout": "Salir",
+  "refresh": "Actualizar",
+  "settings": "Configuración",
+  "audio": "Audio",
+  "employees": {
+    "title": "Empleadas Asignadas",
+    "search": "Buscar empleadas...",
+    "noEmployees": "No hay empleadas asignadas aún",
+    "register": "Registrar Nueva Empleada",
+    "total": "Total Empleadas",
+    "online": "En Línea",
+    "alerts": "Alertas Activas",
+    "needsAttention": "Necesitan Atención"
+  },
+  "filters": {
+    "all": "Todas",
+    "online": "En línea",
+    "alerts": "Alertas",
+    "offline": "Desconectadas"
+  },
+  "stats": {
+    "totalEmployees": "Total Empleadas",
+    "connected": "conectadas",
+    "activeAlerts": "Alertas Activas",
+    "employeesAffected": "empleadas afectadas",
+    "averageMood": "Estado de Ánimo Promedio",
+    "lastHours": "Últimas 24 horas",
+    "noData": "Sin datos",
+    "notReported": "sin reportar",
+    "therapyProgress": "Progreso Terapéutico",
+    "overallProgress": "Progreso general",
+    "urgent": "Urgente"
+  },
+  "queue": {
+    "title": "Necesita Atención Ahora",
+    "risk": "Riesgo",
+    "openCase": "Abrir caso",
+    "contact": "Contactar",
+    "referToPsychology": "Derivar a psicología",
+    "noAttention": "✅ No hay empleadas que requieran atención inmediata"
+  },
+  "kpis": {
+    "title": "Métricas KPI",
+    "activeRisk": "Riesgo Activo",
+    "weightedAverage": "Promedio ponderado",
+    "incidentsThisWeek": "Incidentes Esta Semana",
+    "open": "abiertos",
+    "averageMood24h": "Ánimo Promedio (24h)",
+    "trainingCompleted": "Formación Completada",
+    "checkinsPerWeek": "check-ins/semana"
+  },
+  "reports": {
+    "title": "Reporting Detallado",
+    "subtitle": "Análisis completo y generación de reportes",
+    "tabs": {
+      "summary": "Resumen",
+      "incidents": "Incidentes",
+      "risk": "Riesgo",
+      "mood": "Ánimo",
+      "training": "Formación"
+    }
+  }
+}

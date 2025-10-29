@@ -1,0 +1,63 @@
+{
+  "register": {
+    "title": "تسجيل موظفة جديدة",
+    "subtitle": "أضف موظفة جديدة إلى فريقك",
+    "fullName": "الاسم الكامل",
+    "fullNamePlaceholder": "ماريا غارسيا لوبيز",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "maria@example.com",
+    "phone": "الهاتف",
+    "phonePlaceholder": "+34 600 123 456",
+    "password": "كلمة المرور المؤقتة",
+    "passwordPlaceholder": "إنشاء كلمة مرور آمنة",
+    "generate": "إنشاء تلقائي",
+    "copy": "نسخ",
+    "copied": "تم النسخ!",
+    "submit": "تسجيل الموظفة",
+    "cancel": "إلغاء",
+    "registering": "جاري التسجيل...",
+    "limitReached": "تم الوصول إلى حد الموظفات",
+    "upgradeRequired": "قم بترقية خطتك لإضافة المزيد من الموظفات"
+  },
+  "card": {
+    "status": {
+      "emergency": "طوارئ",
+      "offline": "غير متصلة",
+      "needsAttention": "بحاجة إلى اهتمام",
+      "good": "جيد",
+      "online": "متصلة",
+      "noData": "لا توجد بيانات"
+    },
+    "mood": "الحالة المزاجية",
+    "therapy": "التقدم العلاجي",
+    "lastCheckIn": "آخر تسجيل دخول",
+    "connected": "متصلة",
+    "actions": {
+      "call": "اتصال",
+      "sms": "إرسال رسالة نصية",
+      "whatsapp": "واتساب",
+      "internalMessage": "رسالة داخلية",
+      "viewDetails": "عرض التفاصيل",
+      "flagForFollowUp": "وضع علامة للمتابعة",
+      "unflagForFollowUp": "إزالة علامة المتابعة"
+    },
+    "toast": {
+      "callInitiated": "بدء الاتصال",
+      "callInitiatedDesc": "فتح تطبيق الهاتف...",
+      "smsInitiated": "بدء الرسالة النصية",
+      "smsInitiatedDesc": "فتح تطبيق الرسائل...",
+      "whatsappInitiated": "بدء واتساب",
+      "whatsappInitiatedDesc": "فتح واتساب...",
+      "flagged": "تم وضع علامة للمتابعة",
+      "flaggedDesc": "تم وضع علامة على الموظفة للمتابعة",
+      "unflagged": "تمت إزالة العلامة",
+      "unflaggedDesc": "تمت إزالة علامة المتابعة"
+    }
+  },
+  "notifications": {
+    "registered": "تم تسجيل الموظفة",
+    "registeredDesc": "تم تسجيل الموظفة بنجاح",
+    "error": "خطأ في التسجيل",
+    "errorDesc": "تعذر تسجيل الموظفة. يرجى المحاولة مرة أخرى."
+  }
+}

@@ -4,6 +4,7 @@ import { Activity, AlertTriangle, BookOpen, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 
 interface KPIData {
   active_risk: { score: number; trend_7d: number; trend_30d: number };
@@ -16,6 +17,7 @@ interface KPIData {
 }
 
 export function KPIsSection() {
+  const { t } = useTranslation('dashboard');
   const [kpis, setKpis] = useState<KPIData | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();

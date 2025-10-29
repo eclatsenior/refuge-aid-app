@@ -1,0 +1,49 @@
+{
+  "title": "Emergency Alert",
+  "active": "Active",
+  "from": "From",
+  "type": "Type",
+  "time": "Time",
+  "message": "Message",
+  "status": "Status",
+  "actions": {
+    "title": "Actions",
+    "callEmployee": "Call employee",
+    "sendSMS": "Send SMS",
+    "whatsapp": "WhatsApp",
+    "internalMessage": "Internal message",
+    "call112": "Call 112",
+    "viewLocation": "View location",
+    "resolve": "Resolve Alert"
+  },
+  "resolve": {
+    "title": "Alert Resolution",
+    "notes": "Resolution notes",
+    "notesPlaceholder": "Describe the actions taken and the outcome of the intervention...",
+    "confirm": "Confirm Resolution",
+    "cancel": "Cancel",
+    "resolving": "Resolving..."
+  },
+  "types": {
+    "emergency": "Emergency",
+    "panic": "Panic",
+    "alert": "Alert",
+    "help": "Help"
+  },
+  "toast": {
+    "callInitiated": "Call initiated",
+    "callInitiatedDesc": "Opening phone app...",
+    "smsInitiated": "SMS initiated",
+    "smsInitiatedDesc": "Opening messages app...",
+    "whatsappInitiated": "WhatsApp initiated",
+    "whatsappInitiatedDesc": "Opening WhatsApp...",
+    "emergency112": "Calling 112",
+    "emergency112Desc": "Opening dialer for emergency...",
+    "locationOpened": "Location opened",
+    "locationOpenedDesc": "Opening Google Maps...",
+    "resolved": "Alert resolved",
+    "resolvedDesc": "The alert has been marked as resolved",
+    "error": "Error",
+    "errorDesc": "Could not resolve the alert. Please try again."
+  }
+}

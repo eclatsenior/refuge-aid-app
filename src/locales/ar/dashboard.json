@@ -1,0 +1,66 @@
+{
+  "title": "لوحة القيادة Refugi Lead",
+  "welcome": "مرحبا",
+  "logout": "تسجيل الخروج",
+  "refresh": "تحديث",
+  "settings": "الإعدادات",
+  "audio": "الصوت",
+  "employees": {
+    "title": "الموظفات المعينات",
+    "search": "البحث عن الموظفات...",
+    "noEmployees": "لا توجد موظفات معينات بعد",
+    "register": "تسجيل موظفة جديدة",
+    "total": "إجمالي الموظفات",
+    "online": "متصلات",
+    "alerts": "التنبيهات النشطة",
+    "needsAttention": "بحاجة إلى اهتمام"
+  },
+  "filters": {
+    "all": "الكل",
+    "online": "متصلات",
+    "alerts": "التنبيهات",
+    "offline": "غير متصلات"
+  },
+  "stats": {
+    "totalEmployees": "إجمالي الموظفات",
+    "connected": "متصلات",
+    "activeAlerts": "التنبيهات النشطة",
+    "employeesAffected": "الموظفات المتأثرات",
+    "averageMood": "متوسط الحالة المزاجية",
+    "lastHours": "آخر 24 ساعة",
+    "noData": "لا توجد بيانات",
+    "notReported": "لم يتم الإبلاغ",
+    "therapyProgress": "التقدم العلاجي",
+    "overallProgress": "التقدم العام",
+    "urgent": "عاجل"
+  },
+  "queue": {
+    "title": "بحاجة إلى اهتمام الآن",
+    "risk": "المخاطر",
+    "openCase": "فتح حالة",
+    "contact": "اتصال",
+    "referToPsychology": "إحالة إلى علم النفس",
+    "noAttention": "✅ لا توجد موظفات تحتاج إلى اهتمام فوري"
+  },
+  "kpis": {
+    "title": "مقاييس الأداء الرئيسية",
+    "activeRisk": "المخاطر النشطة",
+    "weightedAverage": "المتوسط المرجح",
+    "incidentsThisWeek": "الحوادث هذا الأسبوع",
+    "open": "مفتوحة",
+    "averageMood24h": "متوسط المزاج (24 ساعة)",
+    "trainingCompleted": "التدريب المكتمل",
+    "checkinsPerWeek": "عمليات تسجيل الوصول/أسبوع"
+  },
+  "reports": {
+    "title": "التقارير التفصيلية",
+    "subtitle": "التحليل الكامل وإنشاء التقارير",
+    "tabs": {
+      "summary": "ملخص",
+      "incidents": "الحوادث",
+      "risk": "المخاطر",
+      "mood": "المزاج",
+      "training": "التدريب"
+    }
+  }
+}

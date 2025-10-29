@@ -1,0 +1,49 @@
+{
+  "title": "Alerta d'Emergència",
+  "active": "Activa",
+  "from": "De",
+  "type": "Tipus",
+  "time": "Hora",
+  "message": "Missatge",
+  "status": "Estat",
+  "actions": {
+    "title": "Accions",
+    "callEmployee": "Trucar empleada",
+    "sendSMS": "Enviar SMS",
+    "whatsapp": "WhatsApp",
+    "internalMessage": "Missatge intern",
+    "call112": "Trucar al 112",
+    "viewLocation": "Veure ubicació",
+    "resolve": "Resoldre Alerta"
+  },
+  "resolve": {
+    "title": "Resolució d'Alerta",
+    "notes": "Notes de resolució",
+    "notesPlaceholder": "Descriu les accions preses i el resultat de la intervenció...",
+    "confirm": "Confirmar Resolució",
+    "cancel": "Cancel·lar",
+    "resolving": "Resolent..."
+  },
+  "types": {
+    "emergency": "Emergència",
+    "panic": "Pànic",
+    "alert": "Alerta",
+    "help": "Ajuda"
+  },
+  "toast": {
+    "callInitiated": "Trucada iniciada",
+    "callInitiatedDesc": "Obrint aplicació de telèfon...",
+    "smsInitiated": "SMS iniciat",
+    "smsInitiatedDesc": "Obrint aplicació de missatges...",
+    "whatsappInitiated": "WhatsApp iniciat",
+    "whatsappInitiatedDesc": "Obrint WhatsApp...",
+    "emergency112": "Trucant al 112",
+    "emergency112Desc": "Obrint marcador per emergències...",
+    "locationOpened": "Ubicació oberta",
+    "locationOpenedDesc": "Obrint Google Maps...",
+    "resolved": "Alerta resolta",
+    "resolvedDesc": "L'alerta ha estat marcada com a resolta",
+    "error": "Error",
+    "errorDesc": "No s'ha pogut resoldre l'alerta. Torna-ho a provar."
+  }
+}

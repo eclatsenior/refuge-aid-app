@@ -6,6 +6,7 @@ import { RiskAnalysisTab } from "./reports/RiskAnalysisTab";
 import { MoodTab } from "./reports/MoodTab";
 import { TrainingTab } from "./reports/TrainingTab";
 import { ReportGenerationDialog } from "./reports/ReportGenerationDialog";
+import { useTranslation } from 'react-i18next';
 
 interface ReportingSectionProps {
   employees: any[];
@@ -13,6 +14,7 @@ interface ReportingSectionProps {
 }
 
 export function ReportingSection({ employees, alerts }: ReportingSectionProps) {
+  const { t } = useTranslation('dashboard');
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-6">

@@ -1,0 +1,63 @@
+{
+  "register": {
+    "title": "Register New Employee",
+    "subtitle": "Add a new employee to your team",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Maria Garcia Lopez",
+    "email": "Email",
+    "emailPlaceholder": "maria@example.com",
+    "phone": "Phone",
+    "phonePlaceholder": "+34 600 123 456",
+    "password": "Temporary Password",
+    "passwordPlaceholder": "Generate a secure password",
+    "generate": "Auto-generate",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "submit": "Register Employee",
+    "cancel": "Cancel",
+    "registering": "Registering...",
+    "limitReached": "Employee limit reached",
+    "upgradeRequired": "Upgrade your plan to add more employees"
+  },
+  "card": {
+    "status": {
+      "emergency": "Emergency",
+      "offline": "Offline",
+      "needsAttention": "Needs attention",
+      "good": "Good",
+      "online": "Online",
+      "noData": "No data"
+    },
+    "mood": "Mood",
+    "therapy": "Therapy progress",
+    "lastCheckIn": "Last check-in",
+    "connected": "Connected",
+    "actions": {
+      "call": "Call",
+      "sms": "Send SMS",
+      "whatsapp": "WhatsApp",
+      "internalMessage": "Internal message",
+      "viewDetails": "View details",
+      "flagForFollowUp": "Flag for follow-up",
+      "unflagForFollowUp": "Remove follow-up flag"
+    },
+    "toast": {
+      "callInitiated": "Call initiated",
+      "callInitiatedDesc": "Opening phone app...",
+      "smsInitiated": "SMS initiated",
+      "smsInitiatedDesc": "Opening messages app...",
+      "whatsappInitiated": "WhatsApp initiated",
+      "whatsappInitiatedDesc": "Opening WhatsApp...",
+      "flagged": "Flagged for follow-up",
+      "flaggedDesc": "Employee has been flagged for follow-up",
+      "unflagged": "Flag removed",
+      "unflaggedDesc": "Follow-up flag has been removed"
+    }
+  },
+  "notifications": {
+    "registered": "Employee registered",
+    "registeredDesc": "Employee has been registered successfully",
+    "error": "Registration error",
+    "errorDesc": "Could not register employee. Please try again."
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "title": "تنبيه الطوارئ",
+  "active": "نشط",
+  "from": "من",
+  "type": "النوع",
+  "time": "الوقت",
+  "message": "الرسالة",
+  "status": "الحالة",
+  "actions": {
+    "title": "الإجراءات",
+    "callEmployee": "الاتصال بالموظفة",
+    "sendSMS": "إرسال رسالة نصية",
+    "whatsapp": "واتساب",
+    "internalMessage": "رسالة داخلية",
+    "call112": "اتصل بـ 112",
+    "viewLocation": "عرض الموقع",
+    "resolve": "حل التنبيه"
+  },
+  "resolve": {
+    "title": "حل التنبيه",
+    "notes": "ملاحظات الحل",
+    "notesPlaceholder": "صف الإجراءات المتخذة ونتيجة التدخل...",
+    "confirm": "تأكيد الحل",
+    "cancel": "إلغاء",
+    "resolving": "جاري الحل..."
+  },
+  "types": {
+    "emergency": "طوارئ",
+    "panic": "ذعر",
+    "alert": "تنبيه",
+    "help": "مساعدة"
+  },
+  "toast": {
+    "callInitiated": "بدء الاتصال",
+    "callInitiatedDesc": "فتح تطبيق الهاتف...",
+    "smsInitiated": "بدء الرسالة النصية",
+    "smsInitiatedDesc": "فتح تطبيق الرسائل...",
+    "whatsappInitiated": "بدء واتساب",
+    "whatsappInitiatedDesc": "فتح واتساب...",
+    "emergency112": "الاتصال بـ 112",
+    "emergency112Desc": "فتح قرص للطوارئ...",
+    "locationOpened": "تم فتح الموقع",
+    "locationOpenedDesc": "فتح خرائط جوجل...",
+    "resolved": "تم حل التنبيه",
+    "resolvedDesc": "تم وضع علامة على التنبيه على أنه تم حله",
+    "error": "خطأ",
+    "errorDesc": "تعذر حل التنبيه. يرجى المحاولة مرة أخرى."
+  }
+}

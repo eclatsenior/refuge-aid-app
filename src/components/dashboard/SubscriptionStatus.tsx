@@ -7,6 +7,7 @@ import { getPlanNameByProductId } from "@/lib/subscriptionPlans";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface SubscriptionStatusProps {
   subscription: {
@@ -27,6 +28,7 @@ export function SubscriptionStatus({
   onViewPlans 
 }: SubscriptionStatusProps) {
   const { toast } = useToast();
+  const { t } = useTranslation('subscription');
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -50,8 +52,8 @@ export function SubscriptionStatus({
     } catch (error) {
       console.error('Error opening customer portal:', error);
       toast({
-        title: "Error",
-        description: "No se pudo abrir el portal de gestión. Intenta de nuevo.",
+        title: t('status.error'),
+        description: t('status.errorDesc'),
         variant: "destructive"
       });
     } finally {
@@ -71,15 +73,15 @@ export function SubscriptionStatus({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-destructive" />
-            Sin Suscripción Activa
+            {t('status.noSubscription')}
           </CardTitle>
           <CardDescription>
-            Necesitas contratar un plan para usar Refugi y gestionar empleadas
+            {t('status.noSubscriptionDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={onViewPlans} className="w-full">
-            Ver Planes Disponibles
+            {t('status.viewPlans')}
           </Button>
         </CardContent>
       </Card>
@@ -102,12 +104,12 @@ export function SubscriptionStatus({
           <div>
             <CardTitle className="flex items-center gap-2">
               {planName}
-              <Badge variant="outline" className="ml-2">Activo</Badge>
+              <Badge variant="outline" className="ml-2">{t('status.active')}</Badge>
             </CardTitle>
             <CardDescription className="flex items-center gap-4 mt-2">
               <span className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                Renovación: {endDate}
+                {t('status.renewal')}: {endDate}
               </span>
             </CardDescription>
           </div>
@@ -126,7 +128,7 @@ export function SubscriptionStatus({
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-1">
               <Users className="w-4 h-4" />
-              Empleadas Registradas
+              {t('status.employeesRegistered')}
             </span>
             <span className={isAtLimit ? 'text-destructive font-semibold' : ''}>
               {currentEmployeeCount} / {subscription.employee_limit}
@@ -140,8 +142,8 @@ export function SubscriptionStatus({
             <p className="text-sm text-destructive flex items-center gap-1">
               <AlertCircle className="w-4 h-4" />
               {isAtLimit 
-                ? 'Has alcanzado el límite de tu plan' 
-                : 'Te estás acercando al límite de tu plan'
+                ? t('status.atLimit')
+                : t('status.nearLimit')
               }
             </p>
           )}
@@ -153,7 +155,7 @@ export function SubscriptionStatus({
             disabled={isLoadingPortal}
             className="flex-1"
           >
-            {isLoadingPortal ? 'Abriendo...' : 'Gestionar Suscripción'}
+            {isLoadingPortal ? t('status.opening') : t('status.manage')}
             <ExternalLink className="w-4 h-4 ml-2" />
           </Button>
           <Button 
@@ -161,7 +163,7 @@ export function SubscriptionStatus({
             variant="outline"
             className="flex-1"
           >
-            Ver Otros Planes
+            {t('status.viewOtherPlans')}
           </Button>
         </div>
       </CardContent>

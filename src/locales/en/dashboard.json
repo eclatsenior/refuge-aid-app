@@ -1,0 +1,66 @@
+{
+  "title": "Refugi Lead Dashboard",
+  "welcome": "Welcome",
+  "logout": "Logout",
+  "refresh": "Refresh",
+  "settings": "Settings",
+  "audio": "Audio",
+  "employees": {
+    "title": "Assigned Employees",
+    "search": "Search employees...",
+    "noEmployees": "No assigned employees yet",
+    "register": "Register New Employee",
+    "total": "Total Employees",
+    "online": "Online",
+    "alerts": "Active Alerts",
+    "needsAttention": "Need Attention"
+  },
+  "filters": {
+    "all": "All",
+    "online": "Online",
+    "alerts": "Alerts",
+    "offline": "Offline"
+  },
+  "stats": {
+    "totalEmployees": "Total Employees",
+    "connected": "connected",
+    "activeAlerts": "Active Alerts",
+    "employeesAffected": "employees affected",
+    "averageMood": "Average Mood",
+    "lastHours": "Last 24 hours",
+    "noData": "No data",
+    "notReported": "not reported",
+    "therapyProgress": "Therapy Progress",
+    "overallProgress": "Overall progress",
+    "urgent": "Urgent"
+  },
+  "queue": {
+    "title": "Needs Attention Now",
+    "risk": "Risk",
+    "openCase": "Open case",
+    "contact": "Contact",
+    "referToPsychology": "Refer to psychology",
+    "noAttention": "✅ No employees requiring immediate attention"
+  },
+  "kpis": {
+    "title": "KPI Metrics",
+    "activeRisk": "Active Risk",
+    "weightedAverage": "Weighted average",
+    "incidentsThisWeek": "Incidents This Week",
+    "open": "open",
+    "averageMood24h": "Average Mood (24h)",
+    "trainingCompleted": "Training Completed",
+    "checkinsPerWeek": "check-ins/week"
+  },
+  "reports": {
+    "title": "Detailed Reporting",
+    "subtitle": "Complete analysis and report generation",
+    "tabs": {
+      "summary": "Summary",
+      "incidents": "Incidents",
+      "risk": "Risk",
+      "mood": "Mood",
+      "training": "Training"
+    }
+  }
+}

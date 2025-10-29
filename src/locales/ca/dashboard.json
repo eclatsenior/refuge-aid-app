@@ -1,0 +1,66 @@
+{
+  "title": "Dashboard Refugi Lead",
+  "welcome": "Benvingut",
+  "logout": "Sortir",
+  "refresh": "Actualitzar",
+  "settings": "Configuració",
+  "audio": "Àudio",
+  "employees": {
+    "title": "Empleades Assignades",
+    "search": "Cercar empleades...",
+    "noEmployees": "No hi ha empleades assignades encara",
+    "register": "Registrar Nova Empleada",
+    "total": "Total Empleades",
+    "online": "En Línia",
+    "alerts": "Alertes Actives",
+    "needsAttention": "Necessiten Atenció"
+  },
+  "filters": {
+    "all": "Totes",
+    "online": "En línia",
+    "alerts": "Alertes",
+    "offline": "Desconnectades"
+  },
+  "stats": {
+    "totalEmployees": "Total Empleades",
+    "connected": "connectades",
+    "activeAlerts": "Alertes Actives",
+    "employeesAffected": "empleades afectades",
+    "averageMood": "Estat d'Ànim Promig",
+    "lastHours": "Últimes 24 hores",
+    "noData": "Sense dades",
+    "notReported": "sense reportar",
+    "therapyProgress": "Progrés Terapèutic",
+    "overallProgress": "Progrés general",
+    "urgent": "Urgent"
+  },
+  "queue": {
+    "title": "Necessita Atenció Ara",
+    "risk": "Risc",
+    "openCase": "Obrir cas",
+    "contact": "Contactar",
+    "referToPsychology": "Derivar a psicologia",
+    "noAttention": "✅ No hi ha empleades que requereixin atenció immediata"
+  },
+  "kpis": {
+    "title": "Mètriques KPI",
+    "activeRisk": "Risc Actiu",
+    "weightedAverage": "Promig ponderat",
+    "incidentsThisWeek": "Incidents Aquesta Setmana",
+    "open": "oberts",
+    "averageMood24h": "Ànim Promig (24h)",
+    "trainingCompleted": "Formació Completada",
+    "checkinsPerWeek": "check-ins/setmana"
+  },
+  "reports": {
+    "title": "Reporting Detallat",
+    "subtitle": "Anàlisi complet i generació de reports",
+    "tabs": {
+      "summary": "Resum",
+      "incidents": "Incidents",
+      "risk": "Risc",
+      "mood": "Ànim",
+      "training": "Formació"
+    }
+  }
+}

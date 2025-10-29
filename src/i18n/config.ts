@@ -41,6 +41,26 @@ import caSettingsLead from '@/locales/ca/settings-lead.json';
 import enSettingsLead from '@/locales/en/settings-lead.json';
 import arSettingsLead from '@/locales/ar/settings-lead.json';
 
+import esDashboard from '@/locales/es/dashboard.json';
+import caDashboard from '@/locales/ca/dashboard.json';
+import enDashboard from '@/locales/en/dashboard.json';
+import arDashboard from '@/locales/ar/dashboard.json';
+
+import esEmployees from '@/locales/es/employees.json';
+import caEmployees from '@/locales/ca/employees.json';
+import enEmployees from '@/locales/en/employees.json';
+import arEmployees from '@/locales/ar/employees.json';
+
+import esAlerts from '@/locales/es/alerts.json';
+import caAlerts from '@/locales/ca/alerts.json';
+import enAlerts from '@/locales/en/alerts.json';
+import arAlerts from '@/locales/ar/alerts.json';
+
+import esSubscription from '@/locales/es/subscription.json';
+import caSubscription from '@/locales/ca/subscription.json';
+import enSubscription from '@/locales/en/subscription.json';
+import arSubscription from '@/locales/ar/subscription.json';
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -54,7 +74,11 @@ i18n
         tracking: esTracking,
         settings: esSettings,
         resources: esResources,
-        'settings-lead': esSettingsLead
+        'settings-lead': esSettingsLead,
+        dashboard: esDashboard,
+        employees: esEmployees,
+        alerts: esAlerts,
+        subscription: esSubscription
       },
       ca: {
         common: caCommon,
@@ -64,7 +88,11 @@ i18n
         tracking: caTracking,
         settings: caSettings,
         resources: caResources,
-        'settings-lead': caSettingsLead
+        'settings-lead': caSettingsLead,
+        dashboard: caDashboard,
+        employees: caEmployees,
+        alerts: caAlerts,
+        subscription: caSubscription
       },
       en: {
         common: enCommon,
@@ -74,7 +102,11 @@ i18n
         tracking: enTracking,
         settings: enSettings,
         resources: enResources,
-        'settings-lead': enSettingsLead
+        'settings-lead': enSettingsLead,
+        dashboard: enDashboard,
+        employees: enEmployees,
+        alerts: enAlerts,
+        subscription: enSubscription
       },
       ar: {
         common: arCommon,
@@ -84,7 +116,11 @@ i18n
         tracking: arTracking,
         settings: arSettings,
         resources: arResources,
-        'settings-lead': arSettingsLead
+        'settings-lead': arSettingsLead,
+        dashboard: arDashboard,
+        employees: arEmployees,
+        alerts: arAlerts,
+        subscription: arSubscription
       }
     },
     fallbackLng: 'es',

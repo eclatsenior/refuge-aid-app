@@ -1,0 +1,34 @@
+{
+  "status": {
+    "noSubscription": "لا يوجد اشتراك نشط",
+    "noSubscriptionDesc": "تحتاج إلى الاشتراك في خطة لاستخدام Refugi وإدارة الموظفات",
+    "viewPlans": "عرض الخطط المتاحة",
+    "active": "نشط",
+    "renewal": "التجديد",
+    "employeesRegistered": "الموظفات المسجلات",
+    "manage": "إدارة الاشتراك",
+    "opening": "جاري الفتح...",
+    "viewOtherPlans": "عرض خطط أخرى",
+    "nearLimit": "أنت تقترب من حد خطتك",
+    "atLimit": "لقد وصلت إلى حد خطتك",
+    "error": "خطأ",
+    "errorDesc": "تعذر فتح بوابة الإدارة. يرجى المحاولة مرة أخرى."
+  },
+  "plans": {
+    "current": "خطتك الحالية",
+    "popular": "الأكثر شعبية",
+    "perMonth": "/شهر",
+    "maxEmployees": "موظفات كحد أقصى",
+    "subscribe": "الاشتراك في الخطة",
+    "processing": "جاري المعالجة...",
+    "currentPlan": "الخطة الحالية",
+    "errorTitle": "خطأ",
+    "errorDesc": "تعذر بدء عملية الدفع. يرجى المحاولة مرة أخرى."
+  },
+  "planNames": {
+    "basic": "الخطة الأساسية",
+    "standard": "الخطة القياسية",
+    "premium": "الخطة المميزة",
+    "individual": "الخطة الفردية"
+  }
+}

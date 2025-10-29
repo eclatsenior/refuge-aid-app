@@ -1,0 +1,34 @@
+{
+  "status": {
+    "noSubscription": "No Active Subscription",
+    "noSubscriptionDesc": "You need to subscribe to a plan to use Refugi and manage employees",
+    "viewPlans": "View Available Plans",
+    "active": "Active",
+    "renewal": "Renewal",
+    "employeesRegistered": "Employees Registered",
+    "manage": "Manage Subscription",
+    "opening": "Opening...",
+    "viewOtherPlans": "View Other Plans",
+    "nearLimit": "You are approaching your plan limit",
+    "atLimit": "You have reached your plan limit",
+    "error": "Error",
+    "errorDesc": "Could not open the management portal. Please try again."
+  },
+  "plans": {
+    "current": "Your Current Plan",
+    "popular": "Most Popular",
+    "perMonth": "/month",
+    "maxEmployees": "employees maximum",
+    "subscribe": "Subscribe to Plan",
+    "processing": "Processing...",
+    "currentPlan": "Current Plan",
+    "errorTitle": "Error",
+    "errorDesc": "Could not start the payment process. Please try again."
+  },
+  "planNames": {
+    "basic": "Basic Plan",
+    "standard": "Standard Plan",
+    "premium": "Premium Plan",
+    "individual": "Individual Plan"
+  }
+}

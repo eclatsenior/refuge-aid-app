@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import type { EmployeeStatus, EmergencyAlert } from "@/store/useAppStore";
+import { useTranslation } from 'react-i18next';
 
 interface StatsOverviewProps {
   employees: EmployeeStatus[];
@@ -18,6 +19,7 @@ interface StatsOverviewProps {
 }
 
 export function StatsOverview({ employees, alerts }: StatsOverviewProps) {
+  const { t } = useTranslation('dashboard');
   const totalEmployees = employees.length;
   const onlineEmployees = employees.filter(e => e.is_online).length;
   const activeAlerts = alerts.filter(a => !a.is_resolved).length;
@@ -41,34 +43,34 @@ export function StatsOverview({ employees, alerts }: StatsOverviewProps) {
 
   const stats = [
     {
-      title: "Total Empleadas",
+      title: t('stats.totalEmployees'),
       value: totalEmployees,
       icon: Users,
-      description: `${onlineEmployees} conectadas`,
+      description: `${onlineEmployees} ${t('stats.connected')}`,
       color: "primary",
       progress: totalEmployees > 0 ? (onlineEmployees / totalEmployees) * 100 : 0
     },
     {
-      title: "Alertas Activas", 
+      title: t('stats.activeAlerts'), 
       value: activeAlerts,
       icon: AlertTriangle,
-      description: `${employeesWithAlerts} empleadas afectadas`,
+      description: `${employeesWithAlerts} ${t('stats.employeesAffected')}`,
       color: activeAlerts > 0 ? "destructive" : "safe",
       urgent: activeAlerts > 0
     },
     {
-      title: "Estado de Ánimo Promedio",
-      value: averageMood !== null ? `${averageMood.toFixed(1)}/10` : 'Sin datos',
+      title: t('stats.averageMood'),
+      value: averageMood !== null ? `${averageMood.toFixed(1)}/10` : t('stats.noData'),
       icon: Heart,
-      description: averageMood !== null ? "Últimas 24 horas" : `${totalEmployees - employeesWithMood.length} sin reportar`,
+      description: averageMood !== null ? t('stats.lastHours') : `${totalEmployees - employeesWithMood.length} ${t('stats.notReported')}`,
       color: averageMood !== null ? getMoodColor(averageMood) : "muted",
       progress: averageMood !== null ? averageMood * 10 : 0
     },
     {
-      title: "Progreso Terapéutico",
+      title: t('stats.therapyProgress'),
       value: `${averageProgress.toFixed(0)}%`,
       icon: TrendingUp,
-      description: "Progreso general",
+      description: t('stats.overallProgress'),
       color: "cyan",
       progress: averageProgress
     }
@@ -109,7 +111,7 @@ export function StatsOverview({ employees, alerts }: StatsOverviewProps) {
                   </div>
                   {stat.urgent && (
                     <Badge variant="destructive" className="text-xs animate-pulse">
-                      Urgente
+                      {t('stats.urgent')}
                     </Badge>
                   )}
                 </div>

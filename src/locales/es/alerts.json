@@ -1,0 +1,49 @@
+{
+  "title": "Alerta de Emergencia",
+  "active": "Activa",
+  "from": "De",
+  "type": "Tipo",
+  "time": "Hora",
+  "message": "Mensaje",
+  "status": "Estado",
+  "actions": {
+    "title": "Acciones",
+    "callEmployee": "Llamar empleada",
+    "sendSMS": "Enviar SMS",
+    "whatsapp": "WhatsApp",
+    "internalMessage": "Mensaje interno",
+    "call112": "Llamar al 112",
+    "viewLocation": "Ver ubicación",
+    "resolve": "Resolver Alerta"
+  },
+  "resolve": {
+    "title": "Resolución de Alerta",
+    "notes": "Notas de resolución",
+    "notesPlaceholder": "Describe las acciones tomadas y el resultado de la intervención...",
+    "confirm": "Confirmar Resolución",
+    "cancel": "Cancelar",
+    "resolving": "Resolviendo..."
+  },
+  "types": {
+    "emergency": "Emergencia",
+    "panic": "Pánico",
+    "alert": "Alerta",
+    "help": "Ayuda"
+  },
+  "toast": {
+    "callInitiated": "Llamada iniciada",
+    "callInitiatedDesc": "Abriendo aplicación de teléfono...",
+    "smsInitiated": "SMS iniciado",
+    "smsInitiatedDesc": "Abriendo aplicación de mensajes...",
+    "whatsappInitiated": "WhatsApp iniciado",
+    "whatsappInitiatedDesc": "Abriendo WhatsApp...",
+    "emergency112": "Llamando al 112",
+    "emergency112Desc": "Abriendo marcador para emergencias...",
+    "locationOpened": "Ubicación abierta",
+    "locationOpenedDesc": "Abriendo Google Maps...",
+    "resolved": "Alerta resuelta",
+    "resolvedDesc": "La alerta ha sido marcada como resuelta",
+    "error": "Error",
+    "errorDesc": "No se pudo resolver la alerta. Intenta de nuevo."
+  }
+}

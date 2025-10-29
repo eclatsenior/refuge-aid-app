@@ -1,0 +1,63 @@
+{
+  "register": {
+    "title": "Registrar Nova Empleada",
+    "subtitle": "Afegeix una nova empleada al teu equip",
+    "fullName": "Nom Complet",
+    "fullNamePlaceholder": "Maria García López",
+    "email": "Email",
+    "emailPlaceholder": "maria@exemple.com",
+    "phone": "Telèfon",
+    "phonePlaceholder": "+34 600 123 456",
+    "password": "Contrasenya Temporal",
+    "passwordPlaceholder": "Genera una contrasenya segura",
+    "generate": "Generar automàtica",
+    "copy": "Copiar",
+    "copied": "Copiat!",
+    "submit": "Registrar Empleada",
+    "cancel": "Cancel·lar",
+    "registering": "Registrant...",
+    "limitReached": "Límit d'empleades assolit",
+    "upgradeRequired": "Millora el teu pla per afegir més empleades"
+  },
+  "card": {
+    "status": {
+      "emergency": "Emergència",
+      "offline": "Desconnectada",
+      "needsAttention": "Necessita atenció",
+      "good": "Bé",
+      "online": "En línia",
+      "noData": "Sense dades"
+    },
+    "mood": "Estat d'ànim",
+    "therapy": "Progrés terapèutic",
+    "lastCheckIn": "Últim check-in",
+    "connected": "Connectada",
+    "actions": {
+      "call": "Trucar",
+      "sms": "Enviar SMS",
+      "whatsapp": "WhatsApp",
+      "internalMessage": "Missatge intern",
+      "viewDetails": "Veure detalls",
+      "flagForFollowUp": "Marcar per seguiment",
+      "unflagForFollowUp": "Treure marca de seguiment"
+    },
+    "toast": {
+      "callInitiated": "Trucada iniciada",
+      "callInitiatedDesc": "Obrint aplicació de telèfon...",
+      "smsInitiated": "SMS iniciat",
+      "smsInitiatedDesc": "Obrint aplicació de missatges...",
+      "whatsappInitiated": "WhatsApp iniciat",
+      "whatsappInitiatedDesc": "Obrint WhatsApp...",
+      "flagged": "Marcada per seguiment",
+      "flaggedDesc": "L'empleada ha estat marcada per seguiment",
+      "unflagged": "Marca eliminada",
+      "unflaggedDesc": "S'ha tret la marca de seguiment"
+    }
+  },
+  "notifications": {
+    "registered": "Empleada registrada",
+    "registeredDesc": "L'empleada ha estat registrada correctament",
+    "error": "Error en registrar",
+    "errorDesc": "No s'ha pogut registrar l'empleada. Torna-ho a provar."
+  }
+}

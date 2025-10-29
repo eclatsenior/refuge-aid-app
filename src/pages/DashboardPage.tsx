@@ -32,12 +32,14 @@ import { ReportingSection } from "@/components/dashboard/ReportingSection";
 import { AlertPermissionDialog } from "@/components/dashboard/AlertPermissionDialog";
 import { audioManager, requestNotificationPermission } from "@/lib/audioManager";
 import { InstallAppBanner } from "@/components/dashboard/InstallAppBanner";
+import { useTranslation } from 'react-i18next';
 
 interface DashboardPageProps {
   onNavigate?: (path: string) => void;
 }
 
 export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
+  const { t } = useTranslation('dashboard');
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<'all' | 'online' | 'alert' | 'offline'>('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +47,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
   const [showPermissionDialog, setShowPermissionDialog] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(audioManager.isAudioEnabled());
   
-  const { 
+  const {
     profile, 
     assignedEmployees, 
     emergencyAlerts, 
@@ -256,9 +258,9 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
                 <Shield className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">Dashboard Refugi Lead</h1>
+                <h1 className="text-xl font-bold text-foreground">{t('title')}</h1>
                 <p className="text-sm text-muted-foreground">
-                  Bienvenido, {profile?.full_name || 'Refugi Lead'}
+                  {t('welcome')}, {profile?.full_name || 'Refugi Lead'}
                 </p>
               </div>
             </div>
@@ -297,7 +299,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
                 onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4" />
-                Salir
+                {t('logout')}
               </Button>
             </div>
           </div>
