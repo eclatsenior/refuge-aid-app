@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { VaultPasswordSetup } from "@/components/vault/VaultPasswordSetup";
 import { VaultUnlock } from "@/components/vault/VaultUnlock";
 import { VaultResetRequest } from "@/components/vault/VaultResetRequest";
+import { VaultResetComplete } from "@/components/vault/VaultResetComplete";
 import { supabase } from "@/integrations/supabase/client";
 import { encryptText, decryptText } from "@/lib/security";
 
@@ -41,11 +42,54 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const [showVaultSetup, setShowVaultSetup] = useState(false);
   const [showVaultUnlock, setShowVaultUnlock] = useState(false);
   const [showVaultReset, setShowVaultReset] = useState(false);
+  const [showVaultResetComplete, setShowVaultResetComplete] = useState(false);
+  const [resetToken, setResetToken] = useState<string | null>(null);
   const [vaultToken, setVaultToken] = useState<string | null>(null);
 
   // Check if user has vault password configured
   useEffect(() => {
     checkVaultPassword();
+  }, []);
+
+  // Suscripción realtime a cambios en solicitudes de reset
+  useEffect(() => {
+    let subscription: any;
+
+    const setupRealtimeSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) return;
+
+      subscription = supabase
+        .channel('vault-reset-updates')
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'vault_reset_requests',
+          filter: `user_id=eq.${user.id}`
+        }, (payload: any) => {
+          if (payload.new.status === 'approved' && payload.new.reset_token) {
+            // Solicitud aprobada, mostrar diálogo de reset
+            setResetToken(payload.new.reset_token);
+            setShowVaultResetComplete(true);
+            setShowVaultReset(false);
+            
+            toast({
+              title: '✅ Solicitud aprobada',
+              description: 'Tu Refugi Lead aprobó tu solicitud. Establece tu nueva contraseña.',
+            });
+          }
+        })
+        .subscribe();
+    };
+
+    setupRealtimeSubscription();
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, []);
 
   const checkVaultPassword = async () => {
@@ -128,6 +172,13 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const handleForgotPassword = () => {
     setShowVaultUnlock(false);
     setShowVaultReset(true);
+  };
+
+  const handleVaultResetSuccess = () => {
+    setShowVaultResetComplete(false);
+    setResetToken(null);
+    setHasVaultPassword(true);
+    checkVaultPassword();
   };
 
   const handleCreateNote = (isVault = false) => {
@@ -730,6 +781,15 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
           open={showVaultReset}
           onClose={() => setShowVaultReset(false)}
           isManagedByLead={profile?.managed_by_lead || false}
+        />
+      )}
+
+      {showVaultResetComplete && resetToken && (
+        <VaultResetComplete
+          open={showVaultResetComplete}
+          onClose={() => setShowVaultResetComplete(false)}
+          resetToken={resetToken}
+          onSuccess={handleVaultResetSuccess}
         />
       )}
     </div>

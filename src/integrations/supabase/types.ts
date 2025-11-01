@@ -763,6 +763,7 @@ export type Database = {
           notes: string | null
           request_type: string
           requested_at: string
+          reset_token: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -776,6 +777,7 @@ export type Database = {
           notes?: string | null
           request_type: string
           requested_at?: string
+          reset_token?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -789,6 +791,7 @@ export type Database = {
           notes?: string | null
           request_type?: string
           requested_at?: string
+          reset_token?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -826,13 +829,10 @@ export type Database = {
         }[]
       }
       get_current_user_role: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
-      get_dashboard_kpis: {
-        Args: { scope_filter?: Json }
-        Returns: Json
-      }
+      get_dashboard_kpis: { Args: { scope_filter?: Json }; Returns: Json }
       get_employee_average_mood_24h: {
         Args: { emp_id: string }
         Returns: number

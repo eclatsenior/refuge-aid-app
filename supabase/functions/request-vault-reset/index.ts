@@ -30,7 +30,7 @@ serve(async (req) => {
       throw new Error('No autorizado');
     }
 
-    const { requestType, idDocumentFile } = await req.json();
+    const { requestType, idDocumentFile, fileName, fileType } = await req.json();
 
     // Obtener perfil del usuario
     const { data: profile } = await supabaseClient
@@ -43,20 +43,30 @@ serve(async (req) => {
 
     // Si es plan individual, subir documento de identidad
     if (requestType === 'id_verification' && idDocumentFile) {
-      const fileExt = idDocumentFile.name.split('.').pop();
-      const fileName = `${user.id}/id-${Date.now()}.${fileExt}`;
+      // Decodificar base64
+      const base64Data = idDocumentFile.includes(',') 
+        ? idDocumentFile.split(',')[1] 
+        : idDocumentFile;
+      
+      const buffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+      
+      const fileExt = fileName.split('.').pop();
+      const storagePath = `${user.id}/id-${Date.now()}.${fileExt}`;
 
-      const { data: uploadData, error: uploadError } = await supabaseClient
+      const { error: uploadError } = await supabaseClient
         .storage
         .from('vault-reset-ids')
-        .upload(fileName, idDocumentFile);
+        .upload(storagePath, buffer, {
+          contentType: fileType,
+          upsert: false
+        });
 
       if (uploadError) {
         console.error('Error al subir documento:', uploadError);
         throw new Error('Error al subir documento de identidad');
       }
 
-      idDocumentUrl = fileName;
+      idDocumentUrl = storagePath;
     }
 
     // Crear solicitud de reset

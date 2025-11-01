@@ -46,6 +46,15 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
     }
   };
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handleRequestReset = async () => {
     if (!isManagedByLead && !idFile) {
       toast({
@@ -74,36 +83,25 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
         throw new Error('No hay sesión activa');
       }
       
-      let idDocumentUrl = null;
-      
-      // Si es plan individual, subir archivo
+      // Convertir archivo a base64 si existe
+      let idDocumentBase64 = null;
       if (!isManagedByLead && idFile) {
-        const fileExt = idFile.name.split('.').pop();
-        const fileName = `${user.id}/id-${Date.now()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('vault-reset-ids')
-          .upload(fileName, idFile);
-        
-        if (uploadError) {
-          console.error('Error al subir archivo:', uploadError);
-          throw new Error('Error al subir documento');
-        }
-        
-        idDocumentUrl = fileName;
+        idDocumentBase64 = await fileToBase64(idFile);
       }
       
       // Crear solicitud
       const { data, error } = await supabase.functions.invoke('request-vault-reset', {
         body: {
           requestType: isManagedByLead ? 'lead_approved' : 'id_verification',
-          idDocumentFile: idDocumentUrl ? { name: idFile!.name } : null,
+          idDocumentFile: idDocumentBase64,
+          fileName: idFile?.name,
+          fileType: idFile?.type,
         }
       });
       
       if (error) throw error;
       
-      if (data.error) {
+      if (data?.error) {
         throw new Error(data.error);
       }
       

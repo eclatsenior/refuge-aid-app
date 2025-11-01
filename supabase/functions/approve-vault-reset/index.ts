@@ -84,7 +84,7 @@ serve(async (req) => {
       JWT_SECRET
     );
 
-    // Actualizar solicitud
+    // Actualizar solicitud con reset_token
     const { error: updateError } = await supabaseClient
       .from('vault_reset_requests')
       .update({
@@ -92,6 +92,7 @@ serve(async (req) => {
         reviewed_at: new Date().toISOString(),
         reviewed_by: user.id,
         notes: notes || null,
+        reset_token: resetToken,
       })
       .eq('id', requestId);
 
