@@ -207,7 +207,7 @@ const App = () => {
     }
     
     // Special routes that don't require authentication
-    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled", "/admin/assign-subscription"];
+    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled"];
     if (publicRoutes.includes(currentPath)) {
       return renderCurrentPage();
     }

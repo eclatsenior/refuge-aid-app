@@ -27,3 +27,6 @@ verify_jwt = true
 [functions.admin-unlock-account]
 verify_jwt = false
 
+[functions.assign-subscription]
+verify_jwt = true
+
