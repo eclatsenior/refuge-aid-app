@@ -24,6 +24,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import PaywallPage from "@/pages/PaywallPage";
 import SettingsPage from "@/pages/SettingsPage";
 import SettingsLeadPage from "@/pages/SettingsLeadPage";
+import AdminAssignSubscription from "@/pages/AdminAssignSubscription";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 import "@/i18n/config";
@@ -135,6 +136,8 @@ const App = () => {
         return <ProfilePage />;
       case "/dashboard/settings":
         return <SettingsLeadPage />;
+      case "/admin/assign-subscription":
+        return <AdminAssignSubscription />;
       case "/instalar":
         return <InstallPage onNavigate={handleNavigate} />;
       case "/stripe-test-secret":
@@ -204,7 +207,7 @@ const App = () => {
     }
     
     // Special routes that don't require authentication
-    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled"];
+    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled", "/admin/assign-subscription"];
     if (publicRoutes.includes(currentPath)) {
       return renderCurrentPage();
     }
