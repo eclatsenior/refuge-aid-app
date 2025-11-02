@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Heart, Shield, Clock, Wind, Flower, RotateCcw } from "lucide-react";
+import { ArrowLeft, Heart, Shield, Clock, Wind, Flower, RotateCcw, Book, MessageSquare, Wrench, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -207,6 +207,7 @@ const routes: Route[] = [
 export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps) {
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
   const [currentModule, setCurrentModule] = useState(0);
+  const [showSummary, setShowSummary] = useState(false);
   const [completedModules, setCompletedModules] = useState<string[]>(
     JSON.parse(localStorage.getItem('completed_modules') || '[]')
   );
@@ -220,6 +221,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     if (selectedRoute) {
       setSelectedRoute(null);
       setCurrentModule(0);
+      setShowSummary(false);
     } else {
       onNavigate('/');
     }
@@ -234,7 +236,14 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     
     if (selectedRoute && currentModule < selectedRoute.modules.length - 1) {
       setCurrentModule(currentModule + 1);
+    } else if (selectedRoute && currentModule === selectedRoute.modules.length - 1) {
+      setShowSummary(true);
     }
+  };
+
+  const handleRepeatModule = (moduleIndex: number) => {
+    setCurrentModule(moduleIndex);
+    setShowSummary(false);
   };
 
   const handleResetRoute = (routeId: string) => {
@@ -243,6 +252,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     setCompletedModules(newCompleted);
     localStorage.setItem('completed_modules', JSON.stringify(newCompleted));
     setCurrentModule(0);
+    setShowSummary(false);
     toast({
       title: "Ruta reiniciada",
       description: "Puedes volver a hacer todos los módulos de esta ruta.",
@@ -275,6 +285,151 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     };
     return colorMap[color] || 'bg-muted/10 border-muted/20 text-muted-foreground hover:bg-muted/20';
   };
+
+  const getModuleIcon = (type: Module['type']) => {
+    switch (type) {
+      case 'breathing':
+        return <Wind className="h-5 w-5" />;
+      case 'grounding':
+        return <Eye className="h-5 w-5" />;
+      case 'education':
+        return <Book className="h-5 w-5" />;
+      case 'tool':
+        return <Wrench className="h-5 w-5" />;
+      case 'reflection':
+        return <MessageSquare className="h-5 w-5" />;
+      default:
+        return <Clock className="h-5 w-5" />;
+    }
+  };
+
+  // Vista de resumen después de completar la ruta
+  if (selectedRoute && showSummary) {
+    return (
+      <div className="min-h-screen bg-gradient-calm p-4 pb-20">
+        <div className="max-w-2xl mx-auto">
+          <header className="flex items-center justify-between mb-6">
+            <Button
+              variant="ghost"
+              onClick={handleBack}
+              className="gap-2"
+            >
+              <ArrowLeft size={20} />
+              Volver
+            </Button>
+            <div className="text-center">
+              <h1 className="text-lg font-semibold">{selectedRoute.title}</h1>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <RotateCcw size={16} />
+                  Reiniciar
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>¿Reiniciar esta ruta?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esto borrará tu progreso en "{selectedRoute.title}" y podrás volver a hacer todos los módulos desde el inicio.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.id)}>
+                    Reiniciar ruta
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </header>
+
+          <div className="text-center mb-8">
+            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-green-500 to-green-600 mx-auto mb-4 flex items-center justify-center shadow-elegant">
+              <Heart className="h-10 w-10 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold mb-2">¡Ruta completada!</h2>
+            <p className="text-muted-foreground">
+              Has terminado todos los módulos de esta ruta terapéutica.
+            </p>
+          </div>
+
+          <div className="space-y-4 mb-6">
+            <h3 className="text-lg font-semibold text-center mb-4">
+              Volver a cursar módulos
+            </h3>
+            {selectedRoute.modules.map((module, index) => (
+              <Card 
+                key={module.id}
+                className="cursor-pointer transition-all hover:shadow-soft bg-card/90 backdrop-blur-sm"
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="h-12 w-12 rounded-full bg-gradient-primary flex items-center justify-center shadow-sm">
+                        <div className="text-white">
+                          {getModuleIcon(module.type)}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-base mb-1">{module.title}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {module.duration} min · {module.description}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => handleRepeatModule(index)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Volver a cursar
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="flex gap-3 justify-center">
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              className="flex-1 max-w-xs"
+            >
+              Volver al inicio
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="flex-1 max-w-xs gap-2">
+                  <RotateCcw size={16} />
+                  Reiniciar ruta
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>¿Reiniciar esta ruta?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esto borrará tu progreso en "{selectedRoute.title}" y podrás volver a hacer todos los módulos desde el inicio.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.id)}>
+                    Reiniciar ruta
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+
+          <div className="text-center text-sm text-muted-foreground mt-8">
+            "Cada paso cuenta, incluso si repites el camino."
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (selectedRoute) {
     const module = selectedRoute.modules[currentModule];
