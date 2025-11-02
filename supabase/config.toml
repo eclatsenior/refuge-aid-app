@@ -30,3 +30,6 @@ verify_jwt = false
 [functions.assign-subscription]
 verify_jwt = true
 
+[functions.auto-assign-basic-plan]
+verify_jwt = false
+
