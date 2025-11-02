@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { ArrowLeft, Heart, Shield, Clock, Wind, Flower } from "lucide-react";
+import { ArrowLeft, Heart, Shield, Clock, Wind, Flower, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { toast } from "@/hooks/use-toast";
 
 interface CaminoTerapeuticoPageProps {
   onNavigate: (path: string) => void;
@@ -224,13 +226,36 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
   };
 
   const handleCompleteModule = (moduleId: string) => {
-    const newCompleted = [...completedModules, moduleId];
-    setCompletedModules(newCompleted);
-    localStorage.setItem('completed_modules', JSON.stringify(newCompleted));
+    if (!completedModules.includes(moduleId)) {
+      const newCompleted = [...completedModules, moduleId];
+      setCompletedModules(newCompleted);
+      localStorage.setItem('completed_modules', JSON.stringify(newCompleted));
+    }
     
     if (selectedRoute && currentModule < selectedRoute.modules.length - 1) {
       setCurrentModule(currentModule + 1);
     }
+  };
+
+  const handleResetRoute = (routeId: string) => {
+    const modulesToRemove = routes.find(r => r.id === routeId)?.modules.map(m => m.id) || [];
+    const newCompleted = completedModules.filter(id => !modulesToRemove.includes(id));
+    setCompletedModules(newCompleted);
+    localStorage.setItem('completed_modules', JSON.stringify(newCompleted));
+    setCurrentModule(0);
+    toast({
+      title: "Ruta reiniciada",
+      description: "Puedes volver a hacer todos los módulos de esta ruta.",
+    });
+  };
+
+  const handleResetAll = () => {
+    setCompletedModules([]);
+    localStorage.setItem('completed_modules', JSON.stringify([]));
+    toast({
+      title: "Todo el progreso limpiado",
+      description: "Puedes volver a hacer todas las rutas desde cero.",
+    });
   };
 
   const getRouteProgress = (route: Route) => {
@@ -271,7 +296,28 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
               <h1 className="text-lg font-semibold">{selectedRoute.title}</h1>
               <Progress value={progress} className="w-32 mt-2" />
             </div>
-            <div></div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <RotateCcw size={16} />
+                  Reiniciar
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>¿Reiniciar esta ruta?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esto borrará tu progreso en "{selectedRoute.title}" y podrás volver a hacer todos los módulos desde el inicio.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.id)}>
+                    Reiniciar ruta
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </header>
 
           <Card className="mb-6 bg-card/90 backdrop-blur-sm">
@@ -329,11 +375,9 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                   onClick={() => handleCompleteModule(module.id)}
                   className="px-8"
                 >
-                  {completedModules.includes(module.id) 
-                    ? 'Completado ✓' 
-                    : currentModule === selectedRoute.modules.length - 1
-                    ? 'Finalizar ruta'
-                    : 'Siguiente'
+                  {currentModule === selectedRoute.modules.length - 1
+                    ? completedModules.includes(module.id) ? 'Finalizar de nuevo' : 'Finalizar ruta'
+                    : completedModules.includes(module.id) ? 'Siguiente ✓' : 'Siguiente'
                   }
                 </Button>
               </div>
@@ -427,11 +471,38 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
           })}
         </div>
 
-        <div className="mt-8 p-6 bg-muted/50 rounded-xl text-center">
-          <p className="text-sm text-muted-foreground">
-            💡 <strong>Consejo:</strong> Cada ruta está diseñada para diferentes momentos emocionales. 
-            Elige la que más resuene contigo ahora.
-          </p>
+        <div className="mt-8 space-y-4">
+          <div className="p-6 bg-muted/50 rounded-xl text-center">
+            <p className="text-sm text-muted-foreground">
+              💡 <strong>Consejo:</strong> Cada ruta está diseñada para diferentes momentos emocionales. 
+              Elige la que más resuene contigo ahora.
+            </p>
+          </div>
+
+          {completedModules.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="w-full gap-2">
+                  <RotateCcw size={16} />
+                  Limpiar todo el progreso
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>¿Limpiar todo el progreso?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esto borrará el progreso de todas las rutas. Podrás volver a hacer todos los módulos desde el inicio.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleResetAll}>
+                    Limpiar todo
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </div>
     </div>
