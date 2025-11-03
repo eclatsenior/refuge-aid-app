@@ -35,6 +35,18 @@
     "menu": "Menú d'usuari"
   },
   "auth": {
+    "emailVerification": {
+      "leadTitle": "Compte creat exitosament!",
+      "leadMessage": "✉️ T'hem enviat un email de verificació al teu correu corporatiu. Si us plau verifica el teu email per activar el teu compte empresarial i començar a gestionar el benestar del teu equip.",
+      "individualTitle": "Benvinguda a Refugi!",
+      "individualMessage": "✉️ T'hem enviat un email de verificació. Si us plau revisa la teva safata d'entrada (i també la carpeta de correu brossa) per activar el teu compte i començar a cuidar el teu benestar.",
+      "notReceived": "No has rebut l'email?",
+      "resendButton": "Reenviar email de verificació",
+      "checkSpam": "Revisa la teva carpeta de correu brossa",
+      "expiresIn": "L'enllaç expira en 24 hores",
+      "resendSuccess": "Email de verificació reenviat correctament",
+      "resendError": "Error en reenviar l'email. Torna-ho a intentar."
+    },
     "passwordReset": {
       "title": "Recuperar contrasenya",
       "enterEmail": "Introdueix el teu email",

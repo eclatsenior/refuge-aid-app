@@ -10,6 +10,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { FaceRecognition } from "@/components/auth/FaceRecognition";
 import { PasswordResetCodeDialog } from "@/components/auth/PasswordResetCodeDialog";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
@@ -37,9 +38,12 @@ export function AuthPage() {
   const [companyName, setCompanyName] = useState("");
   const [companyWebsite, setCompanyWebsite] = useState("");
   const [companyRole, setCompanyRole] = useState("");
+  const [showVerificationBanner, setShowVerificationBanner] = useState(false);
+  const [registeredRole, setRegisteredRole] = useState<string | null>(null);
   
   const { signIn, signUp, user, profile } = useAppStore();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Redirect authenticated users automatically
   useEffect(() => {
@@ -199,12 +203,23 @@ export function AuthPage() {
           variant: "destructive"
         });
       } else {
-        toast({
-          title: "✅ Cuenta creada exitosamente",
-          description: "Te hemos enviado un email de verificación. Por favor revisa tu bandeja de entrada (y carpeta de spam) y haz clic en el enlace para activar tu cuenta.",
-          duration: 8000
-        });
+        // Show banner with personalized message
+        setRegisteredRole(role);
+        setShowVerificationBanner(true);
         setActiveTab("login");
+        
+        // Also show toast for immediate feedback
+        const message = role === 'refugi_lead' 
+          ? t('common.auth.emailVerification.leadMessage')
+          : t('common.auth.emailVerification.individualMessage');
+        
+        toast({
+          title: role === 'refugi_lead' 
+            ? t('common.auth.emailVerification.leadTitle')
+            : t('common.auth.emailVerification.individualTitle'),
+          description: message,
+          duration: 10000
+        });
       }
     } catch (error) {
       toast({
@@ -256,8 +271,8 @@ export function AuthPage() {
         });
       } else {
         toast({
-          title: "✅ Email reenviado",
-          description: "Revisa tu correo para verificar tu cuenta (también en spam)",
+          title: t('common.auth.emailVerification.resendSuccess'),
+          description: t('common.auth.emailVerification.checkSpam'),
           duration: 8000
         });
         setShowResendVerification(false);
@@ -485,6 +500,76 @@ export function AuthPage() {
                     </button>
                   </div>
                 </form>
+
+                {showVerificationBanner && (
+                  <div className={`mt-4 p-4 rounded-lg border-2 ${
+                    registeredRole === 'refugi_lead' 
+                      ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-500' 
+                      : 'bg-pink-50 dark:bg-pink-950/30 border-pink-500'
+                  }`}>
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="flex-1">
+                        <h3 className={`font-semibold mb-2 ${
+                          registeredRole === 'refugi_lead' 
+                            ? 'text-blue-900 dark:text-blue-100' 
+                            : 'text-pink-900 dark:text-pink-100'
+                        }`}>
+                          {registeredRole === 'refugi_lead' 
+                            ? t('common.auth.emailVerification.leadTitle')
+                            : t('common.auth.emailVerification.individualTitle')}
+                        </h3>
+                        <p className={`text-sm leading-relaxed ${
+                          registeredRole === 'refugi_lead' 
+                            ? 'text-blue-800 dark:text-blue-200' 
+                            : 'text-pink-800 dark:text-pink-200'
+                        }`}>
+                          {registeredRole === 'refugi_lead' 
+                            ? t('common.auth.emailVerification.leadMessage')
+                            : t('common.auth.emailVerification.individualMessage')}
+                        </p>
+                        <div className="mt-3 space-y-2">
+                          <p className={`text-xs ${
+                            registeredRole === 'refugi_lead' 
+                              ? 'text-blue-700 dark:text-blue-300' 
+                              : 'text-pink-700 dark:text-pink-300'
+                          }`}>
+                            💡 {t('common.auth.emailVerification.checkSpam')}
+                          </p>
+                          <p className={`text-xs ${
+                            registeredRole === 'refugi_lead' 
+                              ? 'text-blue-700 dark:text-blue-300' 
+                              : 'text-pink-700 dark:text-pink-300'
+                          }`}>
+                            ⏱️ {t('common.auth.emailVerification.expiresIn')}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setShowVerificationBanner(false)}
+                        className={`text-xl leading-none ${
+                          registeredRole === 'refugi_lead' 
+                            ? 'text-blue-400 hover:text-blue-600' 
+                            : 'text-pink-400 hover:text-pink-600'
+                        }`}
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowResendVerification(true)}
+                      className={`mt-3 w-full ${
+                        registeredRole === 'refugi_lead'
+                          ? 'border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900'
+                          : 'border-pink-500 text-pink-700 hover:bg-pink-100 dark:text-pink-300 dark:hover:bg-pink-900'
+                      }`}
+                    >
+                      {t('common.auth.emailVerification.resendButton')}
+                    </Button>
+                  </div>
+                )}
 
                 <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
                   <p className="text-xs text-blue-800 dark:text-blue-200">

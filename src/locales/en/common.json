@@ -35,6 +35,18 @@
     "menu": "User menu"
   },
   "auth": {
+    "emailVerification": {
+      "leadTitle": "Account created successfully!",
+      "leadMessage": "✉️ We've sent a verification email to your corporate email. Please verify your email to activate your business account and start managing your team's wellbeing.",
+      "individualTitle": "Welcome to Refugi!",
+      "individualMessage": "✉️ We've sent you a verification email. Please check your inbox (and spam folder) to activate your account and start caring for your wellbeing.",
+      "notReceived": "Didn't receive the email?",
+      "resendButton": "Resend verification email",
+      "checkSpam": "Check your spam or junk folder",
+      "expiresIn": "Link expires in 24 hours",
+      "resendSuccess": "Verification email resent successfully",
+      "resendError": "Error resending email. Please try again."
+    },
     "passwordReset": {
       "title": "Password recovery",
       "enterEmail": "Enter your email",
