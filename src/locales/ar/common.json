@@ -33,5 +33,30 @@
     "logout": "تسجيل الخروج",
     "user": "المستخدم",
     "menu": "قائمة المستخدم"
+  },
+  "auth": {
+    "passwordReset": {
+      "title": "استعادة كلمة المرور",
+      "enterEmail": "أدخل بريدك الإلكتروني",
+      "enterCode": "رمز الاسترداد (6 أرقام)",
+      "codeSent": "تم إرسال الرمز إلى بريدك الإلكتروني",
+      "codeExpires": "ينتهي الرمز في 15 دقيقة",
+      "verifyCode": "التحقق من الرمز",
+      "resendCode": "إعادة إرسال الرمز",
+      "alreadyHaveCode": "لدي بالفعل رمز استرداد",
+      "step1Title": "أدخل الرمز",
+      "step2Title": "كلمة مرور جديدة",
+      "newPassword": "كلمة مرور جديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "changePassword": "تغيير كلمة المرور",
+      "passwordRequirements": "المتطلبات:",
+      "min8chars": "8 أحرف على الأقل",
+      "oneUppercase": "حرف كبير واحد على الأقل",
+      "oneNumber": "رقم واحد على الأقل",
+      "passwordMismatch": "كلمات المرور غير متطابقة",
+      "invalidCode": "رمز غير صالح أو منتهي الصلاحية",
+      "codeVerified": "تم التحقق من الرمز ✓",
+      "passwordChanged": "تم تحديث كلمة المرور بنجاح"
+    }
   }
 }

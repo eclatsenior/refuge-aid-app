@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { useAppStore } from "@/store/useAppStore";
 import { FaceRecognition } from "@/components/auth/FaceRecognition";
+import { PasswordResetCodeDialog } from "@/components/auth/PasswordResetCodeDialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -32,6 +33,7 @@ export function AuthPage() {
   const [resetEmail, setResetEmail] = useState("");
   const [showResendVerification, setShowResendVerification] = useState(false);
   const [resendEmail, setResendEmail] = useState("");
+  const [showPasswordResetCode, setShowPasswordResetCode] = useState(false);
   const [companyName, setCompanyName] = useState("");
   const [companyWebsite, setCompanyWebsite] = useState("");
   const [companyRole, setCompanyRole] = useState("");
@@ -310,20 +312,20 @@ export function AuthPage() {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo: `${window.location.origin}/`
+      const { data, error } = await supabase.functions.invoke('request-password-reset', {
+        body: { email: normalizedEmail }
       });
 
       if (error) {
         toast({
           title: "Error",
-          description: error.message || "No se pudo enviar el email de recuperación",
+          description: error.message || "No se pudo enviar el código",
           variant: "destructive"
         });
       } else {
         toast({
-          title: "✅ Email enviado",
-          description: "Revisa tu correo para restablecer tu contraseña (también en spam)",
+          title: "✅ Código enviado",
+          description: "Revisa tu email (y spam) para obtener el código de recuperación",
           duration: 8000
         });
         setShowForgotPassword(false);
@@ -366,6 +368,18 @@ export function AuthPage() {
         setResendEmail={setResendEmail}
         isLoading={isLoading}
         onSubmit={handleResendVerification}
+      />
+
+      <PasswordResetCodeDialog
+        open={showPasswordResetCode}
+        onOpenChange={setShowPasswordResetCode}
+        onSuccess={() => {
+          toast({
+            title: "✅ Contraseña actualizada",
+            description: "Ya puedes usar tu nueva contraseña"
+          });
+          setShowPasswordResetCode(false);
+        }}
       />
       
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
@@ -452,14 +466,22 @@ export function AuthPage() {
                     )}
                   </Button>
 
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col gap-2">
                     <button
                       type="button"
                       onClick={() => setShowForgotPassword(true)}
-                      className="text-sm text-primary hover:underline"
+                      className="text-sm text-primary hover:underline text-left"
                       disabled={isLoading}
                     >
                       ¿Olvidaste tu contraseña?
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordResetCode(true)}
+                      className="text-xs text-muted-foreground hover:text-primary transition-colors text-left"
+                      disabled={isLoading}
+                    >
+                      Ya tengo un código de recuperación →
                     </button>
                   </div>
                 </form>
@@ -671,9 +693,9 @@ function ForgotPasswordDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Restablecer Contraseña</DialogTitle>
+          <DialogTitle>Solicitar código de recuperación</DialogTitle>
           <DialogDescription>
-            Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.
+            Ingresa tu email y te enviaremos un código de 6 dígitos para restablecer tu contraseña.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 pt-4">
@@ -703,7 +725,7 @@ function ForgotPasswordDialog({
                   Enviando...
                 </>
               ) : (
-                "Enviar enlace"
+                "Enviar código"
               )}
             </Button>
           </div>

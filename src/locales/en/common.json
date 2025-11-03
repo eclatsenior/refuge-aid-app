@@ -33,5 +33,30 @@
     "logout": "Log out",
     "user": "User",
     "menu": "User menu"
+  },
+  "auth": {
+    "passwordReset": {
+      "title": "Password recovery",
+      "enterEmail": "Enter your email",
+      "enterCode": "Recovery code (6 digits)",
+      "codeSent": "Code sent to your email",
+      "codeExpires": "Code expires in 15 minutes",
+      "verifyCode": "Verify code",
+      "resendCode": "Resend code",
+      "alreadyHaveCode": "I already have a recovery code",
+      "step1Title": "Enter the code",
+      "step2Title": "New password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "changePassword": "Change password",
+      "passwordRequirements": "Requirements:",
+      "min8chars": "Minimum 8 characters",
+      "oneUppercase": "At least 1 uppercase",
+      "oneNumber": "At least 1 number",
+      "passwordMismatch": "Passwords do not match",
+      "invalidCode": "Invalid or expired code",
+      "codeVerified": "Code verified ✓",
+      "passwordChanged": "Password updated successfully"
+    }
   }
 }

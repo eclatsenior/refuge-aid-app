@@ -1,5 +1,14 @@
 project_id = "npmyobeqbipvvuaeswnu"
 
+[functions.request-password-reset]
+verify_jwt = false
+
+[functions.verify-reset-code]
+verify_jwt = false
+
+[functions.reset-password-with-code]
+verify_jwt = false
+
 [functions.dashboard-kpis]
 verify_jwt = true
 

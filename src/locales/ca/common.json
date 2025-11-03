@@ -33,5 +33,30 @@
     "logout": "Tancar sessió",
     "user": "Usuari",
     "menu": "Menú d'usuari"
+  },
+  "auth": {
+    "passwordReset": {
+      "title": "Recuperar contrasenya",
+      "enterEmail": "Introdueix el teu email",
+      "enterCode": "Codi de recuperació (6 dígits)",
+      "codeSent": "Codi enviat al teu email",
+      "codeExpires": "El codi expira en 15 minuts",
+      "verifyCode": "Verificar codi",
+      "resendCode": "Reenviar codi",
+      "alreadyHaveCode": "Ja tinc un codi de recuperació",
+      "step1Title": "Introdueix el codi",
+      "step2Title": "Nova contrasenya",
+      "newPassword": "Nova contrasenya",
+      "confirmPassword": "Confirmar contrasenya",
+      "changePassword": "Canviar contrasenya",
+      "passwordRequirements": "Requisits:",
+      "min8chars": "Mínim 8 caràcters",
+      "oneUppercase": "Almenys 1 majúscula",
+      "oneNumber": "Almenys 1 número",
+      "passwordMismatch": "Les contrasenyes no coincideixen",
+      "invalidCode": "Codi invàlid o caducat",
+      "codeVerified": "Codi verificat ✓",
+      "passwordChanged": "Contrasenya actualitzada correctament"
+    }
   }
 }

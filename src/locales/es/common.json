@@ -33,5 +33,30 @@
     "logout": "Cerrar sesión",
     "user": "Usuario",
     "menu": "Menú de usuario"
+  },
+  "auth": {
+    "passwordReset": {
+      "title": "Recuperar contraseña",
+      "enterEmail": "Ingresa tu email",
+      "enterCode": "Código de recuperación (6 dígitos)",
+      "codeSent": "Código enviado a tu email",
+      "codeExpires": "El código expira en 15 minutos",
+      "verifyCode": "Verificar código",
+      "resendCode": "Reenviar código",
+      "alreadyHaveCode": "Ya tengo un código de recuperación",
+      "step1Title": "Ingresa el código",
+      "step2Title": "Nueva contraseña",
+      "newPassword": "Nueva contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "changePassword": "Cambiar contraseña",
+      "passwordRequirements": "Requisitos:",
+      "min8chars": "Mínimo 8 caracteres",
+      "oneUppercase": "Al menos 1 mayúscula",
+      "oneNumber": "Al menos 1 número",
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "invalidCode": "Código inválido o expirado",
+      "codeVerified": "Código verificado ✓",
+      "passwordChanged": "Contraseña actualizada correctamente"
+    }
   }
 }
