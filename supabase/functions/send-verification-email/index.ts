@@ -181,125 +181,142 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const payload: WebhookPayload = await req.json();
     
-    console.log("Webhook received:", payload.type, "for user:", payload.record.email);
+    console.log('[VERIFICATION-EMAIL] Received webhook:', {
+      type: payload.type,
+      table: payload.table,
+      record: payload.record?.id,
+      email: payload.record?.email
+    });
 
-    // Solo procesar eventos de creación de usuario
+    // Only process INSERT events on users table
     if (payload.type !== 'INSERT' || payload.table !== 'users') {
-      console.log("Ignoring event - not a user insert");
+      console.log('[VERIFICATION-EMAIL] Skipping non-INSERT event or wrong table');
       return new Response(JSON.stringify({ message: 'Event ignored' }), {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
     const user = payload.record;
-
-    // Solo enviar email si el email NO está confirmado aún
-    if (user.email_confirmed_at) {
-      console.log("Email already confirmed, skipping verification email");
-      return new Response(JSON.stringify({ message: 'Email already confirmed' }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Obtener el rol del usuario desde metadata
-    const role = user.raw_user_meta_data?.role || 'employee';
-    const fullName = user.raw_user_meta_data?.full_name || 'Usuario';
-
-    console.log(`Processing verification email for ${role}: ${user.email}`);
-
-    // Verificar si es un empleado registrado por un Lead
-    // Los empleados registrados por Lead tienen email_confirm: true en su metadata
-    const isLeadManaged = user.raw_user_meta_data?.managed_by_lead === true;
     
-    if (isLeadManaged) {
-      console.log("User is managed by Lead, skipping verification email");
-      return new Response(JSON.stringify({ message: 'Lead-managed employee, no verification needed' }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Verify Resend API key is configured
+    if (!Deno.env.get("RESEND_API_KEY")) {
+      console.error('[VERIFICATION-EMAIL] RESEND_API_KEY not configured');
+      return new Response(JSON.stringify({ error: 'Email service not configured' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    // Crear cliente de Supabase con service role para generar token
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    );
+    // Get user role and name from metadata
+    const role = user.raw_user_meta_data?.role || 'employee';
+    const userName = user.raw_user_meta_data?.full_name || 'Usuario';
+    const managedByLead = user.raw_user_meta_data?.managed_by_lead || false;
+    
+    console.log('[VERIFICATION-EMAIL] User details:', { 
+      role, 
+      userName, 
+      email: user.email,
+      managedByLead,
+      emailConfirmedAt: user.email_confirmed_at
+    });
 
-    // Generar enlace de verificación
+    // Skip if user is managed by a Lead (they are auto-confirmed by backend)
+    if (managedByLead) {
+      console.log('[VERIFICATION-EMAIL] User managed by Lead, skipping verification email');
+      return new Response(JSON.stringify({ message: 'Managed user, no verification needed' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Generate verification link using Supabase Admin
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error('[VERIFICATION-EMAIL] Missing Supabase credentials');
+      return new Response(JSON.stringify({ error: 'Server configuration error' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
+
+    console.log('[VERIFICATION-EMAIL] Generating verification link for:', user.email);
+
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'signup',
       email: user.email,
+      options: {
+        redirectTo: `${supabaseUrl.replace('.supabase.co', '.lovableproject.com')}/`
+      }
     });
 
-    if (linkError) {
-      console.error("Error generating verification link:", linkError);
-      throw linkError;
+    if (linkError || !linkData.properties?.action_link) {
+      console.error('[VERIFICATION-EMAIL] Error generating verification link:', linkError);
+      throw new Error(`Failed to generate verification link: ${linkError?.message || 'Unknown error'}`);
     }
 
-    const verificationUrl = linkData.properties?.action_link || '';
+    const verificationUrl = linkData.properties.action_link;
+    console.log('[VERIFICATION-EMAIL] Verification link generated successfully');
+
+    // Get email template based on role
+    const emailHtml = getEmailTemplate(role, userName, verificationUrl);
+
+    // Send email via Resend
+    console.log('[VERIFICATION-EMAIL] Sending email to:', user.email, 'Role:', role);
     
-    if (!verificationUrl) {
-      throw new Error("No verification URL generated");
-    }
-
-    console.log("Verification link generated successfully");
-
-    // Obtener template según el rol
-    const emailHtml = getEmailTemplate(role, fullName, verificationUrl);
-
-    // Enviar email con Resend
-    const emailSubject = role === 'refugi_lead' 
-      ? '🏢 Verifica tu cuenta empresarial - Refugi'
-      : '💜 Verifica tu cuenta - Refugi';
-
-    const fromEmail = 'Refugi <noreply@eclatsenior.com.es>';
-
-    const emailResponse = await resend.emails.send({
-      from: fromEmail,
+    const { data: emailData, error: emailError } = await resend.emails.send({
+      from: 'Refugi <onboarding@resend.dev>', // Use Resend default until domain is verified
       to: [user.email],
-      subject: emailSubject,
-      html: emailHtml,
+      subject: role === 'refugi_lead' 
+        ? 'Verifica tu cuenta empresarial - Refugi'
+        : 'Bienvenida a Refugi - Verifica tu cuenta',
+      html: emailHtml
     });
 
-    if (emailResponse.error) {
-      console.error("Error sending email:", emailResponse.error);
-      throw emailResponse.error;
+    if (emailError) {
+      console.error('[VERIFICATION-EMAIL] Error sending email:', emailError);
+      throw new Error(`Failed to send email: ${emailError.message || 'Unknown error'}`);
     }
 
-    console.log("Verification email sent successfully:", emailResponse.data?.id);
+    console.log('[VERIFICATION-EMAIL] Email sent successfully. ID:', emailData?.id);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: 'Verification email sent',
-        email_id: emailResponse.data?.id 
+        email_id: emailData?.id,
+        recipient: user.email
       }),
       {
         status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders,
-        },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
+
   } catch (error: any) {
-    console.error("Error in send-verification-email function:", error);
+    console.error('[VERIFICATION-EMAIL] Fatal error:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        details: error.toString() 
+        error: error.message || 'Internal server error',
+        type: error.name || 'UnknownError'
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
   }

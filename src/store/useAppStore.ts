@@ -360,74 +360,52 @@ export const useAppStore = create<AppState>()(
       
       signIn: async (email, password) => {
         try {
-          // Normalize credentials to prevent login issues
-          const normalizedEmail = email.trim().toLowerCase();
-          const normalizedPassword = password.trim();
-          
-          console.log('🔐 Attempting login with normalized email:', normalizedEmail);
+          console.log('[SIGN-IN] Attempting login for:', email);
           
           const { data, error } = await supabase.auth.signInWithPassword({
-            email: normalizedEmail,
-            password: normalizedPassword
+            email,
+            password,
           });
-          
+
           if (error) {
-            console.error('❌ Login error:', error.message);
-            
-            // Detectar si es por email no verificado (error explícito de Supabase)
-            if (error.message?.includes('Email not confirmed')) {
-              return { 
-                error: { 
-                  message: '⚠️ Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada (y spam) y haz clic en el enlace de verificación.' 
-                } 
-              };
-            }
-            
+            console.error('[SIGN-IN] Auth error:', error.message);
             return { error };
           }
-          
-          // ✅ NUEVO: Verificación explícita del estado de confirmación
-          // Esto previene el caso donde Supabase permite login pero el email no está confirmado
-          if (data?.user) {
-            const emailConfirmedAt = data.user.email_confirmed_at;
-            const userRole = data.user.user_metadata?.role || 'employee';
-            
-            console.log('🔍 Email confirmation check:', {
+
+          if (data.user) {
+            console.log('[SIGN-IN] User authenticated:', {
+              id: data.user.id,
               email: data.user.email,
-              role: userRole,
-              email_confirmed_at: emailConfirmedAt,
-              is_confirmed: !!emailConfirmedAt
+              emailConfirmed: !!data.user.email_confirmed_at
             });
-            
-            // Solo verificar confirmación para Refugi Leads y particulares autoregistrados
-            // Los empleados (managed_by_lead: true) ya tienen email_confirm: true desde el registro
-            if (!emailConfirmedAt && userRole !== 'employee') {
-              console.warn('⚠️ Email not confirmed, forcing logout');
-              
-              // Forzar logout inmediato
+
+            // CRITICAL: Block login if email is not confirmed
+            if (!data.user.email_confirmed_at) {
+              console.warn('[SIGN-IN] Email not confirmed, blocking login');
               await supabase.auth.signOut();
-              
-              return {
-                error: {
-                  message: '⚠️ Tu email no ha sido verificado. Por favor revisa tu bandeja de entrada (y spam) y haz clic en el enlace de verificación antes de iniciar sesión.'
-                }
-              };
+              return { error: new Error('Por favor verifica tu email antes de iniciar sesión. Revisa tu bandeja de entrada y la carpeta de spam.') };
             }
-            
-            // Para empleados, verificar que tengan el flag managed_by_lead
-            // (esto se establece automáticamente por el edge function register-employee)
-            if (userRole === 'employee') {
-              console.log('👤 Employee login - checking managed status...');
-              // Los empleados registrados por el edge function ya tienen email_confirm: true
-              // así que este check es solo para logging
+
+            // Verify profile exists
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('user_id', data.user.id)
+              .single();
+
+            if (profileError || !profileData) {
+              console.error('[SIGN-IN] Profile not found:', profileError);
+              return { error: new Error('Error al cargar el perfil. Por favor contacta soporte.') };
             }
+
+            console.log('[SIGN-IN] Login successful for role:', profileData.role);
+            set({ session: data.session, user: data.user });
+            return { error: null };
           }
-          
-          console.log('✅ Login successful and email verified');
-          return { error: null };
-          
-        } catch (error) {
-          console.error('❌ Login exception:', error);
+
+          return { error: new Error('No se pudo iniciar sesión') };
+        } catch (error: any) {
+          console.error('[SIGN-IN] Fatal error:', error.message);
           return { error };
         }
       },
