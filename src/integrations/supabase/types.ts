@@ -460,6 +460,33 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_codes: {
+        Row: {
+          code_hash: string
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          used: boolean | null
+        }
+        Insert: {
+          code_hash: string
+          created_at?: string | null
+          email: string
+          expires_at: string
+          id?: string
+          used?: boolean | null
+        }
+        Update: {
+          code_hash?: string
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          used?: boolean | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
@@ -818,6 +845,7 @@ export type Database = {
         Args: { recipient_id_param: string; sender_id_param: string }
         Returns: boolean
       }
+      cleanup_expired_reset_codes: { Args: never; Returns: undefined }
       get_assigned_refugi_lead: {
         Args: { emp_id: string }
         Returns: {
