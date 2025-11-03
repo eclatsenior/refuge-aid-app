@@ -315,12 +315,12 @@ const handler = async (req: Request): Promise<Response> => {
     // Step 1: Trigger Supabase native verification email (contains the link)
     console.log('[VERIFICATION-EMAIL] Triggering Supabase native verification for:', user.email);
     
-    const appUrl = supabaseUrl.replace('.supabase.co', '.lovableproject.com');
+    const appUrl = Deno.env.get('FRONTEND_URL') || supabaseUrl.replace('.supabase.co', '.lovableproject.com');
     const { error: resendError } = await supabaseAdmin.auth.resend({
       type: 'signup',
       email: user.email,
       options: {
-        emailRedirectTo: `${appUrl}/`
+        emailRedirectTo: `${appUrl}/email-verified`
       }
     });
 

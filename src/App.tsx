@@ -25,6 +25,7 @@ import PaywallPage from "@/pages/PaywallPage";
 import SettingsPage from "@/pages/SettingsPage";
 import SettingsLeadPage from "@/pages/SettingsLeadPage";
 import AdminAssignSubscription from "@/pages/AdminAssignSubscription";
+import { EmailVerifiedPage } from "@/pages/EmailVerifiedPage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 import "@/i18n/config";
@@ -152,6 +153,8 @@ const App = () => {
         return <SubscriptionCanceledPage />;
       case "/paywall":
         return <PaywallPage />;
+      case "/email-verified":
+        return <EmailVerifiedPage />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
@@ -207,7 +210,7 @@ const App = () => {
     }
     
     // Special routes that don't require authentication
-    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled"];
+    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled", "/email-verified"];
     if (publicRoutes.includes(currentPath)) {
       return renderCurrentPage();
     }

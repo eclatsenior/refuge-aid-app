@@ -339,7 +339,7 @@ export const useAppStore = create<AppState>()(
             email,
             password,
             options: {
-              emailRedirectTo: `${window.location.origin}/`,
+              emailRedirectTo: `${window.location.origin}/email-verified`,
               data: {
                 full_name: fullName,
                 role: role,
