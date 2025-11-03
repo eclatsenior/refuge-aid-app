@@ -99,6 +99,22 @@ export interface InternalMessage {
   updated_at: string;
 }
 
+export interface VaultResetRequest {
+  id: string;
+  user_id: string;
+  request_type: string;
+  status: string;
+  requested_at: string;
+  reviewed_at?: string;
+  reviewed_by?: string;
+  reset_token?: string;
+  id_document_url?: string;
+  notes?: string;
+  employee_name: string;
+  employee_email: string;
+  employee_avatar?: string;
+}
+
 export interface LeadSettings {
   id: string;
   user_id: string;
@@ -166,6 +182,7 @@ interface AppState {
   // Refugi Lead data
   assignedEmployees: EmployeeStatus[];
   emergencyAlerts: EmergencyAlert[];
+  vaultResetRequests: VaultResetRequest[];
   
   // Messaging
   messages: InternalMessage[];
@@ -216,6 +233,9 @@ interface AppState {
   setupRealtimeSubscriptions: () => (() => void) | undefined;
   updateEmployeePresence: (isOnline?: boolean) => Promise<void>;
   registerEmployee: (data: { email: string; fullName: string; password: string; phone?: string }) => Promise<void>;
+  loadVaultResetRequests: () => Promise<void>;
+  approveVaultReset: (requestId: string, notes?: string) => Promise<void>;
+  rejectVaultReset: (requestId: string, notes?: string) => Promise<void>;
   
   // Subscription actions
   loadSubscriptionStatus: () => Promise<void>;
@@ -271,6 +291,7 @@ export const useAppStore = create<AppState>()(
       trustedContacts: [],
       assignedEmployees: [],
       emergencyAlerts: [],
+      vaultResetRequests: [],
       messages: [],
       unreadMessageCount: 0,
       subscription: null,
@@ -913,6 +934,159 @@ export const useAppStore = create<AppState>()(
           console.log('✅ Employee registered successfully:', result);
         } catch (error: any) {
           console.error('❌ Error registering employee:', error);
+          throw error;
+        }
+      },
+
+      // Load vault reset requests
+      loadVaultResetRequests: async () => {
+        try {
+          const { user } = get();
+          if (!user) {
+            set({ vaultResetRequests: [] });
+            return;
+          }
+
+          console.log('🔐 Loading vault reset requests...');
+
+          // First, get assigned employee IDs
+          const { data: assignments, error: assignmentError } = await supabase
+            .from('employee_assignments')
+            .select('employee_id')
+            .eq('refugi_lead_id', user.id);
+
+          if (assignmentError) {
+            console.error('❌ Error loading assignments:', assignmentError);
+            throw assignmentError;
+          }
+
+          if (!assignments || assignments.length === 0) {
+            console.log('ℹ️ No assigned employees, no reset requests to show');
+            set({ vaultResetRequests: [] });
+            return;
+          }
+
+          const employeeIds = assignments.map(a => a.employee_id);
+
+          // Get pending vault reset requests for assigned employees
+          const { data: requests, error } = await supabase
+            .from('vault_reset_requests')
+            .select('*')
+            .eq('status', 'pending')
+            .in('user_id', employeeIds)
+            .order('requested_at', { ascending: false });
+
+          if (error) {
+            console.error('❌ Error loading vault reset requests:', error);
+            throw error;
+          }
+
+          // Get employee profiles for the requests
+          const userIds = requests?.map(r => r.user_id) || [];
+          const { data: profiles, error: profileError } = await supabase
+            .from('profiles')
+            .select('user_id, full_name, email, avatar_url')
+            .in('user_id', userIds);
+
+          if (profileError) {
+            console.error('❌ Error loading profiles:', profileError);
+          }
+
+          const formattedRequests: VaultResetRequest[] = requests?.map(req => {
+            const profile = profiles?.find(p => p.user_id === req.user_id);
+            return {
+              id: req.id,
+              user_id: req.user_id,
+              request_type: req.request_type,
+              status: req.status,
+              requested_at: req.requested_at,
+              reviewed_at: req.reviewed_at || undefined,
+              reviewed_by: req.reviewed_by || undefined,
+              reset_token: req.reset_token || undefined,
+              id_document_url: req.id_document_url || undefined,
+              notes: req.notes || undefined,
+              employee_name: profile?.full_name || 'Usuario desconocido',
+              employee_email: profile?.email || '',
+              employee_avatar: profile?.avatar_url || undefined,
+            };
+          }) || [];
+
+          console.log('✅ Vault reset requests loaded:', formattedRequests);
+          set({ vaultResetRequests: formattedRequests });
+        } catch (error) {
+          console.error('❌ Error loading vault reset requests:', error);
+          set({ vaultResetRequests: [] });
+        }
+      },
+
+      // Approve vault reset
+      approveVaultReset: async (requestId: string, notes?: string) => {
+        try {
+          const { user } = get();
+          if (!user) throw new Error('No estás autenticado');
+
+          console.log('✅ Approving vault reset:', requestId);
+
+          const { data, error } = await supabase.functions.invoke('approve-vault-reset', {
+            body: {
+              requestId,
+              reviewerNotes: notes,
+            },
+          });
+
+          if (error) throw error;
+          if (!data?.success) throw new Error(data?.message || 'Error al aprobar reset');
+
+          console.log('✅ Vault reset approved successfully');
+
+          // Reload requests to update UI
+          await get().loadVaultResetRequests();
+
+          return data;
+        } catch (error: any) {
+          console.error('❌ Error approving vault reset:', error);
+          throw error;
+        }
+      },
+
+      // Reject vault reset
+      rejectVaultReset: async (requestId: string, notes?: string) => {
+        try {
+          const { user } = get();
+          if (!user) throw new Error('No estás autenticado');
+
+          console.log('❌ Rejecting vault reset:', requestId);
+
+          const { error } = await supabase
+            .from('vault_reset_requests')
+            .update({
+              status: 'rejected',
+              reviewed_at: new Date().toISOString(),
+              reviewed_by: user.id,
+              notes: notes || null,
+            })
+            .eq('id', requestId);
+
+          if (error) throw error;
+
+          console.log('✅ Vault reset rejected successfully');
+
+          // Send notification to employee
+          const request = get().vaultResetRequests.find(r => r.id === requestId);
+          if (request) {
+            await supabase
+              .from('internal_messages')
+              .insert({
+                sender_id: user.id,
+                recipient_id: request.user_id,
+                message: `Tu solicitud de reset de Caja Fuerte ha sido rechazada. ${notes ? `Motivo: ${notes}` : 'Contacta con tu Refugi Lead para más información.'}`,
+              });
+          }
+
+          // Reload requests to update UI
+          await get().loadVaultResetRequests();
+        } catch (error: any) {
+          console.error('❌ Error rejecting vault reset:', error);
           throw error;
         }
       },

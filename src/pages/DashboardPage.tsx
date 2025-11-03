@@ -32,6 +32,7 @@ import { ReportingSection } from "@/components/dashboard/ReportingSection";
 import { AlertPermissionDialog } from "@/components/dashboard/AlertPermissionDialog";
 import { audioManager, requestNotificationPermission } from "@/lib/audioManager";
 import { InstallAppBanner } from "@/components/dashboard/InstallAppBanner";
+import { VaultResetRequestsSection } from "@/components/dashboard/VaultResetRequestsSection";
 import { useTranslation } from 'react-i18next';
 
 interface DashboardPageProps {
@@ -53,10 +54,14 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
     emergencyAlerts, 
     subscription,
     leadSettings,
+    vaultResetRequests,
     loadEmployeeData, 
     loadEmergencyAlerts,
     loadSubscriptionStatus,
     loadLeadSettings,
+    loadVaultResetRequests,
+    approveVaultReset,
+    rejectVaultReset,
     canAddEmployee,
     setupRealtimeSubscriptions,
     logout 
@@ -73,7 +78,8 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
           loadEmployeeData(),
           loadEmergencyAlerts(),
           loadLeadSettings(),
-          loadSubscriptionStatus()
+          loadSubscriptionStatus(),
+          loadVaultResetRequests()
         ]);
         
         toast({
@@ -344,6 +350,15 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
         {/* Attention Queue - Feature Flag */}
         {isEnabled('ff_refugi_queue') && (
           <AttentionQueue items={[]} />
+        )}
+
+        {/* Vault Reset Requests Section */}
+        {vaultResetRequests.length > 0 && (
+          <VaultResetRequestsSection
+            requests={vaultResetRequests}
+            onApprove={approveVaultReset}
+            onReject={rejectVaultReset}
+          />
         )}
 
         {/* Emergency Alerts */}

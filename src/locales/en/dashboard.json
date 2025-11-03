@@ -62,5 +62,10 @@
       "mood": "Mood",
       "training": "Training"
     }
+  },
+  "vaultReset": {
+    "title": "Vault Reset Requests",
+    "pending": "Pending requests",
+    "noRequests": "No pending vault reset requests"
   }
 }

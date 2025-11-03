@@ -62,5 +62,10 @@
       "mood": "Ánimo",
       "training": "Formación"
     }
+  },
+  "vaultReset": {
+    "title": "Solicitudes de Reset de Caja Fuerte",
+    "pending": "Solicitudes pendientes",
+    "noRequests": "No hay solicitudes pendientes de reset de caja fuerte"
   }
 }
