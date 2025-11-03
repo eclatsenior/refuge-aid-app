@@ -10,7 +10,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface WebhookPayload {
+// Database Webhook payload format
+interface DatabaseWebhookPayload {
   type: string;
   table: string;
   record: {
@@ -19,13 +20,39 @@ interface WebhookPayload {
     raw_user_meta_data: {
       role?: string;
       full_name?: string;
+      managed_by_lead?: boolean;
     };
     email_confirmed_at: string | null;
   };
   old_record: any;
 }
 
-const getEmailTemplate = (role: string, userName: string, verificationUrl: string) => {
+// Auth Hook payload format
+interface AuthHookPayload {
+  user: {
+    id: string;
+    email: string;
+    user_metadata: {
+      role?: string;
+      full_name?: string;
+      managed_by_lead?: boolean;
+    };
+    email_confirmed_at: string | null;
+  };
+}
+
+// Normalized user structure
+interface NormalizedUser {
+  id: string;
+  email: string;
+  role: string;
+  full_name: string;
+  managed_by_lead: boolean;
+  email_confirmed_at: string | null;
+}
+
+// Get welcome email template (WITHOUT verification link - that's sent by Supabase)
+const getWelcomeEmailTemplate = (role: string, userName: string) => {
   const isLead = role === 'refugi_lead';
   
   const leadTemplate = `
@@ -53,14 +80,19 @@ const getEmailTemplate = (role: string, userName: string, verificationUrl: strin
                     <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
                       Gracias por elegir Refugi para cuidar el bienestar emocional de tu equipo. Has dado el primer paso para crear un entorno laboral más saludable y productivo.
                     </p>
-                    <p style="margin: 0 0 30px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                      Para activar tu cuenta empresarial y comenzar a gestionar el bienestar de tus empleadas, por favor verifica tu correo electrónico haciendo clic en el botón:
-                    </p>
-                    <div style="text-align: center; margin: 30px 0;">
-                      <a href="${verificationUrl}" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
-                        Verificar Email Corporativo
-                      </a>
-                    </div>
+                     <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                       Para activar tu cuenta empresarial, debes verificar tu correo electrónico.
+                     </p>
+                     <div style="background-color: #eef2ff; border-left: 4px solid #6366f1; padding: 16px; margin: 20px 0; border-radius: 4px;">
+                       <p style="margin: 0; color: #312e81; font-size: 14px; line-height: 1.6;">
+                         <strong>📧 Revisa tu bandeja de entrada</strong><br/>
+                         Te hemos enviado un email de verificación desde Supabase. 
+                         <strong>Haz clic en el enlace</strong> que encontrarás allí para activar tu cuenta.
+                       </p>
+                     </div>
+                     <p style="margin: 20px 0 10px 0; color: #6b7280; font-size: 13px;">
+                       💡 Si no lo ves, revisa tu carpeta de spam o correo no deseado.
+                     </p>
                     <p style="margin: 30px 0 20px 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
                       <strong>Próximos pasos después de verificar:</strong>
                     </p>
@@ -121,14 +153,19 @@ const getEmailTemplate = (role: string, userName: string, verificationUrl: strin
                     <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
                       Nos alegra mucho que hayas decidido cuidar tu bienestar emocional. Has tomado un paso valiente y importante.
                     </p>
-                    <p style="margin: 0 0 30px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                      Para comenzar a usar tu espacio personal y acceder a todas las herramientas de apoyo, por favor verifica tu correo electrónico:
-                    </p>
-                    <div style="text-align: center; margin: 30px 0;">
-                      <a href="${verificationUrl}" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
-                        Verificar Mi Cuenta
-                      </a>
-                    </div>
+                     <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                       Para comenzar a usar tu espacio personal, necesitas verificar tu correo electrónico.
+                     </p>
+                     <div style="background-color: #fce7f3; border-left: 4px solid #ec4899; padding: 16px; margin: 20px 0; border-radius: 4px;">
+                       <p style="margin: 0; color: #831843; font-size: 14px; line-height: 1.6;">
+                         <strong>📧 Revisa tu bandeja de entrada</strong><br/>
+                         Te hemos enviado un email de verificación desde Supabase. 
+                         <strong>Haz clic en el enlace</strong> que encontrarás allí para activar tu cuenta.
+                       </p>
+                     </div>
+                     <p style="margin: 20px 0 10px 0; color: #6b7280; font-size: 13px;">
+                       💡 Si no lo ves, revisa tu carpeta de spam o correo no deseado.
+                     </p>
                     <p style="margin: 30px 0 20px 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
                       <strong>Lo que encontrarás en Refugi:</strong>
                     </p>
@@ -173,56 +210,82 @@ const getEmailTemplate = (role: string, userName: string, verificationUrl: strin
   return isLead ? leadTemplate : individualTemplate;
 };
 
+// Normalize payload from Database Webhook OR Auth Hook
+const normalizePayload = (payload: any): NormalizedUser | null => {
+  // Database Webhook format (type, table, record)
+  if (payload.type && payload.table && payload.record) {
+    console.log('[VERIFICATION-EMAIL] Detected Database Webhook format');
+    
+    if (payload.type !== 'INSERT' || payload.table !== 'users') {
+      console.log('[VERIFICATION-EMAIL] Skipping non-INSERT event or wrong table');
+      return null;
+    }
+    
+    const record = payload.record;
+    return {
+      id: record.id,
+      email: record.email,
+      role: record.raw_user_meta_data?.role || 'employee',
+      full_name: record.raw_user_meta_data?.full_name || 'Usuario',
+      managed_by_lead: record.raw_user_meta_data?.managed_by_lead || false,
+      email_confirmed_at: record.email_confirmed_at
+    };
+  }
+  
+  // Auth Hook format (user object directly)
+  if (payload.user) {
+    console.log('[VERIFICATION-EMAIL] Detected Auth Hook format');
+    const user = payload.user;
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.user_metadata?.role || 'employee',
+      full_name: user.user_metadata?.full_name || 'Usuario',
+      managed_by_lead: user.user_metadata?.managed_by_lead || false,
+      email_confirmed_at: user.email_confirmed_at
+    };
+  }
+  
+  console.error('[VERIFICATION-EMAIL] Unknown payload format:', payload);
+  return null;
+};
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const payload: WebhookPayload = await req.json();
+    const rawPayload = await req.json();
     
-    console.log('[VERIFICATION-EMAIL] Received webhook:', {
-      type: payload.type,
-      table: payload.table,
-      record: payload.record?.id,
-      email: payload.record?.email
+    console.log('[VERIFICATION-EMAIL] Raw payload received:', {
+      hasType: !!rawPayload.type,
+      hasTable: !!rawPayload.table,
+      hasRecord: !!rawPayload.record,
+      hasUser: !!rawPayload.user
     });
 
-    // Only process INSERT events on users table
-    if (payload.type !== 'INSERT' || payload.table !== 'users') {
-      console.log('[VERIFICATION-EMAIL] Skipping non-INSERT event or wrong table');
-      return new Response(JSON.stringify({ message: 'Event ignored' }), {
+    // Normalize the payload
+    const user = normalizePayload(rawPayload);
+    
+    if (!user) {
+      return new Response(JSON.stringify({ message: 'Event ignored or invalid payload' }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
-
-    const user = payload.record;
     
-    // Verify Resend API key is configured
-    if (!Deno.env.get("RESEND_API_KEY")) {
-      console.error('[VERIFICATION-EMAIL] RESEND_API_KEY not configured');
-      return new Response(JSON.stringify({ error: 'Email service not configured' }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Get user role and name from metadata
-    const role = user.raw_user_meta_data?.role || 'employee';
-    const userName = user.raw_user_meta_data?.full_name || 'Usuario';
-    const managedByLead = user.raw_user_meta_data?.managed_by_lead || false;
-    
-    console.log('[VERIFICATION-EMAIL] User details:', { 
-      role, 
-      userName, 
+    console.log('[VERIFICATION-EMAIL] Normalized user data:', {
+      id: user.id,
       email: user.email,
-      managedByLead,
-      emailConfirmedAt: user.email_confirmed_at
+      role: user.role,
+      full_name: user.full_name,
+      managed_by_lead: user.managed_by_lead,
+      email_confirmed_at: user.email_confirmed_at
     });
-
+    
     // Skip if user is managed by a Lead (they are auto-confirmed by backend)
-    if (managedByLead) {
+    if (user.managed_by_lead) {
       console.log('[VERIFICATION-EMAIL] User managed by Lead, skipping verification email');
       return new Response(JSON.stringify({ message: 'Managed user, no verification needed' }), {
         status: 200,
@@ -230,7 +293,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    // Generate verification link using Supabase Admin
+    // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     
@@ -249,52 +312,56 @@ const handler = async (req: Request): Promise<Response> => {
       }
     });
 
-    console.log('[VERIFICATION-EMAIL] Generating verification link for:', user.email);
-
-    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+    // Step 1: Trigger Supabase native verification email (contains the link)
+    console.log('[VERIFICATION-EMAIL] Triggering Supabase native verification for:', user.email);
+    
+    const appUrl = supabaseUrl.replace('.supabase.co', '.lovableproject.com');
+    const { error: resendError } = await supabaseAdmin.auth.resend({
       type: 'signup',
       email: user.email,
       options: {
-        redirectTo: `${supabaseUrl.replace('.supabase.co', '.lovableproject.com')}/`
+        emailRedirectTo: `${appUrl}/`
       }
     });
 
-    if (linkError || !linkData.properties?.action_link) {
-      console.error('[VERIFICATION-EMAIL] Error generating verification link:', linkError);
-      throw new Error(`Failed to generate verification link: ${linkError?.message || 'Unknown error'}`);
+    if (resendError) {
+      console.error('[VERIFICATION-EMAIL] Error triggering Supabase verification:', resendError);
+      // Don't throw - we'll still try to send the companion email
+    } else {
+      console.log('[VERIFICATION-EMAIL] ✅ Supabase verification email triggered successfully');
     }
 
-    const verificationUrl = linkData.properties.action_link;
-    console.log('[VERIFICATION-EMAIL] Verification link generated successfully');
+    // Step 2: Send personalized welcome email via Resend (NO link, just instructions)
+    if (!Deno.env.get("RESEND_API_KEY")) {
+      console.warn('[VERIFICATION-EMAIL] RESEND_API_KEY not configured, skipping companion email');
+    } else {
+      console.log('[VERIFICATION-EMAIL] Sending companion welcome email via Resend');
+      
+      const emailHtml = getWelcomeEmailTemplate(user.role, user.full_name);
+      
+      const { data: emailData, error: emailError } = await resend.emails.send({
+        from: 'Refugi <onboarding@resend.dev>',
+        to: [user.email],
+        subject: user.role === 'refugi_lead' 
+          ? '¡Bienvenido a Refugi! - Verifica tu email'
+          : '¡Bienvenida a Refugi! 💜 - Verifica tu email',
+        html: emailHtml
+      });
 
-    // Get email template based on role
-    const emailHtml = getEmailTemplate(role, userName, verificationUrl);
-
-    // Send email via Resend
-    console.log('[VERIFICATION-EMAIL] Sending email to:', user.email, 'Role:', role);
-    
-    const { data: emailData, error: emailError } = await resend.emails.send({
-      from: 'Refugi <onboarding@resend.dev>', // Use Resend default until domain is verified
-      to: [user.email],
-      subject: role === 'refugi_lead' 
-        ? 'Verifica tu cuenta empresarial - Refugi'
-        : 'Bienvenida a Refugi - Verifica tu cuenta',
-      html: emailHtml
-    });
-
-    if (emailError) {
-      console.error('[VERIFICATION-EMAIL] Error sending email:', emailError);
-      throw new Error(`Failed to send email: ${emailError.message || 'Unknown error'}`);
+      if (emailError) {
+        console.error('[VERIFICATION-EMAIL] Error sending companion email:', emailError);
+        // Don't throw - main verification email was sent by Supabase
+      } else {
+        console.log('[VERIFICATION-EMAIL] ✅ Companion email sent. ID:', emailData?.id);
+      }
     }
-
-    console.log('[VERIFICATION-EMAIL] Email sent successfully. ID:', emailData?.id);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Verification email sent',
-        email_id: emailData?.id,
-        recipient: user.email
+        message: 'Verification process initiated',
+        recipient: user.email,
+        role: user.role
       }),
       {
         status: 200,
