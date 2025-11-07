@@ -1,5 +1,8 @@
 project_id = "npmyobeqbipvvuaeswnu"
 
+[functions.create-premium-test-account]
+verify_jwt = false
+
 [functions.send-verification-email]
 verify_jwt = false
 
