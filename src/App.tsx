@@ -26,6 +26,7 @@ import SettingsPage from "@/pages/SettingsPage";
 import SettingsLeadPage from "@/pages/SettingsLeadPage";
 import AdminAssignSubscription from "@/pages/AdminAssignSubscription";
 import { EmailVerifiedPage } from "@/pages/EmailVerifiedPage";
+import { AdminUploadVideosPage } from "@/pages/AdminUploadVideosPage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 import "@/i18n/config";
@@ -155,6 +156,8 @@ const App = () => {
         return <PaywallPage />;
       case "/email-verified":
         return <EmailVerifiedPage />;
+      case "/admin/upload-videos":
+        return <AdminUploadVideosPage />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }

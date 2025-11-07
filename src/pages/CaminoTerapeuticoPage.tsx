@@ -7,6 +7,8 @@ import { Progress } from "@/components/ui/progress";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
+import { VideoPlayer } from "@/components/therapy/VideoPlayer";
+import { useTherapyVideos } from "@/hooks/useTherapyVideos";
 
 interface CaminoTerapeuticoPageProps {
   onNavigate: (path: string) => void;
@@ -211,6 +213,9 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
   const [completedModules, setCompletedModules] = useState<string[]>(
     JSON.parse(localStorage.getItem('completed_modules') || '[]')
   );
+  const [videoWatchedPercentage, setVideoWatchedPercentage] = useState(0);
+  
+  const { getVideoForModule } = useTherapyVideos();
 
   const handleRouteSelect = (route: Route) => {
     setSelectedRoute(route);
@@ -236,6 +241,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     
     if (selectedRoute && currentModule < selectedRoute.modules.length - 1) {
       setCurrentModule(currentModule + 1);
+      setVideoWatchedPercentage(0); // Reset para el siguiente módulo
     } else if (selectedRoute && currentModule === selectedRoute.modules.length - 1) {
       setShowSummary(true);
     }
@@ -434,6 +440,9 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
   if (selectedRoute) {
     const module = selectedRoute.modules[currentModule];
     const progress = ((currentModule + 1) / selectedRoute.modules.length) * 100;
+    const videoData = getVideoForModule(selectedRoute.id, module.id);
+    const videoRequired = videoData?.is_required || false;
+    const canProceed = !videoRequired || videoWatchedPercentage >= 80;
     
     return (
       <div className="min-h-screen bg-gradient-calm p-4 pb-20">
@@ -486,6 +495,15 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {videoData && (
+                <VideoPlayer
+                  videoUrl={videoData.video_url}
+                  videoName={videoData.video_name || undefined}
+                  required={videoData.is_required}
+                  onVideoWatched={setVideoWatchedPercentage}
+                />
+              )}
+              
               <div className="prose prose-sm">
                 <p className="text-base leading-relaxed">{module.content}</p>
               </div>
@@ -529,6 +547,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                 <Button
                   onClick={() => handleCompleteModule(module.id)}
                   className="px-8"
+                  disabled={!canProceed}
                 >
                   {currentModule === selectedRoute.modules.length - 1
                     ? completedModules.includes(module.id) ? 'Finalizar de nuevo' : 'Finalizar ruta'
@@ -536,6 +555,12 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                   }
                 </Button>
               </div>
+              
+              {!canProceed && (
+                <p className="text-sm text-center text-muted-foreground mt-2">
+                  Debes ver el video completo para continuar
+                </p>
+              )}
             </CardContent>
           </Card>
           
