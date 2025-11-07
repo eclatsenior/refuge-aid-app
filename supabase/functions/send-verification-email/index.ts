@@ -279,9 +279,14 @@ const handler = async (req: Request): Promise<Response> => {
       throw tokenError;
     }
 
-    // Build verification URL - detect correct frontend URL
+    // Build verification URL - include redirect to frontend if provided
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const verificationUrl = `${supabaseUrl}/functions/v1/verify-custom-email?token=${token}`;
+    const redirectOrigin = typeof payload.redirectOrigin === 'string' ? payload.redirectOrigin : '';
+    let verificationUrl = `${supabaseUrl}/functions/v1/verify-custom-email?token=${token}`;
+    if (redirectOrigin && (redirectOrigin.startsWith('http://') || redirectOrigin.startsWith('https://'))) {
+      const redirectParam = encodeURIComponent(`${redirectOrigin}/email-verified`);
+      verificationUrl += `&redirect=${redirectParam}`;
+    }
 
     console.log('Verification URL:', verificationUrl);
 

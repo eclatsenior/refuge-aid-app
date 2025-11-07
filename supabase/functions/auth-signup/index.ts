@@ -16,6 +16,8 @@ interface SignUpRequest {
     company_website: string;
     company_role: string;
   };
+  redirectOrigin?: string;
+  send_custom_verification?: boolean;
 }
 
 serve(async (req: Request) => {
@@ -27,7 +29,7 @@ serve(async (req: Request) => {
   try {
     console.log('[AUTH-SIGNUP] Function started');
     
-    const { email, password, fullName, role, companyData }: SignUpRequest = await req.json();
+    const { email, password, fullName, role, companyData, redirectOrigin, send_custom_verification }: SignUpRequest = await req.json();
     
     console.log('[AUTH-SIGNUP] Received signup request:', { email, fullName, role });
 
@@ -127,7 +129,9 @@ serve(async (req: Request) => {
               full_name: fullName,
               role: role
             }
-          }
+          },
+          send_custom_verification: send_custom_verification === true,
+          redirectOrigin
         }
       }
     );

@@ -15,6 +15,13 @@ serve(async (req: Request) => {
   try {
     const url = new URL(req.url);
     const token = url.searchParams.get('token');
+    const redirect = url.searchParams.get('redirect');
+    const buildRedirect = (pathWithQuery: string) => {
+      if (redirect && (redirect.startsWith('http://') || redirect.startsWith('https://'))) {
+        return redirect;
+      }
+      return `${url.origin}${pathWithQuery}`;
+    };
 
     if (!token) {
       console.error('No token provided');
@@ -24,7 +31,7 @@ serve(async (req: Request) => {
           status: 302,
           headers: {
             ...corsHeaders,
-            'Location': `${url.origin}/auth?error=invalid_token`,
+            'Location': buildRedirect('/auth?error=invalid_token'),
           },
         }
       );
@@ -60,7 +67,7 @@ serve(async (req: Request) => {
           status: 302,
           headers: {
             ...corsHeaders,
-            'Location': `${url.origin}/auth?error=invalid_token`,
+            'Location': buildRedirect('/auth?error=invalid_token'),
           },
         }
       );
@@ -78,7 +85,7 @@ serve(async (req: Request) => {
           status: 302,
           headers: {
             ...corsHeaders,
-            'Location': `${url.origin}/auth?error=token_expired`,
+            'Location': buildRedirect('/auth?error=token_expired'),
           },
         }
       );
@@ -115,7 +122,7 @@ serve(async (req: Request) => {
         status: 302,
         headers: {
           ...corsHeaders,
-          'Location': `${url.origin}/email-verified`,
+          'Location': buildRedirect('/email-verified'),
         },
       }
     );
@@ -129,7 +136,7 @@ serve(async (req: Request) => {
         status: 302,
         headers: {
           ...corsHeaders,
-          'Location': `${url.origin}/auth?error=verification_failed`,
+          'Location': buildRedirect('/auth?error=verification_failed'),
         },
       }
     );
