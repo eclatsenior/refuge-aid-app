@@ -46,12 +46,29 @@ serve(async (req: Request) => {
     );
 
     // Check if user already exists
-    console.log('[AUTH-SIGNUP] Checking if user exists...');
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find(u => u.email === email);
+  console.log('[AUTH-SIGNUP] Checking if user exists...');
+  // Robust email lookup with pagination (avoids missing users not on first page)
+  let existingUser: any = null;
+  try {
+    let page = 1;
+    const perPage = 100;
+    while (true) {
+      const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
+      if (error) {
+        console.error('[AUTH-SIGNUP] listUsers error:', error);
+        break;
+      }
+      const found = data?.users?.find((u: any) => (u.email ?? '').toLowerCase() === email.toLowerCase());
+      if (found) { existingUser = found; break; }
+      if (!data?.users?.length || data.users.length < perPage) break;
+      page += 1;
+    }
+  } catch (e) {
+    console.error('[AUTH-SIGNUP] Error while searching users by email:', e);
+  }
 
-    let userData: any;
-    let isExistingUser = false;
+  let userData: any;
+  let isExistingUser = false;
 
     if (existingUser) {
       console.log('[AUTH-SIGNUP] User already exists:', existingUser.id);
@@ -112,13 +129,57 @@ serve(async (req: Request) => {
 
       if (userError) {
         console.error('[AUTH-SIGNUP] Error creating user:', userError);
-        return new Response(
-          JSON.stringify({ error: userError.message }),
-          {
-            status: 400,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        const code = (userError as any)?.code;
+        const message = (userError as any)?.message ?? '';
+        const isEmailExists = code === 'email_exists' || /already been registered/i.test(message);
+        if (isEmailExists) {
+          console.log('[AUTH-SIGNUP] Detected existing email via createUser error. Falling back to existing-user flow');
+          // Ensure we have the existing user loaded
+          if (!existingUser) {
+            try {
+              let page = 1;
+              const perPage = 100;
+              while (true) {
+                const { data } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
+                const found = data?.users?.find((u: any) => (u.email ?? '').toLowerCase() === email.toLowerCase());
+                if (found) { existingUser = found; break; }
+                if (!data?.users?.length || data.users.length < perPage) break;
+                page += 1;
+              }
+            } catch (_) {}
           }
-        );
+          if (existingUser) {
+            isExistingUser = true;
+            userData = { user: existingUser };
+            // Update metadata and password so user can use the latest
+            try {
+              await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
+                user_metadata: {
+                  full_name: fullName,
+                  role: role,
+                  ...(companyData && {
+                    company_name: companyData.company_name,
+                    company_website: companyData.company_website,
+                    company_role: companyData.company_role
+                  })
+                }
+              });
+              await supabaseAdmin.auth.admin.updateUserById(existingUser.id, { password });
+            } catch (e) {
+              console.warn('[AUTH-SIGNUP] Non-fatal: could not update existing user metadata/password', e);
+            }
+          } else {
+            return new Response(
+              JSON.stringify({ error: 'Ya existe una cuenta con este correo. Por favor inicia sesión.' }),
+              { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+            );
+          }
+        } else {
+          return new Response(
+            JSON.stringify({ error: message || 'Error al crear el usuario' }),
+            { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+          );
+        }
       }
 
       userData = newUserData;
@@ -152,16 +213,21 @@ serve(async (req: Request) => {
       // Create employee_status if role is employee
       if (role === 'employee') {
         console.log('[AUTH-SIGNUP] Creating employee status...');
-        const { error: statusError } = await supabaseAdmin
+        const { count } = await supabaseAdmin
           .from('employee_status')
-          .upsert({
-            employee_id: userData.user.id,
-            mood_level: null,
-            therapy_progress: 0
-          }, { onConflict: 'employee_id' });
+          .select('id', { count: 'exact', head: true })
+          .eq('employee_id', userData.user.id);
 
-        if (statusError) {
-          console.error('[AUTH-SIGNUP] Error creating employee status:', statusError);
+        if (!count || count === 0) {
+          const { error: statusInsertError } = await supabaseAdmin
+            .from('employee_status')
+            .insert([{ employee_id: userData.user.id, mood_level: null, therapy_progress: 0 }]);
+
+          if (statusInsertError) {
+            console.error('[AUTH-SIGNUP] Error creating employee status:', statusInsertError);
+          }
+        } else {
+          console.log('[AUTH-SIGNUP] Employee status already exists, skipping insert');
         }
       }
     } else {
