@@ -82,12 +82,6 @@ export function VideoPlayer({
 
   return (
     <div className="w-full space-y-3">
-      {videoName && (
-        <div className="text-sm text-muted-foreground">
-          📹 {videoName}
-        </div>
-      )}
-      
       <div className="relative bg-black rounded-lg overflow-hidden shadow-lg">
         <video
           ref={videoRef}
