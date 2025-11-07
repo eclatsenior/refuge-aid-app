@@ -46,6 +46,30 @@ const MODULES: Record<string, Array<{ id: string; name: string }>> = {
   ]
 };
 
+/**
+ * Sanitiza el nombre del archivo para Supabase Storage
+ * - Remueve acentos y caracteres especiales
+ * - Reemplaza espacios con guiones
+ * - Convierte a minúsculas
+ * - Preserva la extensión del archivo
+ */
+const sanitizeFileName = (fileName: string): string => {
+  // Obtener extensión
+  const lastDotIndex = fileName.lastIndexOf('.');
+  const name = lastDotIndex > 0 ? fileName.slice(0, lastDotIndex) : fileName;
+  const extension = lastDotIndex > 0 ? fileName.slice(lastDotIndex) : '';
+  
+  // Normalizar caracteres (convertir á → a, ñ → n, etc.)
+  const normalized = name
+    .normalize('NFD') // Descomponer caracteres acentuados
+    .replace(/[\u0300-\u036f]/g, '') // Eliminar marcas diacríticas
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-') // Reemplazar caracteres no alfanuméricos con guiones
+    .replace(/^-+|-+$/g, ''); // Eliminar guiones al inicio/final
+  
+  return normalized + extension.toLowerCase();
+};
+
 export function AdminUploadVideosPage() {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -91,7 +115,8 @@ export function AdminUploadVideosPage() {
     setUploadProgress(0);
 
     try {
-      const fileName = `${selectedRoute}/${selectedModule}/${Date.now()}_${videoFile.name}`;
+      const sanitizedName = sanitizeFileName(videoFile.name);
+      const fileName = `${selectedRoute}/${selectedModule}/${Date.now()}_${sanitizedName}`;
       
       // Simular progreso para UX
       const progressInterval = setInterval(() => {
