@@ -246,7 +246,8 @@ const App = () => {
           '/paywall',
           '/subscription-success',
           '/subscription-canceled',
-          '/auth'
+          '/auth',
+          '/admin/upload-videos'
         ];
         
         if (!allowedRoutes.some(route => currentPath.startsWith(route))) {
