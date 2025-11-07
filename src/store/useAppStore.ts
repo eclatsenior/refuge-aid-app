@@ -335,25 +335,32 @@ export const useAppStore = create<AppState>()(
       
       signUp: async (email, password, fullName, role, companyData) => {
         try {
-          const { error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              emailRedirectTo: `${window.location.origin}/email-verified`,
-              data: {
-                full_name: fullName,
-                role: role,
-                ...(companyData && {
-                  company_name: companyData.company_name,
-                  company_website: companyData.company_website,
-                  company_role: companyData.company_role
-                })
-              }
+          console.log('[SIGN-UP] Calling auth-signup edge function...');
+          
+          const { data, error } = await supabase.functions.invoke('auth-signup', {
+            body: {
+              email,
+              password,
+              fullName,
+              role,
+              companyData
             }
           });
-          
-          return { error };
+
+          if (error) {
+            console.error('[SIGN-UP] Edge function error:', error);
+            return { error };
+          }
+
+          if (data?.error) {
+            console.error('[SIGN-UP] Server error:', data.error);
+            return { error: new Error(data.error) };
+          }
+
+          console.log('[SIGN-UP] Registration successful:', data?.message);
+          return { error: null };
         } catch (error) {
+          console.error('[SIGN-UP] Fatal error:', error);
           return { error };
         }
       },

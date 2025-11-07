@@ -2,6 +2,12 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.0";
 import { Resend } from "npm:resend@2.0.0";
 
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+// Parametrización del remitente y marca
+const RESEND_FROM_ADDRESS = Deno.env.get("RESEND_FROM_ADDRESS") || "Refugi <onboarding@resend.dev>";
+const RESEND_BRAND_NAME = Deno.env.get("RESEND_BRAND_NAME") || "Refugi";
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -272,9 +278,9 @@ const handler = async (req: Request): Promise<Response> => {
     );
     
     const { data: resendData, error: resendError } = await resend.emails.send({
-      from: 'Refugi <onboarding@resend.dev>',
+      from: RESEND_FROM_ADDRESS,
       to: [normalizedUser.email],
-      subject: `✨ Verifica tu cuenta de Refugi${normalizedUser.role === 'refugi_lead' ? ' Lead' : ''}`,
+      subject: `✨ Verifica tu cuenta de ${RESEND_BRAND_NAME}${normalizedUser.role === 'refugi_lead' ? ' Lead' : ''}`,
       html: emailHtml,
     });
 
