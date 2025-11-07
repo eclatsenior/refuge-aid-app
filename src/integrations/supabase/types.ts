@@ -746,6 +746,45 @@ export type Database = {
           },
         ]
       }
+      therapy_videos: {
+        Row: {
+          created_at: string | null
+          duration_seconds: number | null
+          file_size: number | null
+          id: string
+          is_required: boolean | null
+          module_id: string
+          route_id: string
+          updated_at: string | null
+          video_name: string | null
+          video_url: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration_seconds?: number | null
+          file_size?: number | null
+          id?: string
+          is_required?: boolean | null
+          module_id: string
+          route_id: string
+          updated_at?: string | null
+          video_name?: string | null
+          video_url: string
+        }
+        Update: {
+          created_at?: string | null
+          duration_seconds?: number | null
+          file_size?: number | null
+          id?: string
+          is_required?: boolean | null
+          module_id?: string
+          route_id?: string
+          updated_at?: string | null
+          video_name?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
       training_completions: {
         Row: {
           completed_at: string | null
