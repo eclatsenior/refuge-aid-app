@@ -197,10 +197,20 @@ export function AuthPage() {
       const { error } = await signUp(normalizedEmail, normalizedPassword, normalizedFullName, role, companyData);
       
       if (error) {
+        // Manejo amigable cuando el edge function devuelve 400 (usuario ya existe)
+        const anyError = error as any;
+        const isFunctionsHttpError = anyError?.name === 'FunctionsHttpError' || (anyError?.message || '').includes('non-2xx');
+        const friendlyMessage = isFunctionsHttpError
+          ? 'Ya existe una cuenta con este correo. Por favor inicia sesión o recupera tu contraseña.'
+          : (anyError?.message || 'No se pudo crear la cuenta');
+
+        // Cambiar automáticamente a la pestaña de login y mantener el email
+        setActiveTab('login');
+
         toast({
-          title: "Error de registro",
-          description: error.message || "No se pudo crear la cuenta",
-          variant: "destructive"
+          title: 'Error de registro',
+          description: friendlyMessage,
+          variant: 'destructive'
         });
       } else {
         // Show banner with personalized message
