@@ -215,6 +215,22 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Normalized user:', normalizedUser);
 
+    // IMPORTANTE: Solo enviar correo personalizado si viene con flag explícito
+    // Esto previene duplicados cuando se usa el signup nativo de Supabase
+    if (!payload.send_custom_verification) {
+      console.log('No custom verification flag detected, skipping branded email (using Supabase native email instead)');
+      return new Response(
+        JSON.stringify({ 
+          message: 'Event ignored - using Supabase native verification email',
+          user_id: normalizedUser.id 
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
     // Skip sending email if user is managed by a lead
     if (normalizedUser.managed_by_lead) {
       console.log('User is managed by lead, skipping verification email');
