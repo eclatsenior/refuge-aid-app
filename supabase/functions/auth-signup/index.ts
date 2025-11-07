@@ -45,73 +45,127 @@ serve(async (req: Request) => {
       }
     );
 
-    // Create user with Admin API - email_confirm: false prevents default Supabase email
-    console.log('[AUTH-SIGNUP] Creating user with Admin API...');
-    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: false, // CRITICAL: Prevents default Supabase confirmation email
-      user_metadata: {
-        full_name: fullName,
-        role: role,
-        ...(companyData && {
-          company_name: companyData.company_name,
-          company_website: companyData.company_website,
-          company_role: companyData.company_role
-        })
-      }
-    });
+    // Check if user already exists
+    console.log('[AUTH-SIGNUP] Checking if user exists...');
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const existingUser = existingUsers?.users?.find(u => u.email === email);
 
-    if (userError) {
-      console.error('[AUTH-SIGNUP] Error creating user:', userError);
-      return new Response(
-        JSON.stringify({ error: userError.message }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    let userData: any;
+    let isExistingUser = false;
+
+    if (existingUser) {
+      console.log('[AUTH-SIGNUP] User already exists:', existingUser.id);
+      
+      // Check if email is already confirmed
+      if (existingUser.email_confirmed_at) {
+        console.log('[AUTH-SIGNUP] User already verified, cannot re-register');
+        return new Response(
+          JSON.stringify({ 
+            error: 'Ya existe una cuenta con este correo. Por favor inicia sesión.' 
+          }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          }
+        );
+      }
+
+      // User exists but not verified - resend verification
+      console.log('[AUTH-SIGNUP] User exists but not verified, will resend verification email');
+      isExistingUser = true;
+      userData = { user: existingUser };
+
+      // Update user metadata if provided
+      await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
+        user_metadata: {
+          full_name: fullName,
+          role: role,
+          ...(companyData && {
+            company_name: companyData.company_name,
+            company_website: companyData.company_website,
+            company_role: companyData.company_role
+          })
         }
-      );
-    }
+      });
 
-    console.log('[AUTH-SIGNUP] User created successfully:', userData.user.id);
-
-    // Upsert profile
-    console.log('[AUTH-SIGNUP] Upserting profile...');
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .upsert({
-        user_id: userData.user.id,
-        email: email,
-        full_name: fullName,
-        role: role,
-        ...(companyData && {
-          company_name: companyData.company_name,
-          company_website: companyData.company_website,
-          company_role: companyData.company_role
-        })
-      }, { onConflict: 'user_id' });
-
-    if (profileError) {
-      console.error('[AUTH-SIGNUP] Error creating profile:', profileError);
-      // Continue anyway - the handle_new_user trigger might have already created it
+      // Update password if it's different (optional)
+      await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
+        password: password
+      });
     } else {
-      console.log('[AUTH-SIGNUP] Profile created successfully');
+      // Create new user
+      console.log('[AUTH-SIGNUP] Creating new user with Admin API...');
+      const { data: newUserData, error: userError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: false, // CRITICAL: Prevents default Supabase confirmation email
+        user_metadata: {
+          full_name: fullName,
+          role: role,
+          ...(companyData && {
+            company_name: companyData.company_name,
+            company_website: companyData.company_website,
+            company_role: companyData.company_role
+          })
+        }
+      });
+
+      if (userError) {
+        console.error('[AUTH-SIGNUP] Error creating user:', userError);
+        return new Response(
+          JSON.stringify({ error: userError.message }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          }
+        );
+      }
+
+      userData = newUserData;
+      console.log('[AUTH-SIGNUP] User created successfully:', userData.user.id);
     }
 
-    // Create employee_status if role is employee
-    if (role === 'employee') {
-      console.log('[AUTH-SIGNUP] Creating employee status...');
-      const { error: statusError } = await supabaseAdmin
-        .from('employee_status')
+    // Upsert profile (only if new user or updating)
+    if (!isExistingUser) {
+      console.log('[AUTH-SIGNUP] Upserting profile...');
+      const { error: profileError } = await supabaseAdmin
+        .from('profiles')
         .upsert({
-          employee_id: userData.user.id,
-          mood_level: null,
-          therapy_progress: 0
-        }, { onConflict: 'employee_id' });
+          user_id: userData.user.id,
+          email: email,
+          full_name: fullName,
+          role: role,
+          ...(companyData && {
+            company_name: companyData.company_name,
+            company_website: companyData.company_website,
+            company_role: companyData.company_role
+          })
+        }, { onConflict: 'user_id' });
 
-      if (statusError) {
-        console.error('[AUTH-SIGNUP] Error creating employee status:', statusError);
+      if (profileError) {
+        console.error('[AUTH-SIGNUP] Error creating profile:', profileError);
+        // Continue anyway - the handle_new_user trigger might have already created it
+      } else {
+        console.log('[AUTH-SIGNUP] Profile created successfully');
       }
+
+      // Create employee_status if role is employee
+      if (role === 'employee') {
+        console.log('[AUTH-SIGNUP] Creating employee status...');
+        const { error: statusError } = await supabaseAdmin
+          .from('employee_status')
+          .upsert({
+            employee_id: userData.user.id,
+            mood_level: null,
+            therapy_progress: 0
+          }, { onConflict: 'employee_id' });
+
+        if (statusError) {
+          console.error('[AUTH-SIGNUP] Error creating employee status:', statusError);
+        }
+      }
+    } else {
+      console.log('[AUTH-SIGNUP] Skipping profile/status creation for existing user');
     }
 
     // Invoke send-verification-email to send our branded email
@@ -145,10 +199,15 @@ serve(async (req: Request) => {
 
     console.log('[AUTH-SIGNUP] Signup completed successfully');
 
+    const message = isExistingUser 
+      ? 'Email de verificación reenviado. Por favor revisa tu correo.'
+      : 'Usuario creado. Por favor verifica tu email para completar el registro.';
+
     return new Response(
       JSON.stringify({ 
         ok: true,
-        message: 'Usuario creado. Por favor verifica tu email para completar el registro.'
+        message,
+        is_resend: isExistingUser
       }),
       {
         status: 200,
