@@ -213,7 +213,7 @@ const App = () => {
     }
     
     // Special routes that don't require authentication
-    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled", "/email-verified"];
+    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled", "/email-verified", "/admin/upload-videos", "/admin/assign-subscription"];
     if (publicRoutes.includes(currentPath)) {
       return renderCurrentPage();
     }
@@ -223,11 +223,6 @@ const App = () => {
       return <AuthPage />;
     }
     
-    // Admin routes - bypass role and paywall checks (have their own authentication)
-    const adminRoutes = ["/admin/upload-videos", "/admin/assign-subscription"];
-    if (adminRoutes.includes(currentPath)) {
-      return renderCurrentPage();
-    }
     
     // If Refugi Lead, handle dashboard routes
     if (userRole === 'refugi_lead') {
