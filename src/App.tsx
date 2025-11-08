@@ -223,6 +223,12 @@ const App = () => {
       return <AuthPage />;
     }
     
+    // Admin routes - bypass role and paywall checks (have their own authentication)
+    const adminRoutes = ["/admin/upload-videos", "/admin/assign-subscription"];
+    if (adminRoutes.includes(currentPath)) {
+      return renderCurrentPage();
+    }
+    
     // If Refugi Lead, handle dashboard routes
     if (userRole === 'refugi_lead') {
       if (currentPath === '/dashboard/settings') {
