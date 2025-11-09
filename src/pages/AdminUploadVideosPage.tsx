@@ -165,13 +165,13 @@ export function AdminUploadVideosPage() {
     }
     console.log('✅ Tipo de archivo validado:', videoFile.type);
 
-    // Validar tamaño (500MB límite de Supabase Storage)
-    const maxSize = 500 * 1024 * 1024; // 500MB en bytes
+    // Validar tamaño (250MB límite configurado)
+    const maxSize = 250 * 1024 * 1024; // 250MB en bytes
     if (videoFile.size > maxSize) {
       console.error('❌ Archivo demasiado grande:', videoFile.size);
       toast({
         title: 'Archivo demasiado grande',
-        description: `El tamaño máximo es 500MB. Tu archivo: ${(videoFile.size / 1024 / 1024).toFixed(2)}MB`,
+        description: `El tamaño máximo es 250MB. Tu archivo: ${(videoFile.size / 1024 / 1024).toFixed(2)}MB`,
         variant: 'destructive'
       });
       return;
