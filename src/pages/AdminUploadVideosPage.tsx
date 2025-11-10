@@ -77,6 +77,7 @@ export function AdminUploadVideosPage() {
   const [videos, setVideos] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [last413Error, setLast413Error] = useState(false);
   
   const [selectedRoute, setSelectedRoute] = useState('');
   const [selectedModule, setSelectedModule] = useState('');
@@ -164,6 +165,18 @@ export function AdminUploadVideosPage() {
         // Usar TUS (subida reanudable) para archivos > 50MB
         console.log('📤 Archivo grande detectado, usando subida reanudable (TUS)...');
         
+        // Logs de diagnóstico
+        console.log('🔍 Detalles del archivo:');
+        console.log('  - Nombre sanitizado:', fileName);
+        console.log('  - Tamaño:', (videoFile.size / 1024 / 1024).toFixed(2), 'MB');
+        console.log('  - Tipo MIME:', videoFile.type || 'video/mp4');
+        console.log('  - Metadata:', {
+          bucketName: 'therapy-videos',
+          objectName: fileName,
+          contentType: videoFile.type || 'video/mp4',
+          cacheControl: '3600'
+        });
+        
         publicUrl = await new Promise<string>((resolve, reject) => {
           const upload = new tus.Upload(videoFile, {
             endpoint: SUPABASE_STORAGE_RESUMABLE_URL,
@@ -183,6 +196,18 @@ export function AdminUploadVideosPage() {
             chunkSize: 6 * 1024 * 1024, // 6MB chunks
             onError: (error) => {
               console.error('❌ Error en subida TUS:', error);
+              
+              // Detectar error 413 (límite de tamaño)
+              const errorMessage = error.message || error.toString();
+              if (errorMessage.includes('413') || errorMessage.toLowerCase().includes('maximum size exceeded')) {
+                setLast413Error(true);
+                toast({
+                  title: '⚠️ Límite de tamaño del proyecto excedido',
+                  description: 'El límite global de Supabase es 50MB. Para subir archivos mayores: (1) Aumenta el límite en el Dashboard de Supabase (requiere plan Pro), o (2) Comprime el video.',
+                  variant: 'destructive'
+                });
+              }
+              
               reject(error);
             },
             onProgress: (bytesUploaded, bytesTotal) => {
@@ -364,12 +389,27 @@ export function AdminUploadVideosPage() {
               <Input
                 type="file"
                 accept="video/*"
-                onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                onChange={(e) => {
+                  setVideoFile(e.target.files?.[0] || null);
+                  setLast413Error(false); // Resetear advertencia al seleccionar nuevo archivo
+                }}
               />
               {videoFile && (
                 <p className="text-sm text-muted-foreground mt-1">
                   {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
                 </p>
+              )}
+              {last413Error && (
+                <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                  <p className="text-sm text-destructive font-medium">⚠️ Límite del proyecto: 50MB</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Tu proyecto tiene un límite global de 50MB por archivo. Opciones:
+                  </p>
+                  <ul className="text-xs text-muted-foreground mt-1 ml-4 list-disc space-y-0.5">
+                    <li>Aumenta el límite en <a href="https://supabase.com/dashboard/project/npmyobeqbipvvuaeswnu/settings/storage" target="_blank" rel="noopener noreferrer" className="underline">Dashboard → Storage Settings</a> (requiere plan Pro)</li>
+                    <li>Comprime el video con herramientas como HandBrake o FFmpeg</li>
+                  </ul>
+                </div>
               )}
             </div>
 
