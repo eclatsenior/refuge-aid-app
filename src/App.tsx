@@ -164,6 +164,12 @@ const App = () => {
   };
 
   const renderApp = () => {
+    // FIRST: Handle administrative routes (no authentication or validation needed)
+    const adminRoutes = ["/admin/upload-videos", "/admin/assign-subscription"];
+    if (adminRoutes.includes(currentPath)) {
+      return renderCurrentPage();
+    }
+    
     // Show loading during initialization
     if (isInitializing) {
       return (
@@ -213,7 +219,7 @@ const App = () => {
     }
     
     // Special routes that don't require authentication
-    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled", "/email-verified", "/admin/upload-videos", "/admin/assign-subscription"];
+    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled", "/email-verified"];
     if (publicRoutes.includes(currentPath)) {
       return renderCurrentPage();
     }
