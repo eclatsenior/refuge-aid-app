@@ -29,14 +29,49 @@ export function useTherapyVideos() {
         });
 
         setVideos(videoMap);
+        console.debug('[useTherapyVideos] Loaded videos:', Object.keys(videoMap));
       } catch (error) {
-        console.error('Error loading therapy videos:', error);
+        console.error('[useTherapyVideos] Error loading therapy videos:', error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchVideos();
+
+    // Suscripción Realtime para actualizaciones en vivo
+    const channel = supabase
+      .channel('therapy_videos_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'therapy_videos'
+        },
+        (payload) => {
+          console.debug('[useTherapyVideos] Realtime event:', payload.eventType, payload);
+          
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            const video = payload.new as TherapyVideo;
+            const key = `${video.route_id}-${video.module_id}`;
+            setVideos(prev => ({ ...prev, [key]: video }));
+          } else if (payload.eventType === 'DELETE') {
+            const video = payload.old as TherapyVideo;
+            const key = `${video.route_id}-${video.module_id}`;
+            setVideos(prev => {
+              const newVideos = { ...prev };
+              delete newVideos[key];
+              return newVideos;
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const getVideoForModule = (routeId: string, moduleId: string) => {

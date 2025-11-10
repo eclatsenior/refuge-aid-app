@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Heart, Shield, Clock, Wind, Flower, RotateCcw, Book, MessageSquare, Wrench, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -220,6 +220,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
   const handleRouteSelect = (route: Route) => {
     setSelectedRoute(route);
     setCurrentModule(0);
+    setVideoWatchedPercentage(0); // Reset al entrar a una ruta
   };
 
   const handleBack = () => {
@@ -250,6 +251,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
   const handleRepeatModule = (moduleIndex: number) => {
     setCurrentModule(moduleIndex);
     setShowSummary(false);
+    setVideoWatchedPercentage(0); // Reset al cambiar de módulo
   };
 
   const handleResetRoute = (routeId: string) => {
@@ -437,6 +439,13 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     );
   }
 
+  // Reset video progress cuando cambia el módulo
+  useEffect(() => {
+    if (selectedRoute) {
+      setVideoWatchedPercentage(0);
+    }
+  }, [currentModule, selectedRoute]);
+
   if (selectedRoute) {
     const module = selectedRoute.modules[currentModule];
     const progress = ((currentModule + 1) / selectedRoute.modules.length) * 100;
@@ -489,19 +498,30 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
               <CardTitle className="flex items-center gap-3">
                 {selectedRoute.icon}
                 {module.title}
+                {videoData && (
+                  <Badge variant="secondary" className="ml-auto text-xs">
+                    Video disponible
+                  </Badge>
+                )}
               </CardTitle>
               <CardDescription>
                 Módulo {currentModule + 1} de {selectedRoute.modules.length} · {module.duration} min
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {videoData && (
+              {videoData ? (
                 <VideoPlayer
                   videoUrl={videoData.video_url}
                   videoName={videoData.video_name || undefined}
                   required={videoData.is_required}
                   onVideoWatched={setVideoWatchedPercentage}
                 />
+              ) : (
+                <div className="p-4 bg-muted/30 border border-muted rounded-lg text-center">
+                  <p className="text-sm text-muted-foreground">
+                    Sin video asignado todavía
+                  </p>
+                </div>
               )}
               
               <div className="prose prose-sm">
@@ -538,7 +558,10 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
               <div className="flex justify-between items-center pt-4">
                 <Button
                   variant="outline"
-                  onClick={() => setCurrentModule(Math.max(0, currentModule - 1))}
+                  onClick={() => {
+                    setCurrentModule(Math.max(0, currentModule - 1));
+                    setVideoWatchedPercentage(0);
+                  }}
                   disabled={currentModule === 0}
                 >
                   Anterior
@@ -561,6 +584,60 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                   Debes ver el video completo para continuar
                 </p>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Sección "Volver a cursar módulos" siempre visible */}
+          <Card className="mb-6 bg-card/90 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">Todos los módulos de esta ruta</CardTitle>
+              <CardDescription>Puedes saltar a cualquier módulo</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {selectedRoute.modules.map((mod, index) => {
+                const isCurrentModule = index === currentModule;
+                const isCompleted = completedModules.includes(mod.id);
+                
+                return (
+                  <div
+                    key={mod.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                      isCurrentModule 
+                        ? 'bg-primary/10 border-primary/30' 
+                        : 'bg-muted/20 border-muted hover:bg-muted/40'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                        isCurrentModule ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                      }`}>
+                        {getModuleIcon(mod.type)}
+                      </div>
+                      <div className="flex-1">
+                        <p className={`font-medium text-sm ${isCurrentModule ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          {mod.title}
+                          {isCompleted && ' ✓'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{mod.duration} min</p>
+                      </div>
+                    </div>
+                    {!isCurrentModule && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRepeatModule(index)}
+                      >
+                        Ir a módulo
+                      </Button>
+                    )}
+                    {isCurrentModule && (
+                      <Badge variant="default" className="text-xs">
+                        Actual
+                      </Badge>
+                    )}
+                  </div>
+                );
+              })}
             </CardContent>
           </Card>
           
