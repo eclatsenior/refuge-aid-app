@@ -217,6 +217,13 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
   
   const { getVideoForModule } = useTherapyVideos();
 
+  // Reset video progress cuando cambia el módulo
+  useEffect(() => {
+    if (selectedRoute) {
+      setVideoWatchedPercentage(0);
+    }
+  }, [currentModule, selectedRoute]);
+
   const handleRouteSelect = (route: Route) => {
     setSelectedRoute(route);
     setCurrentModule(0);
@@ -438,13 +445,6 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
       </div>
     );
   }
-
-  // Reset video progress cuando cambia el módulo
-  useEffect(() => {
-    if (selectedRoute) {
-      setVideoWatchedPercentage(0);
-    }
-  }, [currentModule, selectedRoute]);
 
   if (selectedRoute) {
     const module = selectedRoute.modules[currentModule];
