@@ -23,7 +23,7 @@ const MODULES: Record<string, Array<{ id: string; name: string }>> = {
   estabilizacion: [
     { id: 'breathing', name: 'Respiración 4-7-8' },
     { id: 'grounding', name: 'Grounding 5-4-3-2-1' },
-    { id: 'toolbox', name: 'Caja de herramientas' }
+    { id: 'toolbox', name: 'Caja de herramientas rápidas' }
   ],
   ansiedad: [
     { id: 'wave', name: 'Atraviesa la ola' },
@@ -31,19 +31,19 @@ const MODULES: Record<string, Array<{ id: string; name: string }>> = {
     { id: 'tracking', name: 'Registro rápido' }
   ],
   trauma: [
-    { id: 'safe', name: 'Espacio seguro' },
-    { id: 'container', name: 'Técnica del contenedor' },
-    { id: 'resources', name: 'Recursos internos' }
+    { id: 'grounding-intensive', name: 'Volver al presente' },
+    { id: 'anchor-plan', name: 'Plan personal de anclaje' },
+    { id: 'mantra', name: 'Mantras de seguridad' }
   ],
   violencia: [
-    { id: 'safety', name: 'Plan de seguridad' },
-    { id: 'boundaries', name: 'Límites saludables' },
-    { id: 'support', name: 'Red de apoyo' }
+    { id: 'safety-plan', name: 'Plan de seguridad' },
+    { id: 'evidence', name: 'Guardar pruebas de forma segura' },
+    { id: 'resources-24h', name: 'Recursos 24/7' }
   ],
   aromaterapia: [
-    { id: 'intro', name: 'Introducción' },
-    { id: 'practice', name: 'Práctica guiada' },
-    { id: 'daily', name: 'Uso diario' }
+    { id: 'library', name: 'Biblioteca de aromas' },
+    { id: 'routine', name: 'Rutina guiada de 3 minutos' },
+    { id: 'alternatives', name: 'Alternativas sensoriales' }
   ]
 };
 
