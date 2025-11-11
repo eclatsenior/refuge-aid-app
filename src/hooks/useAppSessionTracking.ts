@@ -9,12 +9,20 @@ export function useAppSessionTracking() {
 
     const startSession = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user || !isActive) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user || !isActive) {
+          console.debug('[AppSession] No active session, skipping tracking');
+          return;
+        }
 
-        const { data } = await supabase.functions.invoke('track-app-session', {
+        const { data, error } = await supabase.functions.invoke('track-app-session', {
           body: { action: 'start' }
         });
+
+        if (error) {
+          console.error('[AppSession] Error starting session:', error);
+          return;
+        }
 
         if (data?.session_id) {
           sessionIdRef.current = data.session_id;
