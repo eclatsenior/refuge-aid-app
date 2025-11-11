@@ -26,16 +26,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { EmployeeStatus } from "@/store/useAppStore";
 import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+import { getDateFnsLocale } from "@/lib/dateUtils";
 import { useToast } from "@/hooks/use-toast";
 import { useAppStore } from "@/store/useAppStore";
 import { MessageDialog } from "@/components/messaging/MessageDialog";
+import { useTranslation } from "react-i18next";
 
 interface EmployeeCardProps {
   employee: EmployeeStatus;
 }
 
 export function EmployeeCard({ employee }: EmployeeCardProps) {
+  const { t, i18n } = useTranslation('dashboard');
   const [isExpanded, setIsExpanded] = useState(false);
   const [showMessageDialog, setShowMessageDialog] = useState(false);
   const { toast } = useToast();
@@ -50,11 +52,11 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
   };
 
   const getStatusText = () => {
-    if (employee.emergency_alert) return "Emergencia";
-    if (!employee.is_online) return "Desconectada";
-    if (employee.mood_level !== null && employee.mood_level <= 4) return "Necesita atención";
-    if (employee.mood_level !== null) return "Bien";
-    return "Sin datos";
+    if (employee.emergency_alert) return t('employeeCard.emergency');
+    if (!employee.is_online) return t('employeeCard.disconnected');
+    if (employee.mood_level !== null && employee.mood_level <= 4) return t('employeeCard.needsAttention');
+    if (employee.mood_level !== null) return t('employeeCard.well');
+    return t('employeeCard.noData');
   };
 
   const getMoodEmoji = (level: number) => {
@@ -105,8 +107,8 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
 
   const lastCheckInDate = employee.last_check_in ? new Date(employee.last_check_in) : null;
   const timeSinceLastCheckIn = lastCheckInDate 
-    ? formatDistanceToNow(lastCheckInDate, { addSuffix: true, locale: es })
-    : 'Sin registro';
+    ? formatDistanceToNow(lastCheckInDate, { addSuffix: true, locale: getDateFnsLocale(i18n.language) })
+    : t('employeeCard.noRecord');
   
   // Count unread messages from this employee
   const { user } = useAppStore();

@@ -61,39 +61,39 @@ export function KPIsSection() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Métricas KPI</h2>
+      <h2 className="text-lg font-semibold">{t('kpisSection.sectionTitle')}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
-          title="Riesgo Activo"
+          title={t('kpisSection.activeRisk')}
           value={kpis.active_risk.score.toFixed(0)}
           trend={kpis.active_risk.trend_7d}
-          chips={['Promedio ponderado']}
+          chips={[t('kpisSection.weightedAverage')]}
           icon={AlertTriangle}
           variant={kpis.active_risk.score > 70 ? 'danger' : kpis.active_risk.score > 40 ? 'warning' : 'success'}
           onClick={() => console.log('Drill-down: Riesgo')}
         />
 
         <KPICard
-          title="Incidentes Esta Semana"
+          title={t('kpisSection.incidentsThisWeek')}
           value={kpis.incidents_week}
-          chips={[`${kpis.incidents_open} abiertos`]}
+          chips={[`${kpis.incidents_open} ${t('kpisSection.open')}`]}
           icon={Activity}
           variant={kpis.incidents_open > 5 ? 'warning' : 'default'}
           onClick={() => console.log('Drill-down: Incidentes')}
         />
 
         <KPICard
-          title="Ánimo Promedio (24h)"
-          value={kpis.avg_mood > 0 ? kpis.avg_mood.toFixed(1) : 'Sin datos'}
+          title={t('kpisSection.averageMood24h')}
+          value={kpis.avg_mood > 0 ? kpis.avg_mood.toFixed(1) : t('stats.noData')}
           icon={Heart}
           variant={kpis.avg_mood > 0 && kpis.avg_mood < 5 ? 'warning' : 'success'}
           onClick={() => console.log('Drill-down: Ánimo')}
         />
 
         <KPICard
-          title="Formación Completada"
+          title={t('kpisSection.trainingCompleted')}
           value={`${kpis.training_completion.toFixed(0)}%`}
-          chips={[`${kpis.checkins_count} check-ins/semana`]}
+          chips={[`${kpis.checkins_count} ${t('kpisSection.checkinsPerWeek')}`]}
           icon={BookOpen}
           variant={kpis.training_completion < 70 ? 'warning' : 'success'}
           onClick={() => console.log('Drill-down: Formación')}

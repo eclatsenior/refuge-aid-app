@@ -19,19 +19,19 @@ export function ReportingSection({ employees, alerts }: ReportingSectionProps) {
     <Card className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold">Reporting Detallado</h2>
-          <p className="text-muted-foreground">Análisis completo y generación de reportes</p>
+          <h2 className="text-2xl font-bold">{t('reporting.title')}</h2>
+          <p className="text-muted-foreground">{t('reporting.subtitle')}</p>
         </div>
         <ReportGenerationDialog />
       </div>
 
       <Tabs defaultValue="resumen" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="resumen">Resumen</TabsTrigger>
-          <TabsTrigger value="incidentes">Incidentes</TabsTrigger>
-          <TabsTrigger value="riesgo">Riesgo</TabsTrigger>
-          <TabsTrigger value="animo">Ánimo</TabsTrigger>
-          <TabsTrigger value="formacion">Formación</TabsTrigger>
+          <TabsTrigger value="resumen">{t('reporting.tabs.summary')}</TabsTrigger>
+          <TabsTrigger value="incidentes">{t('reporting.tabs.incidents')}</TabsTrigger>
+          <TabsTrigger value="riesgo">{t('reporting.tabs.risk')}</TabsTrigger>
+          <TabsTrigger value="animo">{t('reporting.tabs.mood')}</TabsTrigger>
+          <TabsTrigger value="formacion">{t('reporting.tabs.training')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="resumen">
