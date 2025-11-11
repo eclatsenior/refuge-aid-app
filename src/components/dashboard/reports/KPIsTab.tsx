@@ -32,14 +32,27 @@ export function KPIsTab({ employees }: { employees: any[] }) {
 
   const fetchData = async () => {
     try {
-      // Fetch KPIs
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get assigned employees
+      const { data: assignments } = await supabase
+        .from('employee_assignments')
+        .select('employee_id')
+        .eq('refugi_lead_id', user.id);
+      
+      const assignedEmployeeIds = assignments?.map(a => a.employee_id) || [];
+
+      // Fetch KPIs (already filtered in edge function)
       const { data: kpiData } = await supabase.functions.invoke('dashboard-kpis');
       if (kpiData) setKpis(kpiData);
 
-      // Fetch risk trend (last 30 days)
+      // Fetch risk trend - FILTERED
       const { data: riskData } = await supabase
         .from('risk_scores')
-        .select('score_int, calculated_at')
+        .select('score_int, calculated_at, employee_id')
+        .in('employee_id', assignedEmployeeIds)
         .gte('calculated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
         .order('calculated_at', { ascending: true });
 
@@ -48,10 +61,11 @@ export function KPIsTab({ employees }: { employees: any[] }) {
         setRiskTrend(aggregated);
       }
 
-      // Fetch incidents trend (last 4 weeks) - now using emergency_alerts
+      // Fetch incidents trend - FILTERED
       const { data: incidentData } = await supabase
         .from('emergency_alerts')
-        .select('created_at')
+        .select('created_at, employee_id')
+        .in('employee_id', assignedEmployeeIds)
         .gte('created_at', new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString());
 
       if (incidentData) {

@@ -41,9 +41,23 @@ export function IncidentsTab() {
 
   const fetchIncidents = async () => {
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get assigned employees
+      const { data: assignments } = await supabase
+        .from('employee_assignments')
+        .select('employee_id')
+        .eq('refugi_lead_id', user.id);
+      
+      const assignedEmployeeIds = assignments?.map(a => a.employee_id) || [];
+
+      // Fetch incidents - FILTERED
       const { data, error } = await supabase
         .from('incidents')
         .select('*')
+        .in('employee_id', assignedEmployeeIds)
         .order('opened_at', { ascending: false });
 
       if (error) throw error;

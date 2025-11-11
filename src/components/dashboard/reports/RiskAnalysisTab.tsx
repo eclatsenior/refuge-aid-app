@@ -19,10 +19,23 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
 
   const fetchActivityData = async () => {
     try {
-      // Fetch average session count per day for last 30 days
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get assigned employees
+      const { data: assignments } = await supabase
+        .from('employee_assignments')
+        .select('employee_id')
+        .eq('refugi_lead_id', user.id);
+      
+      const assignedEmployeeIds = assignments?.map(a => a.employee_id) || [];
+
+      // Fetch app_sessions - FILTERED
       const { data } = await supabase
         .from('app_sessions')
         .select('started_at, employee_id')
+        .in('employee_id', assignedEmployeeIds)
         .gte('started_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
 
       if (data) {
@@ -60,9 +73,23 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
 
   const fetchRiskEvolution = async () => {
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get assigned employees
+      const { data: assignments } = await supabase
+        .from('employee_assignments')
+        .select('employee_id')
+        .eq('refugi_lead_id', user.id);
+      
+      const assignedEmployeeIds = assignments?.map(a => a.employee_id) || [];
+
+      // Fetch risk_scores - FILTERED
       const { data } = await supabase
         .from('risk_scores')
-        .select('score_int, calculated_at')
+        .select('score_int, calculated_at, employee_id')
+        .in('employee_id', assignedEmployeeIds)
         .gte('calculated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
         .order('calculated_at', { ascending: true });
 

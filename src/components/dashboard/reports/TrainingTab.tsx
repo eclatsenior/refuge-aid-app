@@ -19,16 +19,29 @@ export function TrainingTab({ employees }: { employees: any[] }) {
 
   const fetchTrainingData = async () => {
     try {
-      // Fetch all therapy routes
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get assigned employees
+      const { data: assignments } = await supabase
+        .from('employee_assignments')
+        .select('employee_id')
+        .eq('refugi_lead_id', user.id);
+      
+      const assignedEmployeeIds = assignments?.map(a => a.employee_id) || [];
+
+      // Fetch all therapy routes (no filter - public data)
       const { data: videosData } = await supabase
         .from('therapy_videos')
         .select('*')
         .order('route_id', { ascending: true });
 
-      // Fetch all video progress
+      // Fetch video progress - FILTERED
       const { data: progressData } = await supabase
         .from('video_progress')
-        .select('*');
+        .select('*')
+        .in('employee_id', assignedEmployeeIds);
 
       if (videosData) {
         // Group videos by route

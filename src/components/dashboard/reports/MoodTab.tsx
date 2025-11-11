@@ -20,10 +20,23 @@ export function MoodTab({ employees }: { employees: any[] }) {
 
   const fetchMoodData = async () => {
     try {
-      // Fetch mood check-ins from last 30 days
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get assigned employees
+      const { data: assignments } = await supabase
+        .from('employee_assignments')
+        .select('employee_id')
+        .eq('refugi_lead_id', user.id);
+      
+      const assignedEmployeeIds = assignments?.map(a => a.employee_id) || [];
+
+      // Fetch mood check-ins - FILTERED
       const { data: checkIns } = await supabase
         .from('mood_check_ins')
         .select('mood_level, created_at, employee_id')
+        .in('employee_id', assignedEmployeeIds)
         .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
         .order('created_at', { ascending: true });
 
