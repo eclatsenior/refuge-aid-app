@@ -10,9 +10,10 @@ import { toast } from '@/hooks/use-toast';
 interface VaultPasswordSetupProps {
   open: boolean;
   onSuccess: () => void;
+  onClose?: () => void;
 }
 
-export function VaultPasswordSetup({ open, onSuccess }: VaultPasswordSetupProps) {
+export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSetupProps) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -93,23 +94,23 @@ export function VaultPasswordSetup({ open, onSuccess }: VaultPasswordSetupProps)
   };
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={(open) => { if (!open && onClose) onClose(); }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2">
             <Shield className="h-6 w-6 text-primary" />
             <DialogTitle>Configura tu Caja Fuerte</DialogTitle>
           </div>
-          <DialogDescription className="space-y-2 pt-2">
-            <p>Esta contraseña protegerá tus notas más sensibles.</p>
-            <div className="flex items-start gap-2 p-3 bg-warning/10 rounded-lg border border-warning/20">
-              <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
-              <div className="text-sm text-warning">
-                <strong>Importante:</strong> No olvides esta contraseña. Recuperarla requiere 
-                {' '}verificación especial y perderás el acceso a tus notas antiguas.
-              </div>
-            </div>
+          <DialogDescription className="pt-2">
+            Esta contraseña protegerá tus notas más sensibles.
           </DialogDescription>
+          <div className="flex items-start gap-2 p-3 bg-warning/10 rounded-lg border border-warning/20 mt-2">
+            <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+            <div className="text-sm text-warning">
+              <strong>Importante:</strong> No olvides esta contraseña. Recuperarla requiere 
+              {' '}verificación especial y perderás el acceso a tus notas antiguas.
+            </div>
+          </div>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">

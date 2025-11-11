@@ -162,6 +162,10 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     });
   };
 
+  const handleVaultSetupClose = () => {
+    setShowVaultSetup(false);
+  };
+
   const handleVaultUnlockSuccess = (token: string) => {
     setShowVaultUnlock(false);
     setVaultToken(token);
@@ -765,6 +769,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
         <VaultPasswordSetup
           open={showVaultSetup}
           onSuccess={handleVaultSetupSuccess}
+          onClose={handleVaultSetupClose}
         />
       )}
 
