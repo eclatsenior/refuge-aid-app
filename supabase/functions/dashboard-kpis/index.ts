@@ -31,11 +31,8 @@ serve(async (req) => {
       throw new Error('Forbidden: RefugiLead role required');
     }
 
-    const url = new URL(req.url);
-    const scopeFilter = url.searchParams.get('scope') || '{}';
-
     const { data: kpis, error } = await supabase.rpc('get_dashboard_kpis', {
-      scope_filter: JSON.parse(scopeFilter)
+      lead_user_id: user.id
     });
 
     if (error) throw error;
