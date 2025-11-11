@@ -258,16 +258,24 @@
   },
   "training": {
     "progress": "التقدم",
-    "completed": "مكتمل",
-    "pending": "معلق",
-    "generalStats": "الإحصائيات العامة",
+    "completed": "مكتملة",
+    "pending": "معلقة",
+    "generalStats": "إحصائيات عامة",
     "totalEmployees": "إجمالي الموظفات",
     "allTrainings": "جميع التدريبات",
     "noTraining": "بدون تدريب",
     "detailPerEmployee": "التفاصيل حسب الموظفة",
+    "totalModules": "إجمالي الوحدات",
+    "totalVideos": "إجمالي مقاطع الفيديو",
+    "employeesWithProgress": "الموظفات ذوات التقدم",
+    "ofTotal": "من {{total}}",
+    "employeesCompleted": "الموظفات اللواتي أكملن",
+    "moduleProgress": "التقدم حسب الوحدة",
+    "employeeProgress": "التقدم حسب الموظفة",
+    "videos": "مقاطع فيديو",
     "courses": {
       "VG_101": "العنف القائم على النوع الاجتماعي 101",
-      "ACOSO_PREV": "منع التحرش"
+      "ACOSO_PREV": "الوقاية من التحرش"
     }
   },
   "installBanner": {
@@ -301,9 +309,6 @@
       "low": "منخفض (0-30)",
       "medium": "متوسط (31-60)",
       "high": "مرتفع (61-100)"
-    }
-  },
-      "high": "عالي (61-100)"
     }
   },
   "kpisTabs": {

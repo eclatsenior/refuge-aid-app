@@ -303,6 +303,14 @@
     "allTrainings": "Totes les Formacions",
     "noTraining": "Sense Formació",
     "detailPerEmployee": "Detall per Empleada",
+    "totalModules": "Total Mòduls",
+    "totalVideos": "vídeos totals",
+    "employeesWithProgress": "Empleades amb Progrés",
+    "ofTotal": "de {{total}}",
+    "employeesCompleted": "Empleades que han Completat",
+    "moduleProgress": "Progrés per Mòdul",
+    "employeeProgress": "Progrés per Empleada",
+    "videos": "vídeos",
     "courses": {
       "VG_101": "Violència de Gènere 101",
       "ACOSO_PREV": "Prevenció d'Assetjament"
@@ -338,9 +346,6 @@
     "levels": {
       "low": "Baix (0-30)",
       "medium": "Mitjà (31-60)",
-      "high": "Alt (61-100)"
-    }
-  },
       "high": "Alt (61-100)"
     }
   },
