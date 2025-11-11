@@ -45,7 +45,14 @@
       "checkSpam": "Revisa tu carpeta de spam o correo no deseado",
       "expiresIn": "El enlace expira en 24 horas",
       "resendSuccess": "Email de verificación reenviado correctamente",
-      "resendError": "Error al reenviar el email. Intenta de nuevo."
+      "resendError": "Error al reenviar el email. Intenta de nuevo.",
+      "codeTitle": "Verifica tu email",
+      "codeMessage": "Te hemos enviado un código de 6 dígitos",
+      "codeExpires": "El código expira en 15 minutos",
+      "verifyButton": "Verificar código",
+      "resendCode": "¿No recibiste el código? Reenviar",
+      "invalidCode": "Código inválido o expirado",
+      "verificationSuccess": "Email verificado correctamente"
     },
     "passwordReset": {
       "title": "Recuperar contraseña",

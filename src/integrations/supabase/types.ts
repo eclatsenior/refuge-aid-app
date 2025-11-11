@@ -107,6 +107,36 @@ export type Database = {
         }
         Relationships: []
       }
+      email_verification_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          used: boolean | null
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          email: string
+          expires_at: string
+          id?: string
+          used?: boolean | null
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          used?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_verification_tokens: {
         Row: {
           created_at: string | null
@@ -980,6 +1010,7 @@ export type Database = {
         Returns: boolean
       }
       cleanup_expired_reset_codes: { Args: never; Returns: undefined }
+      cleanup_expired_verification_codes: { Args: never; Returns: undefined }
       get_assigned_refugi_lead: {
         Args: { emp_id: string }
         Returns: {

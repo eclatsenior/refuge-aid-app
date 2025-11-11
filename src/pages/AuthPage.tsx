@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAppStore } from "@/store/useAppStore";
 import { FaceRecognition } from "@/components/auth/FaceRecognition";
 import { PasswordResetCodeDialog } from "@/components/auth/PasswordResetCodeDialog";
+import { EmailVerificationCodeDialog } from "@/components/auth/EmailVerificationCodeDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +41,9 @@ export function AuthPage() {
   const [companyRole, setCompanyRole] = useState("");
   const [showVerificationBanner, setShowVerificationBanner] = useState(false);
   const [registeredRole, setRegisteredRole] = useState<string | null>(null);
+  const [showEmailVerificationDialog, setShowEmailVerificationDialog] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [registeredUserName, setRegisteredUserName] = useState("");
   
   const { signIn, signUp, user, profile } = useAppStore();
   const { toast } = useToast();
@@ -213,22 +217,22 @@ export function AuthPage() {
           variant: 'destructive'
         });
       } else {
-        // Show banner with personalized message
+        // Mostrar dialog de verificación con código
+        setRegisteredEmail(normalizedEmail);
+        setRegisteredUserName(normalizedFullName);
         setRegisteredRole(role);
-        setShowVerificationBanner(true);
-        setActiveTab("login");
         
-        // Also show toast for immediate feedback
-        const message = role === 'refugi_lead' 
-          ? t('auth.emailVerification.leadMessage')
-          : t('auth.emailVerification.individualMessage');
+        // Enviar email con código de verificación
+        await supabase.functions.invoke('send-verification-email', {
+          body: { email: normalizedEmail, userName: normalizedFullName }
+        });
+        
+        setShowEmailVerificationDialog(true);
         
         toast({
-          title: role === 'refugi_lead' 
-            ? t('auth.emailVerification.leadTitle')
-            : t('auth.emailVerification.individualTitle'),
-          description: message,
-          duration: 10000
+          title: "✅ Cuenta creada",
+          description: "Revisa tu email para el código de verificación",
+          duration: 8000
         });
       }
     } catch (error) {
