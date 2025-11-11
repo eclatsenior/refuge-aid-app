@@ -65,11 +65,11 @@ export function KPIsSection() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
           title={t('kpisSection.activeRisk')}
-          value={kpis.active_risk.score.toFixed(0)}
+          value={typeof kpis.active_risk.score === 'number' ? kpis.active_risk.score.toFixed(0) : '0'}
           trend={kpis.active_risk.trend_7d}
           chips={[t('kpisSection.weightedAverage')]}
           icon={AlertTriangle}
-          variant={kpis.active_risk.score > 70 ? 'danger' : kpis.active_risk.score > 40 ? 'warning' : 'success'}
+          variant={typeof kpis.active_risk.score === 'number' && kpis.active_risk.score > 70 ? 'danger' : typeof kpis.active_risk.score === 'number' && kpis.active_risk.score > 40 ? 'warning' : 'success'}
           onClick={() => console.log('Drill-down: Riesgo')}
         />
 
@@ -84,18 +84,18 @@ export function KPIsSection() {
 
         <KPICard
           title={t('kpisSection.averageMood24h')}
-          value={kpis.avg_mood > 0 ? kpis.avg_mood.toFixed(1) : t('stats.noData')}
+          value={typeof kpis.avg_mood === 'number' && kpis.avg_mood > 0 ? kpis.avg_mood.toFixed(1) : t('stats.noData')}
           icon={Heart}
-          variant={kpis.avg_mood > 0 && kpis.avg_mood < 5 ? 'warning' : 'success'}
+          variant={typeof kpis.avg_mood === 'number' && kpis.avg_mood > 0 && kpis.avg_mood < 5 ? 'warning' : 'success'}
           onClick={() => console.log('Drill-down: Ánimo')}
         />
 
         <KPICard
           title={t('kpisSection.trainingCompleted')}
-          value={`${kpis.training_completion.toFixed(0)}%`}
-          chips={[`${kpis.checkins_count} ${t('kpisSection.checkinsPerWeek')}`]}
+          value={`${typeof kpis.training_completion === 'number' ? kpis.training_completion.toFixed(0) : '0'}%`}
+          chips={[`${kpis.checkins_count || 0} ${t('kpisSection.checkinsPerWeek')}`]}
           icon={BookOpen}
-          variant={kpis.training_completion < 70 ? 'warning' : 'success'}
+          variant={typeof kpis.training_completion === 'number' && kpis.training_completion < 70 ? 'warning' : 'success'}
           onClick={() => console.log('Drill-down: Formación')}
         />
       </div>
