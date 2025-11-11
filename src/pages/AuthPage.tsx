@@ -769,11 +769,26 @@ export function AuthPage() {
         </p>
       </div>
       </div>
+
+      <EmailVerificationCodeDialog
+        open={showEmailVerificationDialog}
+        onOpenChange={setShowEmailVerificationDialog}
+        email={registeredEmail}
+        userName={registeredUserName}
+        onSuccess={() => {
+          setShowEmailVerificationDialog(false);
+          setActiveTab("login");
+          toast({
+            title: "✅ Email verificado",
+            description: "Ahora puedes iniciar sesión",
+          });
+        }}
+      />
     </>
   );
 }
 
-function ForgotPasswordDialog({ 
+function ForgotPasswordDialog({
   open, 
   onOpenChange, 
   resetEmail, 

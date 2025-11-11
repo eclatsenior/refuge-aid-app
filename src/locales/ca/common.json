@@ -45,7 +45,14 @@
       "checkSpam": "Revisa la teva carpeta de correu brossa",
       "expiresIn": "L'enllaç expira en 24 hores",
       "resendSuccess": "Email de verificació reenviat correctament",
-      "resendError": "Error en reenviar l'email. Torna-ho a intentar."
+      "resendError": "Error en reenviar l'email. Torna-ho a intentar.",
+      "codeTitle": "Verifica el teu email",
+      "codeMessage": "T'hem enviat un codi de 6 dígits",
+      "codeExpires": "El codi expira en 15 minuts",
+      "verifyButton": "Verificar codi",
+      "resendCode": "No has rebut el codi? Reenviar",
+      "invalidCode": "Codi invàlid o expirat",
+      "verificationSuccess": "Email verificat correctament"
     },
     "passwordReset": {
       "title": "Recuperar contrasenya",

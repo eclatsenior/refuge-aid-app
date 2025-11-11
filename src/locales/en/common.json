@@ -45,7 +45,14 @@
       "checkSpam": "Check your spam or junk folder",
       "expiresIn": "Link expires in 24 hours",
       "resendSuccess": "Verification email resent successfully",
-      "resendError": "Error resending email. Please try again."
+      "resendError": "Error resending email. Please try again.",
+      "codeTitle": "Verify your email",
+      "codeMessage": "We've sent you a 6-digit code",
+      "codeExpires": "Code expires in 15 minutes",
+      "verifyButton": "Verify code",
+      "resendCode": "Didn't receive the code? Resend",
+      "invalidCode": "Invalid or expired code",
+      "verificationSuccess": "Email verified successfully"
     },
     "passwordReset": {
       "title": "Password recovery",
