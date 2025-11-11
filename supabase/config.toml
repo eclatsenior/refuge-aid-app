@@ -24,6 +24,12 @@ verify_jwt = false
 [functions.dashboard-kpis]
 verify_jwt = true
 
+[functions.track-app-session]
+verify_jwt = true
+
+[functions.track-video-progress]
+verify_jwt = true
+
 [functions.calculate-risk-scores]
 verify_jwt = true
 

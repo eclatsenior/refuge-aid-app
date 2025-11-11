@@ -303,6 +303,14 @@
     "allTrainings": "Todas las Formaciones",
     "noTraining": "Sin Formación",
     "detailPerEmployee": "Detalle por Empleada",
+    "totalModules": "Total Módulos",
+    "totalVideos": "videos totales",
+    "employeesWithProgress": "Empleadas con Progreso",
+    "ofTotal": "de {{total}}",
+    "employeesCompleted": "Empleadas que Completaron",
+    "moduleProgress": "Progreso por Módulo",
+    "employeeProgress": "Progreso por Empleada",
+    "videos": "videos",
     "courses": {
       "VG_101": "Violencia de Género 101",
       "ACOSO_PREV": "Prevención de Acoso"
@@ -333,6 +341,7 @@
     "employees": "empleadas",
     "evolutionTitle": "Evolución de Riesgo Promedio - 30 días",
     "scoreAverage": "Score Promedio",
+    "activityLevel": "Nivel de Actividad",
     "employeeDetailTitle": "Detalle por Empleada",
     "levels": {
       "low": "Bajo (0-30)",

@@ -303,6 +303,14 @@
     "allTrainings": "All Trainings",
     "noTraining": "No Training",
     "detailPerEmployee": "Detail by Employee",
+    "totalModules": "Total Modules",
+    "totalVideos": "total videos",
+    "employeesWithProgress": "Employees with Progress",
+    "ofTotal": "of {{total}}",
+    "employeesCompleted": "Employees Completed",
+    "moduleProgress": "Progress by Module",
+    "employeeProgress": "Progress by Employee",
+    "videos": "videos",
     "courses": {
       "VG_101": "Gender Violence 101",
       "ACOSO_PREV": "Harassment Prevention"
@@ -333,6 +341,7 @@
     "employees": "employees",
     "evolutionTitle": "Average Risk Evolution - 30 days",
     "scoreAverage": "Average Score",
+    "activityLevel": "Activity Level",
     "employeeDetailTitle": "Employee Details",
     "levels": {
       "low": "Low (0-30)",

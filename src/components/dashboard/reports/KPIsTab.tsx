@@ -48,14 +48,14 @@ export function KPIsTab({ employees }: { employees: any[] }) {
         setRiskTrend(aggregated);
       }
 
-      // Fetch incidents trend (last 4 weeks)
+      // Fetch incidents trend (last 4 weeks) - now using emergency_alerts
       const { data: incidentData } = await supabase
-        .from('incidents')
-        .select('opened_at')
-        .gte('opened_at', new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString());
+        .from('emergency_alerts')
+        .select('created_at')
+        .gte('created_at', new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString());
 
       if (incidentData) {
-        const byWeek = aggregateByWeek(incidentData, 'opened_at');
+        const byWeek = aggregateByWeek(incidentData, 'created_at');
         setIncidentsTrend(byWeek);
       }
     } finally {

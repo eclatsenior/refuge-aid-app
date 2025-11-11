@@ -295,10 +295,14 @@
     "employees": "موظفات",
     "evolutionTitle": "تطور متوسط المخاطر - 30 يوماً",
     "scoreAverage": "المتوسط",
+    "activityLevel": "مستوى النشاط",
     "employeeDetailTitle": "تفاصيل الموظفة",
     "levels": {
       "low": "منخفض (0-30)",
       "medium": "متوسط (31-60)",
+      "high": "مرتفع (61-100)"
+    }
+  },
       "high": "عالي (61-100)"
     }
   },

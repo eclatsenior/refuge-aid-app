@@ -111,5 +111,21 @@ export function useTherapyVideos() {
     return videos[`${routeId}-${moduleId}`];
   };
 
-  return { videos, loading, getVideoForModule, refresh: fetchVideos };
+  const markVideoAsCompleted = async (videoId: string, routeId: string, moduleId: string, watchedDuration: number) => {
+    try {
+      await supabase.functions.invoke('track-video-progress', {
+        body: {
+          video_id: videoId,
+          route_id: routeId,
+          module_id: moduleId,
+          watched_duration_seconds: Math.floor(watchedDuration)
+        }
+      });
+      console.debug('[useTherapyVideos] Video marked as completed:', videoId);
+    } catch (error) {
+      console.error('[useTherapyVideos] Error marking video as completed:', error);
+    }
+  };
+
+  return { videos, loading, getVideoForModule, markVideoAsCompleted, refresh: fetchVideos };
 }

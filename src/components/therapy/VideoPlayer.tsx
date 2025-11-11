@@ -6,16 +6,24 @@ import { Progress } from '@/components/ui/progress';
 interface VideoPlayerProps {
   videoUrl: string;
   videoName?: string;
+  videoId?: string;
+  routeId?: string;
+  moduleId?: string;
   onVideoEnd?: () => void;
   onVideoWatched?: (percentage: number) => void;
+  onVideoCompleted?: (videoId: string, routeId: string, moduleId: string, duration: number) => void;
   required?: boolean;
 }
 
 export function VideoPlayer({ 
   videoUrl, 
-  videoName, 
+  videoName,
+  videoId,
+  routeId,
+  moduleId,
   onVideoEnd, 
-  onVideoWatched, 
+  onVideoWatched,
+  onVideoCompleted,
   required = false 
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -69,6 +77,11 @@ export function VideoPlayer({
     const handleEnded = () => {
       setIsPlaying(false);
       onVideoEnd?.();
+      
+      // Track completion if 80%+ watched
+      if (watchedPercentage >= 80 && videoId && routeId && moduleId) {
+        onVideoCompleted?.(videoId, routeId, moduleId, video.currentTime);
+      }
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);

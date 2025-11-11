@@ -14,7 +14,49 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
 
   useEffect(() => {
     fetchRiskEvolution();
+    fetchActivityData();
   }, []);
+
+  const fetchActivityData = async () => {
+    try {
+      // Fetch average session count per day for last 30 days
+      const { data } = await supabase
+        .from('app_sessions')
+        .select('started_at, employee_id')
+        .gte('started_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+      if (data) {
+        const grouped: { [key: string]: Set<string> } = {};
+        data.forEach(item => {
+          const date = new Date(item.started_at).toLocaleDateString(i18n.language, { 
+            month: 'short', 
+            day: 'numeric' 
+          });
+          if (!grouped[date]) grouped[date] = new Set();
+          grouped[date].add(item.employee_id);
+        });
+        
+        const activityData = Object.entries(grouped).map(([date, employeeSet]) => ({
+          date,
+          activity: employeeSet.size
+        }));
+        
+        // Merge with risk evolution data
+        setRiskEvolution(prev => {
+          const merged = [...prev];
+          activityData.forEach(act => {
+            const existing = merged.find(r => r.date === act.date);
+            if (existing) {
+              existing.activity = act.activity;
+            }
+          });
+          return merged;
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching activity data:', error);
+    }
+  };
 
   const fetchRiskEvolution = async () => {
     try {
@@ -45,11 +87,32 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
     }
   };
 
-  // Distribution of risk levels
+  // Distribution of risk levels - now includes activity
   const riskDistribution = [
-    { name: t('risk.levels.low'), value: employees.filter(e => (e.risk_score || 0) <= 30).length, color: '#22c55e' },
-    { name: t('risk.levels.medium'), value: employees.filter(e => (e.risk_score || 0) > 30 && (e.risk_score || 0) <= 60).length, color: '#f59e0b' },
-    { name: t('risk.levels.high'), value: employees.filter(e => (e.risk_score || 0) > 60).length, color: '#ef4444' }
+    { 
+      name: t('risk.levels.low'), 
+      value: employees.filter(e => {
+        const risk = e.risk_score || 0;
+        return risk <= 30;
+      }).length, 
+      color: '#22c55e' 
+    },
+    { 
+      name: t('risk.levels.medium'), 
+      value: employees.filter(e => {
+        const risk = e.risk_score || 0;
+        return risk > 30 && risk <= 60;
+      }).length, 
+      color: '#f59e0b' 
+    },
+    { 
+      name: t('risk.levels.high'), 
+      value: employees.filter(e => {
+        const risk = e.risk_score || 0;
+        return risk > 60;
+      }).length, 
+      color: '#ef4444' 
+    }
   ];
 
   // Risk factors analysis
@@ -134,6 +197,7 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
               <Tooltip />
               <Legend />
               <Line type="monotone" dataKey="score" name={t('risk.scoreAverage')} stroke="hsl(var(--destructive))" strokeWidth={2} />
+              <Line type="monotone" dataKey="activity" name={t('risk.activityLevel')} stroke="hsl(var(--primary))" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>

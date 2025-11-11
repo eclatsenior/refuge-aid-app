@@ -333,10 +333,14 @@
     "employees": "empleades",
     "evolutionTitle": "Evolució de Risc Mitjà - 30 dies",
     "scoreAverage": "Puntuació Mitjana",
+    "activityLevel": "Nivell d'Activitat",
     "employeeDetailTitle": "Detall per Empleada",
     "levels": {
       "low": "Baix (0-30)",
       "medium": "Mitjà (31-60)",
+      "high": "Alt (61-100)"
+    }
+  },
       "high": "Alt (61-100)"
     }
   },
