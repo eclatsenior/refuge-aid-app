@@ -168,14 +168,20 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Verification code saved to database");
 
     // Enviar email con el código
-    const emailResponse = await resend.emails.send({
-      from: "Refugi <onboarding@resend.dev>",
+    const { data, error: emailError } = await resend.emails.send({
+      from: "Refugi <no-reply@eclatsenior.com.es>",
+      reply_to: ["soporte@eclatsenior.com.es"],
       to: [email],
       subject: "✨ Verifica tu cuenta de Refugi",
       html: getEmailTemplate(code, userName || "Usuario"),
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    if (emailError) {
+      console.error("Error sending email via Resend:", emailError);
+      throw new Error(`Failed to send email: ${emailError.message || JSON.stringify(emailError)}`);
+    }
+
+    console.log("Email sent successfully:", data);
 
     return new Response(
       JSON.stringify({ 
