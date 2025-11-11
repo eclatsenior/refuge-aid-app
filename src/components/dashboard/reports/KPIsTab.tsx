@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle } from "lucide-react";
+import { TrendingUp, TrendingDown, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface KPIData {
@@ -19,6 +20,7 @@ interface KPIData {
 }
 
 export function KPIsTab({ employees }: { employees: any[] }) {
+  const { t, i18n } = useTranslation('dashboard');
   const [kpis, setKpis] = useState<KPIData | null>(null);
   const [riskTrend, setRiskTrend] = useState<any[]>([]);
   const [incidentsTrend, setIncidentsTrend] = useState<any[]>([]);
@@ -64,7 +66,10 @@ export function KPIsTab({ employees }: { employees: any[] }) {
   const aggregateByDay = (data: any[], dateField: string, valueField: string) => {
     const grouped: { [key: string]: number[] } = {};
     data.forEach(item => {
-      const day = new Date(item[dateField]).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+      const day = new Date(item[dateField]).toLocaleDateString(i18n.language, { 
+        month: 'short', 
+        day: 'numeric' 
+      });
       if (!grouped[day]) grouped[day] = [];
       grouped[day].push(item[valueField]);
     });
@@ -75,7 +80,12 @@ export function KPIsTab({ employees }: { employees: any[] }) {
   };
 
   const aggregateByWeek = (data: any[], dateField: string) => {
-    const weeks = ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'];
+    const weeks = [
+      t('kpisTabs.weeks.week1'),
+      t('kpisTabs.weeks.week2'),
+      t('kpisTabs.weeks.week3'),
+      t('kpisTabs.weeks.week4')
+    ];
     const counts = [0, 0, 0, 0];
     data.forEach(item => {
       const daysAgo = Math.floor((Date.now() - new Date(item[dateField]).getTime()) / (24 * 60 * 60 * 1000));
@@ -98,7 +108,7 @@ export function KPIsTab({ employees }: { employees: any[] }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Riesgo Activo</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('kpisTabs.riskActive')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{kpis?.active_risk.score.toFixed(0) || 0}</div>
@@ -109,7 +119,7 @@ export function KPIsTab({ employees }: { employees: any[] }) {
                 <TrendingDown className="h-4 w-4 text-green-500 mr-1" />
               )}
               <span className={`${(kpis?.active_risk.trend_7d || 0) >= 0 ? 'text-destructive' : 'text-green-500'}`}>
-                {Math.abs(kpis?.active_risk.trend_7d || 0).toFixed(1)}% vs semana anterior
+                {Math.abs(kpis?.active_risk.trend_7d || 0).toFixed(1)}% {t('kpisTabs.vsPreviousWeek')}
               </span>
             </div>
           </CardContent>
@@ -117,38 +127,38 @@ export function KPIsTab({ employees }: { employees: any[] }) {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Incidentes Semana</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('kpisTabs.incidentsWeek')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{kpis?.incidents_week || 0}</div>
             <div className="flex items-center gap-2 mt-2">
-              <Badge variant="destructive">{kpis?.incidents_open || 0} abiertos</Badge>
-              <Badge variant="outline">{kpis?.incidents_in_progress || 0} en proceso</Badge>
+              <Badge variant="destructive">{kpis?.incidents_open || 0} {t('kpisTabs.open')}</Badge>
+              <Badge variant="outline">{kpis?.incidents_in_progress || 0} {t('kpisTabs.inProgress')}</Badge>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Ánimo Promedio</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('kpisTabs.averageMood')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{kpis?.avg_mood.toFixed(1) || 0}</div>
             <div className="text-sm text-muted-foreground mt-2">
-              {kpis?.checkins_count || 0} check-ins esta semana
+              {kpis?.checkins_count || 0} {t('kpisTabs.checkInsThisWeek')}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Formación</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('kpisTabs.training')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{kpis?.training_completion.toFixed(0) || 0}%</div>
             <div className="flex items-center mt-2 text-sm text-green-500">
               <CheckCircle className="h-4 w-4 mr-1" />
-              Completado
+              {t('kpisTabs.completed')}
             </div>
           </CardContent>
         </Card>
@@ -158,7 +168,7 @@ export function KPIsTab({ employees }: { employees: any[] }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Tendencia de Riesgo - 30 días</CardTitle>
+            <CardTitle>{t('kpisTabs.riskTrendTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -168,7 +178,7 @@ export function KPIsTab({ employees }: { employees: any[] }) {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="value" name="Score Promedio" stroke="hsl(var(--destructive))" strokeWidth={2} />
+                <Line type="monotone" dataKey="value" name={t('kpisTabs.scoreAverage')} stroke="hsl(var(--destructive))" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -176,7 +186,7 @@ export function KPIsTab({ employees }: { employees: any[] }) {
 
         <Card>
           <CardHeader>
-            <CardTitle>Incidentes por Semana</CardTitle>
+            <CardTitle>{t('kpisTabs.incidentsPerWeek')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -186,7 +196,7 @@ export function KPIsTab({ employees }: { employees: any[] }) {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="count" name="Incidentes" fill="hsl(var(--primary))" />
+                <Bar dataKey="count" name={t('kpisTabs.incidents')} fill="hsl(var(--primary))" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -196,7 +206,7 @@ export function KPIsTab({ employees }: { employees: any[] }) {
       {/* Top Risk Employees */}
       <Card>
         <CardHeader>
-          <CardTitle>Top 5 Empleadas en Riesgo</CardTitle>
+          <CardTitle>{t('kpisTabs.topRiskEmployees')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">

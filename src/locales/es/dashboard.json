@@ -307,5 +307,59 @@
       "VG_101": "Violencia de Género 101",
       "ACOSO_PREV": "Prevención de Acoso"
     }
+  },
+  "installBanner": {
+    "dismissed": "Banner ocultado",
+    "dismissedDescription": "Puedes instalar la app desde Configuración > Instalación",
+    "installed": "¡App instalada!",
+    "installedDescription": "Refugio se ha instalado correctamente en tu dispositivo",
+    "couldNotInstall": "No se pudo instalar",
+    "couldNotInstallDescription": "Intenta instalarlo desde la configuración del navegador",
+    "title": "Instala Refugio en tu dispositivo",
+    "description": "Accede más rápido y recibe notificaciones instantáneas instalando la app",
+    "seeInstructions": "Ver instrucciones",
+    "installNow": "Instalar ahora",
+    "later": "Más tarde",
+    "iosTitle": "Instalar en iPhone/iPad",
+    "iosDescription": "Para instalar Refugio en tu dispositivo iOS:",
+    "iosStep1": "Toca el botón de Compartir en Safari",
+    "iosStep2": "Desplázate hacia abajo y selecciona \"Añadir a pantalla de inicio\"",
+    "iosStep3": "Toca \"Añadir\" en la esquina superior derecha",
+    "iosNote": "💡 Nota: Esta función solo está disponible en Safari en iOS"
+  },
+  "risk": {
+    "distributionTitle": "Distribución de Riesgo",
+    "topFactorsTitle": "Principales Factores de Riesgo",
+    "employees": "empleadas",
+    "evolutionTitle": "Evolución de Riesgo Promedio - 30 días",
+    "scoreAverage": "Score Promedio",
+    "employeeDetailTitle": "Detalle por Empleada",
+    "levels": {
+      "low": "Bajo (0-30)",
+      "medium": "Medio (31-60)",
+      "high": "Alto (61-100)"
+    }
+  },
+  "kpisTabs": {
+    "riskActive": "Riesgo Activo",
+    "vsPreviousWeek": "vs semana anterior",
+    "incidentsWeek": "Incidentes Semana",
+    "open": "abiertos",
+    "inProgress": "en proceso",
+    "averageMood": "Ánimo Promedio",
+    "checkInsThisWeek": "check-ins esta semana",
+    "training": "Formación",
+    "completed": "Completado",
+    "riskTrendTitle": "Tendencia de Riesgo - 30 días",
+    "scoreAverage": "Score Promedio",
+    "incidentsPerWeek": "Incidentes por Semana",
+    "incidents": "Incidentes",
+    "topRiskEmployees": "Top 5 Empleadas en Riesgo",
+    "weeks": {
+      "week1": "Semana 1",
+      "week2": "Semana 2",
+      "week3": "Semana 3",
+      "week4": "Semana 4"
+    }
   }
 }

@@ -307,5 +307,59 @@
       "VG_101": "Gender Violence 101",
       "ACOSO_PREV": "Harassment Prevention"
     }
+  },
+  "installBanner": {
+    "dismissed": "Banner hidden",
+    "dismissedDescription": "You can install the app from Settings > Installation",
+    "installed": "App installed!",
+    "installedDescription": "Refugio has been successfully installed on your device",
+    "couldNotInstall": "Could not install",
+    "couldNotInstallDescription": "Try installing it from your browser settings",
+    "title": "Install Refugio on your device",
+    "description": "Access faster and receive instant notifications by installing the app",
+    "seeInstructions": "See instructions",
+    "installNow": "Install now",
+    "later": "Later",
+    "iosTitle": "Install on iPhone/iPad",
+    "iosDescription": "To install Refugio on your iOS device:",
+    "iosStep1": "Tap the Share button in Safari",
+    "iosStep2": "Scroll down and select \"Add to Home Screen\"",
+    "iosStep3": "Tap \"Add\" in the top right corner",
+    "iosNote": "💡 Note: This feature is only available in Safari on iOS"
+  },
+  "risk": {
+    "distributionTitle": "Risk Distribution",
+    "topFactorsTitle": "Top Risk Factors",
+    "employees": "employees",
+    "evolutionTitle": "Average Risk Evolution - 30 days",
+    "scoreAverage": "Average Score",
+    "employeeDetailTitle": "Employee Details",
+    "levels": {
+      "low": "Low (0-30)",
+      "medium": "Medium (31-60)",
+      "high": "High (61-100)"
+    }
+  },
+  "kpisTabs": {
+    "riskActive": "Active Risk",
+    "vsPreviousWeek": "vs previous week",
+    "incidentsWeek": "Incidents This Week",
+    "open": "open",
+    "inProgress": "in progress",
+    "averageMood": "Average Mood",
+    "checkInsThisWeek": "check-ins this week",
+    "training": "Training",
+    "completed": "Completed",
+    "riskTrendTitle": "Risk Trend - 30 days",
+    "scoreAverage": "Average Score",
+    "incidentsPerWeek": "Incidents per Week",
+    "incidents": "Incidents",
+    "topRiskEmployees": "Top 5 At-Risk Employees",
+    "weeks": {
+      "week1": "Week 1",
+      "week2": "Week 2",
+      "week3": "Week 3",
+      "week4": "Week 4"
+    }
   }
 }

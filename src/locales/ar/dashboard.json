@@ -269,5 +269,59 @@
       "VG_101": "العنف القائم على النوع الاجتماعي 101",
       "ACOSO_PREV": "منع التحرش"
     }
+  },
+  "installBanner": {
+    "dismissed": "تم إخفاء الشعار",
+    "dismissedDescription": "يمكنك تثبيت التطبيق من الإعدادات > التثبيت",
+    "installed": "تم تثبيت التطبيق!",
+    "installedDescription": "تم تثبيت Refugio بنجاح على جهازك",
+    "couldNotInstall": "تعذر التثبيت",
+    "couldNotInstallDescription": "حاول تثبيته من إعدادات المتصفح",
+    "title": "قم بتثبيت Refugio على جهازك",
+    "description": "وصول أسرع واستقبال إشعارات فورية من خلال تثبيت التطبيق",
+    "seeInstructions": "عرض التعليمات",
+    "installNow": "التثبيت الآن",
+    "later": "لاحقاً",
+    "iosTitle": "التثبيت على iPhone/iPad",
+    "iosDescription": "لتثبيت Refugio على جهاز iOS الخاص بك:",
+    "iosStep1": "انقر على زر المشاركة في Safari",
+    "iosStep2": "قم بالتمرير لأسفل وحدد \"إضافة إلى الشاشة الرئيسية\"",
+    "iosStep3": "انقر على \"إضافة\" في الزاوية العلوية اليمنى",
+    "iosNote": "💡 ملاحظة: هذه الميزة متاحة فقط في Safari على iOS"
+  },
+  "risk": {
+    "distributionTitle": "توزيع المخاطر",
+    "topFactorsTitle": "أهم عوامل الخطر",
+    "employees": "موظفات",
+    "evolutionTitle": "تطور متوسط المخاطر - 30 يوماً",
+    "scoreAverage": "المتوسط",
+    "employeeDetailTitle": "تفاصيل الموظفة",
+    "levels": {
+      "low": "منخفض (0-30)",
+      "medium": "متوسط (31-60)",
+      "high": "عالي (61-100)"
+    }
+  },
+  "kpisTabs": {
+    "riskActive": "المخاطر النشطة",
+    "vsPreviousWeek": "مقارنة بالأسبوع السابق",
+    "incidentsWeek": "حوادث الأسبوع",
+    "open": "مفتوحة",
+    "inProgress": "قيد المعالجة",
+    "averageMood": "متوسط المزاج",
+    "checkInsThisWeek": "تسجيلات هذا الأسبوع",
+    "training": "التدريب",
+    "completed": "مكتمل",
+    "riskTrendTitle": "اتجاه المخاطر - 30 يوماً",
+    "scoreAverage": "المتوسط",
+    "incidentsPerWeek": "حوادث لكل أسبوع",
+    "incidents": "حوادث",
+    "topRiskEmployees": "أعلى 5 موظفات في خطر",
+    "weeks": {
+      "week1": "الأسبوع 1",
+      "week2": "الأسبوع 2",
+      "week3": "الأسبوع 3",
+      "week4": "الأسبوع 4"
+    }
   }
 }

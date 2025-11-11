@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { getDateFnsLocale } from "@/lib/dateUtils";
 
 export function RiskAnalysisTab({ employees }: { employees: any[] }) {
+  const { t, i18n } = useTranslation('dashboard');
   const [riskEvolution, setRiskEvolution] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +27,10 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
       if (data) {
         const grouped: { [key: string]: number[] } = {};
         data.forEach(item => {
-          const date = new Date(item.calculated_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+          const date = new Date(item.calculated_at).toLocaleDateString(i18n.language, { 
+            month: 'short', 
+            day: 'numeric' 
+          });
           if (!grouped[date]) grouped[date] = [];
           grouped[date].push(item.score_int);
         });
@@ -41,9 +47,9 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
 
   // Distribution of risk levels
   const riskDistribution = [
-    { name: 'Bajo (0-30)', value: employees.filter(e => (e.risk_score || 0) <= 30).length, color: '#22c55e' },
-    { name: 'Medio (31-60)', value: employees.filter(e => (e.risk_score || 0) > 30 && (e.risk_score || 0) <= 60).length, color: '#f59e0b' },
-    { name: 'Alto (61-100)', value: employees.filter(e => (e.risk_score || 0) > 60).length, color: '#ef4444' }
+    { name: t('risk.levels.low'), value: employees.filter(e => (e.risk_score || 0) <= 30).length, color: '#22c55e' },
+    { name: t('risk.levels.medium'), value: employees.filter(e => (e.risk_score || 0) > 30 && (e.risk_score || 0) <= 60).length, color: '#f59e0b' },
+    { name: t('risk.levels.high'), value: employees.filter(e => (e.risk_score || 0) > 60).length, color: '#ef4444' }
   ];
 
   // Risk factors analysis
@@ -65,7 +71,7 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
         {/* Risk Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Distribución de Riesgo</CardTitle>
+            <CardTitle>{t('risk.distributionTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -94,7 +100,7 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
         {/* Top Risk Factors */}
         <Card>
           <CardHeader>
-            <CardTitle>Principales Factores de Riesgo</CardTitle>
+            <CardTitle>{t('risk.topFactorsTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -106,7 +112,7 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
                     </div>
                     <span className="font-medium">{factor}</span>
                   </div>
-                  <Badge variant="destructive">{count} empleadas</Badge>
+                  <Badge variant="destructive">{count} {t('risk.employees')}</Badge>
                 </div>
               ))}
             </div>
@@ -117,7 +123,7 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
       {/* Risk Evolution */}
       <Card>
         <CardHeader>
-          <CardTitle>Evolución de Riesgo Promedio - 30 días</CardTitle>
+          <CardTitle>{t('risk.evolutionTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -127,7 +133,7 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
               <YAxis domain={[0, 100]} />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="score" name="Score Promedio" stroke="hsl(var(--destructive))" strokeWidth={2} />
+              <Line type="monotone" dataKey="score" name={t('risk.scoreAverage')} stroke="hsl(var(--destructive))" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -136,7 +142,7 @@ export function RiskAnalysisTab({ employees }: { employees: any[] }) {
       {/* Employee Risk List */}
       <Card>
         <CardHeader>
-          <CardTitle>Detalle por Empleada</CardTitle>
+          <CardTitle>{t('risk.employeeDetailTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">

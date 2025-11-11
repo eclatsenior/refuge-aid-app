@@ -46,6 +46,11 @@ import caDashboard from '@/locales/ca/dashboard.json';
 import enDashboard from '@/locales/en/dashboard.json';
 import arDashboard from '@/locales/ar/dashboard.json';
 
+import esAdmin from '@/locales/es/admin.json';
+import caAdmin from '@/locales/ca/admin.json';
+import enAdmin from '@/locales/en/admin.json';
+import arAdmin from '@/locales/ar/admin.json';
+
 import esEmployees from '@/locales/es/employees.json';
 import caEmployees from '@/locales/ca/employees.json';
 import enEmployees from '@/locales/en/employees.json';
@@ -76,6 +81,7 @@ i18n
         resources: esResources,
         'settings-lead': esSettingsLead,
         dashboard: esDashboard,
+        admin: esAdmin,
         employees: esEmployees,
         alerts: esAlerts,
         subscription: esSubscription
@@ -90,6 +96,7 @@ i18n
         resources: caResources,
         'settings-lead': caSettingsLead,
         dashboard: caDashboard,
+        admin: caAdmin,
         employees: caEmployees,
         alerts: caAlerts,
         subscription: caSubscription
@@ -104,6 +111,7 @@ i18n
         resources: enResources,
         'settings-lead': enSettingsLead,
         dashboard: enDashboard,
+        admin: enAdmin,
         employees: enEmployees,
         alerts: enAlerts,
         subscription: enSubscription
@@ -118,6 +126,7 @@ i18n
         resources: arResources,
         'settings-lead': arSettingsLead,
         dashboard: arDashboard,
+        admin: arAdmin,
         employees: arEmployees,
         alerts: arAlerts,
         subscription: arSubscription

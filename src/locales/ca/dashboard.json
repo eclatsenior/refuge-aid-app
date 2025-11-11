@@ -307,5 +307,59 @@
       "VG_101": "Violència de Gènere 101",
       "ACOSO_PREV": "Prevenció d'Assetjament"
     }
+  },
+  "installBanner": {
+    "dismissed": "Bàner amagat",
+    "dismissedDescription": "Pots instal·lar l'app des de Configuració > Instal·lació",
+    "installed": "App instal·lada!",
+    "installedDescription": "Refugi s'ha instal·lat correctament al teu dispositiu",
+    "couldNotInstall": "No s'ha pogut instal·lar",
+    "couldNotInstallDescription": "Intenta instal·lar-lo des de la configuració del navegador",
+    "title": "Instal·la Refugi al teu dispositiu",
+    "description": "Accedeix més ràpid i rep notificacions instantànies instal·lant l'app",
+    "seeInstructions": "Veure instruccions",
+    "installNow": "Instal·lar ara",
+    "later": "Més tard",
+    "iosTitle": "Instal·lar a iPhone/iPad",
+    "iosDescription": "Per instal·lar Refugi al teu dispositiu iOS:",
+    "iosStep1": "Toca el botó de Compartir a Safari",
+    "iosStep2": "Desplaça't cap avall i selecciona \"Afegir a la pantalla d'inici\"",
+    "iosStep3": "Toca \"Afegir\" a la cantonada superior dreta",
+    "iosNote": "💡 Nota: Aquesta funció només està disponible a Safari a iOS"
+  },
+  "risk": {
+    "distributionTitle": "Distribució de Risc",
+    "topFactorsTitle": "Principals Factors de Risc",
+    "employees": "empleades",
+    "evolutionTitle": "Evolució de Risc Mitjà - 30 dies",
+    "scoreAverage": "Puntuació Mitjana",
+    "employeeDetailTitle": "Detall per Empleada",
+    "levels": {
+      "low": "Baix (0-30)",
+      "medium": "Mitjà (31-60)",
+      "high": "Alt (61-100)"
+    }
+  },
+  "kpisTabs": {
+    "riskActive": "Risc Actiu",
+    "vsPreviousWeek": "vs setmana anterior",
+    "incidentsWeek": "Incidents Setmana",
+    "open": "oberts",
+    "inProgress": "en procés",
+    "averageMood": "Ànim Mitjà",
+    "checkInsThisWeek": "check-ins aquesta setmana",
+    "training": "Formació",
+    "completed": "Completat",
+    "riskTrendTitle": "Tendència de Risc - 30 dies",
+    "scoreAverage": "Puntuació Mitjana",
+    "incidentsPerWeek": "Incidents per Setmana",
+    "incidents": "Incidents",
+    "topRiskEmployees": "Top 5 Empleades en Risc",
+    "weeks": {
+      "week1": "Setmana 1",
+      "week2": "Setmana 2",
+      "week3": "Setmana 3",
+      "week4": "Setmana 4"
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Download, X, Smartphone, Share } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 
 export const InstallAppBanner = () => {
+  const { t } = useTranslation('dashboard');
   const { canInstall, isInstalled, isIOS, install } = usePWAInstall();
   const [isDismissed, setIsDismissed] = useState(
     localStorage.getItem('pwa-banner-dismissed') === 'true'
@@ -29,8 +31,8 @@ export const InstallAppBanner = () => {
     setIsDismissed(true);
     localStorage.setItem('pwa-banner-dismissed', 'true');
     toast({
-      title: "Banner ocultado",
-      description: "Puedes instalar la app desde Configuración > Instalación"
+      title: t('installBanner.dismissed'),
+      description: t('installBanner.dismissedDescription')
     });
   };
 
@@ -44,13 +46,13 @@ export const InstallAppBanner = () => {
     
     if (success) {
       toast({
-        title: "¡App instalada!",
-        description: "Refugio se ha instalado correctamente en tu dispositivo"
+        title: t('installBanner.installed'),
+        description: t('installBanner.installedDescription')
       });
     } else {
       toast({
-        title: "No se pudo instalar",
-        description: "Intenta instalarlo desde la configuración del navegador",
+        title: t('installBanner.couldNotInstall'),
+        description: t('installBanner.couldNotInstallDescription'),
         variant: "destructive"
       });
     }
@@ -67,10 +69,10 @@ export const InstallAppBanner = () => {
             
             <div className="flex-1">
               <h3 className="font-semibold text-foreground mb-1">
-                📱 Instala Refugio en tu dispositivo
+                📱 {t('installBanner.title')}
               </h3>
               <p className="text-sm text-muted-foreground mb-3">
-                Accede más rápido y recibe notificaciones instantáneas instalando la app
+                {t('installBanner.description')}
               </p>
               
               <div className="flex gap-2">
@@ -80,7 +82,7 @@ export const InstallAppBanner = () => {
                   className="gap-2"
                 >
                   <Download className="h-4 w-4" />
-                  {isIOS ? 'Ver instrucciones' : 'Instalar ahora'}
+                  {isIOS ? t('installBanner.seeInstructions') : t('installBanner.installNow')}
                 </Button>
                 
                 <Button 
@@ -88,7 +90,7 @@ export const InstallAppBanner = () => {
                   size="sm"
                   variant="ghost"
                 >
-                  Más tarde
+                  {t('installBanner.later')}
                 </Button>
               </div>
             </div>
@@ -105,23 +107,23 @@ export const InstallAppBanner = () => {
         </div>
       </Card>
 
-      {/* Instrucciones para iOS */}
+      {/* iOS Instructions */}
       <Dialog open={showIOSInstructions} onOpenChange={setShowIOSInstructions}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Instalar en iPhone/iPad</DialogTitle>
+            <DialogTitle>{t('installBanner.iosTitle')}</DialogTitle>
             <DialogDescription className="text-left space-y-4 pt-4">
-              <p>Para instalar Refugio en tu dispositivo iOS:</p>
+              <p>{t('installBanner.iosDescription')}</p>
               
               <ol className="list-decimal list-inside space-y-2 text-sm">
-                <li>Toca el botón de <strong>Compartir</strong> <Share className="inline h-4 w-4" /> en Safari</li>
-                <li>Desplázate hacia abajo y selecciona <strong>"Añadir a pantalla de inicio"</strong></li>
-                <li>Toca <strong>"Añadir"</strong> en la esquina superior derecha</li>
+                <li>{t('installBanner.iosStep1')} <Share className="inline h-4 w-4" /></li>
+                <li>{t('installBanner.iosStep2')}</li>
+                <li>{t('installBanner.iosStep3')}</li>
               </ol>
 
               <div className="bg-muted p-3 rounded-lg">
                 <p className="text-xs text-muted-foreground">
-                  💡 <strong>Nota:</strong> Esta función solo está disponible en Safari en iOS
+                  {t('installBanner.iosNote')}
                 </p>
               </div>
             </DialogDescription>
