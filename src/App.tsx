@@ -25,6 +25,7 @@ import PaywallPage from "@/pages/PaywallPage";
 import SettingsPage from "@/pages/SettingsPage";
 import SettingsLeadPage from "@/pages/SettingsLeadPage";
 import AdminAssignSubscription from "@/pages/AdminAssignSubscription";
+import AdminCreateRefugiLeadTest from "@/pages/AdminCreateRefugiLeadTest";
 import { EmailVerifiedPage } from "@/pages/EmailVerifiedPage";
 import { AdminUploadVideosPage } from "@/pages/AdminUploadVideosPage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
@@ -141,6 +142,8 @@ const App = () => {
         return <SettingsLeadPage />;
       case "/admin/assign-subscription":
         return <AdminAssignSubscription />;
+      case "/admin/create-refugi-lead-test":
+        return <AdminCreateRefugiLeadTest />;
       case "/instalar":
         return <InstallPage onNavigate={handleNavigate} />;
       case "/stripe-test-secret":
@@ -166,7 +169,7 @@ const App = () => {
 
   const renderApp = () => {
     // FIRST: Handle administrative routes (no authentication or validation needed)
-    const adminRoutes = ["/admin/upload-videos", "/admin/assign-subscription"];
+    const adminRoutes = ["/admin/upload-videos", "/admin/assign-subscription", "/admin/create-refugi-lead-test"];
     if (adminRoutes.includes(currentPath)) {
       return renderCurrentPage();
     }
