@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { AlertCircle, Calendar, Users, ExternalLink, RefreshCw } from "lucide-react";
-import { getPlanNameByProductId } from "@/lib/subscriptionPlans";
+import { getTranslatedPlanName } from "@/lib/subscriptionPlans";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -90,7 +90,7 @@ export function SubscriptionStatus({
     );
   }
 
-  const planName = getPlanNameByProductId(subscription.product_id);
+  const planName = getTranslatedPlanName(subscription.product_id, t);
   const endDate = subscription.subscription_end 
     ? format(new Date(subscription.subscription_end), 'PPP', {
         locale: getDateFnsLocale(i18n.language)

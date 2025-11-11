@@ -67,6 +67,33 @@ export const SUBSCRIPTION_PLANS = {
   }
 } as const;
 
+// Mapeo de product_id a claves de traducción
+export const PLAN_TRANSLATION_KEYS: Record<string, string> = {
+  'prod_TD9UdEM6XDdBZT': 'planNames.individual',
+  'prod_TD9YFQnIPhkgz4': 'planNames.basic',
+  'prod_TD9o6VZUCKCnhB': 'planNames.intermediate',
+  'prod_TD9qO6wy051a2r': 'planNames.enterprise',
+};
+
+// Mapeo de características a claves de traducción
+export const FEATURE_TRANSLATION_KEYS: Record<string, string> = {
+  'Acceso completo a todas las funciones': 'features.fullAccess',
+  'Alertas de emergencia 24/7': 'features.emergencyAlerts247',
+  'Contactos de confianza ilimitados': 'features.unlimitedTrustedContacts',
+  'Notas cifradas y seguras': 'features.encryptedNotes',
+  'Seguimiento de estado de ánimo': 'features.moodTracking',
+  'Recursos terapéuticos': 'features.therapeuticResources',
+  'Soporte prioritario': 'features.prioritySupport',
+  'Dashboard completo': 'features.completeDashboard',
+  'Alertas de emergencia': 'features.emergencyAlerts',
+  'Registro de estado de ánimo': 'features.moodRegistry',
+  'Soporte básico': 'features.basicSupport',
+  'KPIs avanzados': 'features.advancedKPIs',
+  'Cola de atención': 'features.attentionQueue',
+  'Reportes personalizados': 'features.customReports',
+  'Soporte 24/7': 'features.support247',
+};
+
 export function getPlanByProductId(productId: string) {
   return Object.values(SUBSCRIPTION_PLANS).find(
     plan => plan.product_id === productId
@@ -76,4 +103,24 @@ export function getPlanByProductId(productId: string) {
 export function getPlanNameByProductId(productId: string): string {
   const plan = getPlanByProductId(productId);
   return plan?.name || 'Plan Desconocido';
+}
+
+// Nueva función para obtener el nombre traducido del plan
+export function getTranslatedPlanName(productId: string, t: (key: string) => string): string {
+  const translationKey = PLAN_TRANSLATION_KEYS[productId];
+  if (!translationKey) return t('planNames.unknown');
+  return t(translationKey);
+}
+
+// Función para obtener características traducidas
+export function getTranslatedFeature(feature: string, t: any, count?: number): string {
+  // Si la característica incluye un número de empleadas, extraerlo
+  const employeeMatch = feature.match(/^Hasta (\d+) empleadas$/);
+  if (employeeMatch) {
+    return t('features.upToEmployees', { count: employeeMatch[1] });
+  }
+  
+  const translationKey = FEATURE_TRANSLATION_KEYS[feature];
+  if (!translationKey) return feature;
+  return t(translationKey);
 }

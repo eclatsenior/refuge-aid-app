@@ -28,8 +28,39 @@
   },
   "planNames": {
     "basic": "Plan Básico",
+    "intermediate": "Plan Intermedio",
+    "enterprise": "Plan Empresarial",
     "standard": "Plan Estándar",
     "premium": "Plan Premium",
-    "individual": "Plan Individual"
+    "individual": "Refugi Individual",
+    "unknown": "Plan Desconocido"
+  },
+  "features": {
+    "fullAccess": "Acceso completo a todas las funciones",
+    "emergencyAlerts247": "Alertas de emergencia 24/7",
+    "unlimitedTrustedContacts": "Contactos de confianza ilimitados",
+    "encryptedNotes": "Notas cifradas y seguras",
+    "moodTracking": "Seguimiento de estado de ánimo",
+    "therapeuticResources": "Recursos terapéuticos",
+    "prioritySupport": "Soporte prioritario",
+    "upToEmployees": "Hasta {{count}} empleadas",
+    "completeDashboard": "Dashboard completo",
+    "emergencyAlerts": "Alertas de emergencia",
+    "moodRegistry": "Registro de estado de ánimo",
+    "basicSupport": "Soporte básico",
+    "advancedKPIs": "KPIs avanzados",
+    "attentionQueue": "Cola de atención",
+    "customReports": "Reportes personalizados",
+    "support247": "Soporte 24/7"
+  },
+  "ui": {
+    "mostPopular": "Más Popular",
+    "currentPlan": "Tu Plan Actual",
+    "perMonth": "/mes",
+    "maxEmployees": "empleadas máximo",
+    "cancelAnytime": "Cancela cuando quieras",
+    "securePayment": "Pago seguro procesado por Stripe. Tus datos están protegidos.",
+    "startSubscription": "Comenzar mi suscripción",
+    "individualPlanLabel": "Plan Individual"
   }
 }

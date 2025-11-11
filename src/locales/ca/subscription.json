@@ -28,8 +28,39 @@
   },
   "planNames": {
     "basic": "Pla Bàsic",
+    "intermediate": "Pla Intermedi",
+    "enterprise": "Pla Empresarial",
     "standard": "Pla Estàndard",
     "premium": "Pla Premium",
-    "individual": "Pla Individual"
+    "individual": "Refugi Individual",
+    "unknown": "Pla Desconegut"
+  },
+  "features": {
+    "fullAccess": "Accés complet a totes les funcions",
+    "emergencyAlerts247": "Alertes d'emergència 24/7",
+    "unlimitedTrustedContacts": "Contactes de confiança il·limitats",
+    "encryptedNotes": "Notes xifrades i segures",
+    "moodTracking": "Seguiment d'estat d'ànim",
+    "therapeuticResources": "Recursos terapèutics",
+    "prioritySupport": "Suport prioritari",
+    "upToEmployees": "Fins a {{count}} empleades",
+    "completeDashboard": "Dashboard complet",
+    "emergencyAlerts": "Alertes d'emergència",
+    "moodRegistry": "Registre d'estat d'ànim",
+    "basicSupport": "Suport bàsic",
+    "advancedKPIs": "KPIs avançats",
+    "attentionQueue": "Cua d'atenció",
+    "customReports": "Informes personalitzats",
+    "support247": "Suport 24/7"
+  },
+  "ui": {
+    "mostPopular": "Més Popular",
+    "currentPlan": "El Teu Pla Actual",
+    "perMonth": "/mes",
+    "maxEmployees": "empleades màxim",
+    "cancelAnytime": "Cancel·la quan vulguis",
+    "securePayment": "Pagament segur processat per Stripe. Les teves dades estan protegides.",
+    "startSubscription": "Començar la meva subscripció",
+    "individualPlanLabel": "Pla Individual"
   }
 }

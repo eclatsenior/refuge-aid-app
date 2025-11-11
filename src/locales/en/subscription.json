@@ -28,8 +28,39 @@
   },
   "planNames": {
     "basic": "Basic Plan",
+    "intermediate": "Intermediate Plan",
+    "enterprise": "Enterprise Plan",
     "standard": "Standard Plan",
     "premium": "Premium Plan",
-    "individual": "Individual Plan"
+    "individual": "Refugi Individual",
+    "unknown": "Unknown Plan"
+  },
+  "features": {
+    "fullAccess": "Full access to all features",
+    "emergencyAlerts247": "Emergency alerts 24/7",
+    "unlimitedTrustedContacts": "Unlimited trusted contacts",
+    "encryptedNotes": "Encrypted and secure notes",
+    "moodTracking": "Mood tracking",
+    "therapeuticResources": "Therapeutic resources",
+    "prioritySupport": "Priority support",
+    "upToEmployees": "Up to {{count}} employees",
+    "completeDashboard": "Complete dashboard",
+    "emergencyAlerts": "Emergency alerts",
+    "moodRegistry": "Mood registry",
+    "basicSupport": "Basic support",
+    "advancedKPIs": "Advanced KPIs",
+    "attentionQueue": "Attention queue",
+    "customReports": "Custom reports",
+    "support247": "24/7 Support"
+  },
+  "ui": {
+    "mostPopular": "Most Popular",
+    "currentPlan": "Your Current Plan",
+    "perMonth": "/month",
+    "maxEmployees": "employees maximum",
+    "cancelAnytime": "Cancel anytime",
+    "securePayment": "Secure payment processed by Stripe. Your data is protected.",
+    "startSubscription": "Start my subscription",
+    "individualPlanLabel": "Individual Plan"
   }
 }

@@ -28,8 +28,39 @@
   },
   "planNames": {
     "basic": "الخطة الأساسية",
+    "intermediate": "الخطة المتوسطة",
+    "enterprise": "الخطة المؤسسية",
     "standard": "الخطة القياسية",
     "premium": "الخطة المميزة",
-    "individual": "الخطة الفردية"
+    "individual": "Refugi الفردي",
+    "unknown": "خطة غير معروفة"
+  },
+  "features": {
+    "fullAccess": "وصول كامل لجميع الميزات",
+    "emergencyAlerts247": "تنبيهات طوارئ 24/7",
+    "unlimitedTrustedContacts": "جهات اتصال موثوقة غير محدودة",
+    "encryptedNotes": "ملاحظات مشفرة وآمنة",
+    "moodTracking": "تتبع الحالة المزاجية",
+    "therapeuticResources": "موارد علاجية",
+    "prioritySupport": "دعم ذو أولوية",
+    "upToEmployees": "حتى {{count}} موظفة",
+    "completeDashboard": "لوحة تحكم كاملة",
+    "emergencyAlerts": "تنبيهات الطوارئ",
+    "moodRegistry": "سجل الحالة المزاجية",
+    "basicSupport": "دعم أساسي",
+    "advancedKPIs": "مؤشرات أداء متقدمة",
+    "attentionQueue": "قائمة الانتظار للاهتمام",
+    "customReports": "تقارير مخصصة",
+    "support247": "دعم 24/7"
+  },
+  "ui": {
+    "mostPopular": "الأكثر شعبية",
+    "currentPlan": "خطتك الحالية",
+    "perMonth": "/شهر",
+    "maxEmployees": "موظفة كحد أقصى",
+    "cancelAnytime": "إلغاء في أي وقت",
+    "securePayment": "دفع آمن تتم معالجته بواسطة Stripe. بياناتك محمية.",
+    "startSubscription": "ابدأ اشتراكي",
+    "individualPlanLabel": "الخطة الفردية"
   }
 }

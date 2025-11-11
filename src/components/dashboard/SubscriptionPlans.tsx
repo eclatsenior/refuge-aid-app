@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
-import { SUBSCRIPTION_PLANS } from "@/lib/subscriptionPlans";
+import { SUBSCRIPTION_PLANS, getTranslatedPlanName, getTranslatedFeature } from "@/lib/subscriptionPlans";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -65,26 +65,28 @@ export function SubscriptionPlans({ currentProductId, onCheckoutStart }: Subscri
             {plan.popular && !isCurrentPlan && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-                  Más Popular
+                  {t('ui.mostPopular')}
                 </Badge>
               </div>
             )}
             {isCurrentPlan && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <Badge className="bg-primary text-primary-foreground">
-                  Tu Plan Actual
+                  {t('ui.currentPlan')}
                 </Badge>
               </div>
             )}
 
             <CardHeader className="text-center pb-4">
-              <CardTitle className="text-2xl">{plan.name}</CardTitle>
+              <CardTitle className="text-2xl">
+                {getTranslatedPlanName(plan.product_id, t)}
+              </CardTitle>
               <CardDescription>
                 <span className="text-4xl font-bold text-foreground">{plan.price}€</span>
-                <span className="text-muted-foreground">/mes</span>
+                <span className="text-muted-foreground">{t('ui.perMonth')}</span>
               </CardDescription>
               <p className="text-sm text-muted-foreground mt-2">
-                {plan.employee_limit} empleadas máximo
+                {plan.employee_limit} {t('ui.maxEmployees')}
               </p>
             </CardHeader>
 
@@ -93,7 +95,9 @@ export function SubscriptionPlans({ currentProductId, onCheckoutStart }: Subscri
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm">{feature}</span>
+                    <span className="text-sm">
+                      {getTranslatedFeature(feature, t, plan.employee_limit)}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -107,10 +111,10 @@ export function SubscriptionPlans({ currentProductId, onCheckoutStart }: Subscri
                 onClick={() => handleSubscribe(plan.price_id, plan.name)}
               >
                 {loadingPlanId === plan.price_id 
-                  ? "Procesando..." 
+                  ? t('plans.processing')
                   : isCurrentPlan 
-                    ? "Plan Actual" 
-                    : "Contratar Plan"
+                    ? t('plans.currentPlan')
+                    : t('plans.subscribe')
                 }
               </Button>
             </CardFooter>

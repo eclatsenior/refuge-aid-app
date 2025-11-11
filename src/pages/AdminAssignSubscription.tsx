@@ -6,13 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { SUBSCRIPTION_PLANS } from "@/lib/subscriptionPlans";
+import { SUBSCRIPTION_PLANS, getTranslatedPlanName } from "@/lib/subscriptionPlans";
+import { useTranslation } from 'react-i18next';
 
 export default function AdminAssignSubscription() {
   const [userEmail, setUserEmail] = useState("");
   const [selectedPlan, setSelectedPlan] = useState<keyof typeof SUBSCRIPTION_PLANS | "">("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation('subscription');
 
   const handleAssign = async () => {
     if (!userEmail || !selectedPlan) {
@@ -85,7 +87,7 @@ export default function AdminAssignSubscription() {
               <SelectContent>
                 {Object.entries(SUBSCRIPTION_PLANS).map(([key, plan]) => (
                   <SelectItem key={key} value={key}>
-                    {plan.name} - €{plan.price}/mes ({plan.employee_limit} empleadas)
+                    {getTranslatedPlanName(plan.product_id, t)} - €{plan.price}{t('ui.perMonth')} ({plan.employee_limit} {t('ui.maxEmployees')})
                   </SelectItem>
                 ))}
               </SelectContent>

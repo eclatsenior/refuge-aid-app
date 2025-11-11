@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ExternalLink } from "lucide-react";
 import { format } from 'date-fns';
 import { getDateFnsLocale } from '@/lib/dateUtils';
+import { getTranslatedPlanName } from '@/lib/subscriptionPlans';
 
 export function SubscriptionSettingsSection() {
   const { t, i18n } = useTranslation();
@@ -55,13 +56,7 @@ export function SubscriptionSettingsSection() {
 
   const getPlanName = () => {
     if (!subscription?.product_id) return t('settings-lead:subscription.noSubscription');
-    const products: Record<string, string> = {
-      'prod_TD9UPvCIbUg6iG': t('settings-lead:subscription.planNames.basic'),
-      'prod_TD9UX3KBJM3B0I': t('settings-lead:subscription.planNames.standard'),
-      'prod_TD9UlYvHdxbCo8': t('settings-lead:subscription.planNames.premium'),
-      'prod_TD9UdEM6XDdBZT': t('settings-lead:subscription.planNames.individual')
-    };
-    return products[subscription.product_id] || t('settings-lead:subscription.unknownPlan');
+    return getTranslatedPlanName(subscription.product_id, (key: string) => t(`subscription:${key}`));
   };
 
   const formatDate = (dateString: string | null) => {

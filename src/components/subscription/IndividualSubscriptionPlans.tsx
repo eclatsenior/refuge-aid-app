@@ -4,10 +4,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { SUBSCRIPTION_PLANS } from "@/lib/subscriptionPlans";
+import { SUBSCRIPTION_PLANS, getTranslatedPlanName, getTranslatedFeature } from "@/lib/subscriptionPlans";
+import { useTranslation } from 'react-i18next';
 
 export function IndividualSubscriptionPlans() {
   const { toast } = useToast();
+  const { t } = useTranslation('subscription');
   const [loading, setLoading] = useState(false);
 
   const individualPlan = SUBSCRIPTION_PLANS.individual;
@@ -40,16 +42,18 @@ export function IndividualSubscriptionPlans() {
       <CardHeader className="text-center bg-gradient-to-b from-primary/5 to-transparent pb-8">
         <div className="mb-4">
           <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-semibold rounded-full">
-            Plan Individual
+            {t('ui.individualPlanLabel')}
           </span>
         </div>
-        <CardTitle className="text-3xl font-bold">{individualPlan.name}</CardTitle>
+        <CardTitle className="text-3xl font-bold">
+          {getTranslatedPlanName(individualPlan.product_id, t)}
+        </CardTitle>
         <CardDescription className="text-2xl mt-4">
           <span className="text-5xl font-bold text-foreground">{individualPlan.price}€</span>
-          <span className="text-muted-foreground text-lg">/mes</span>
+          <span className="text-muted-foreground text-lg">{t('ui.perMonth')}</span>
         </CardDescription>
         <p className="text-sm text-muted-foreground mt-2">
-          Cancela cuando quieras
+          {t('ui.cancelAnytime')}
         </p>
       </CardHeader>
       
@@ -60,7 +64,9 @@ export function IndividualSubscriptionPlans() {
               <div className="mt-0.5">
                 <Check className="w-5 h-5 text-primary shrink-0" />
               </div>
-              <span className="text-sm leading-relaxed">{feature}</span>
+              <span className="text-sm leading-relaxed">
+                {getTranslatedFeature(feature, t)}
+              </span>
             </li>
           ))}
         </ul>
@@ -76,15 +82,14 @@ export function IndividualSubscriptionPlans() {
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Procesando...
+              {t('plans.processing')}
             </>
           ) : (
-            "Comenzar mi suscripción"
+            t('ui.startSubscription')
           )}
         </Button>
         <p className="text-xs text-center text-muted-foreground">
-          Pago seguro procesado por Stripe. 
-          Tus datos están protegidos.
+          {t('ui.securePayment')}
         </p>
       </CardFooter>
     </Card>
