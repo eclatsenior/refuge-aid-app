@@ -67,5 +67,43 @@
     "title": "Solicitudes de Reset de Caja Fuerte",
     "pending": "Solicitudes pendientes",
     "noRequests": "No hay solicitudes pendientes de reset de caja fuerte"
+  },
+  "notifications": {
+    "dataLoaded": "Datos cargados correctamente",
+    "dataUpdated": "La información se ha actualizado correctamente",
+    "dashboardUpdated": "Dashboard actualizado",
+    "errorLoading": "Error al cargar datos",
+    "errorLoadingDesc": "Hubo un problema al cargar la información del dashboard",
+    "errorUpdating": "Error",
+    "errorUpdatingDesc": "No se pudo actualizar la información",
+    "alertsEnabled": "✅ Alertas habilitadas",
+    "alertsEnabledDesc": "Recibirás alertas sonoras y notificaciones",
+    "alertsEnabledNoAudio": "Recibirás notificaciones (audio no disponible)",
+    "alertsDisabled": "Alertas deshabilitadas",
+    "alertsDisabledDesc": "Puedes habilitarlas más tarde desde la configuración",
+    "audioDisabled": "Audio deshabilitado",
+    "audioDisabledDesc": "Las alertas sonoras están desactivadas",
+    "audioEnabled": "Audio habilitado",
+    "audioEnabledDesc": "Las alertas sonoras están activadas",
+    "sessionClosed": "Sesión cerrada",
+    "sessionClosedDesc": "Has cerrado sesión correctamente",
+    "enableAlerts": "No se pudieron habilitar las alertas"
+  },
+  "actions": {
+    "disableAudioAlerts": "Deshabilitar alertas sonoras",
+    "enableAudioAlerts": "Habilitar alertas sonoras"
+  },
+  "plans": {
+    "title": "Planes Disponibles"
+  },
+  "emergencyAlerts": {
+    "title": "Alertas de Emergencia"
+  },
+  "employeeList": {
+    "title": "Empleadas Asignadas",
+    "searchPlaceholder": "Buscar empleadas...",
+    "noEmployees": "No hay empleadas",
+    "noEmployeesFiltered": "No se encontraron empleadas que coincidan con los filtros aplicados.",
+    "noEmployeesYet": "No tienes empleadas asignadas en este momento."
   }
 }

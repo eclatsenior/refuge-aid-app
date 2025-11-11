@@ -67,5 +67,43 @@
     "title": "Sol·licituds de Reset de Caixa Forta",
     "pending": "Sol·licituds pendents",
     "noRequests": "No hi ha sol·licituds pendents de reset de caixa forta"
+  },
+  "notifications": {
+    "dataLoaded": "Dades carregades correctament",
+    "dataUpdated": "La informació s'ha actualitzat correctament",
+    "dashboardUpdated": "Dashboard actualitzat",
+    "errorLoading": "Error en carregar dades",
+    "errorLoadingDesc": "Hi ha hagut un problema en carregar la informació del dashboard",
+    "errorUpdating": "Error",
+    "errorUpdatingDesc": "No s'ha pogut actualitzar la informació",
+    "alertsEnabled": "✅ Alertes habilitades",
+    "alertsEnabledDesc": "Rebràs alertes sonores i notificacions",
+    "alertsEnabledNoAudio": "Rebràs notificacions (àudio no disponible)",
+    "alertsDisabled": "Alertes deshabilitades",
+    "alertsDisabledDesc": "Pots habilitar-les més tard des de la configuració",
+    "audioDisabled": "Àudio deshabilitat",
+    "audioDisabledDesc": "Les alertes sonores estan desactivades",
+    "audioEnabled": "Àudio habilitat",
+    "audioEnabledDesc": "Les alertes sonores estan activades",
+    "sessionClosed": "Sessió tancada",
+    "sessionClosedDesc": "Has tancat la sessió correctament",
+    "enableAlerts": "No s'han pogut habilitar les alertes"
+  },
+  "actions": {
+    "disableAudioAlerts": "Deshabilitar alertes sonores",
+    "enableAudioAlerts": "Habilitar alertes sonores"
+  },
+  "plans": {
+    "title": "Plans Disponibles"
+  },
+  "emergencyAlerts": {
+    "title": "Alertes d'Emergència"
+  },
+  "employeeList": {
+    "title": "Empleades Assignades",
+    "searchPlaceholder": "Cercar empleades...",
+    "noEmployees": "No hi ha empleades",
+    "noEmployeesFiltered": "No s'han trobat empleades que coincideixin amb els filtres aplicats.",
+    "noEmployeesYet": "No tens empleades assignades en aquest moment."
   }
 }

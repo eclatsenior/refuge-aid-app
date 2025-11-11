@@ -81,7 +81,7 @@ export function TeamSettingsSection() {
           <div className="grid gap-4">
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">{t('settings-lead:team.currentLimit')}</span>
-              <Badge variant="outline">{limitEmployees} empleadas</Badge>
+              <Badge variant="outline">{limitEmployees} {t('settings-lead:team.employees')}</Badge>
             </div>
 
             <div className="flex justify-between items-center">
@@ -108,13 +108,13 @@ export function TeamSettingsSection() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="welcomeMessage">Mensaje</Label>
+            <Label htmlFor="welcomeMessage">{t('settings-lead:team.message')}</Label>
             <Textarea
               id="welcomeMessage"
               value={welcomeMessage}
               onChange={(e) => setWelcomeMessage(e.target.value)}
               rows={5}
-              placeholder="Escribe el mensaje de bienvenida para las nuevas empleadas..."
+              placeholder={t('settings-lead:team.messagePlaceholder')}
             />
           </div>
 
@@ -123,7 +123,7 @@ export function TeamSettingsSection() {
             disabled={isSaving}
             className="w-full"
           >
-            {isSaving ? "Guardando..." : t('settings-lead:team.saved')}
+            {isSaving ? t('settings-lead:team.saving') : t('settings-lead:account.save')}
           </Button>
         </CardContent>
       </Card>

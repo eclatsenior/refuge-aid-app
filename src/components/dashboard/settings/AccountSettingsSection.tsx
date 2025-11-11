@@ -63,7 +63,7 @@ export function AccountSettingsSection() {
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
-        title: "Error al guardar",
+        title: t('settings-lead:account.errorSaving'),
         variant: "destructive"
       });
     } finally {
@@ -153,7 +153,7 @@ export function AccountSettingsSection() {
                   variant="outline"
                   size="icon"
                   onClick={() => window.open(profile.company_website, '_blank')}
-                  title="Abrir sitio web"
+                  title={t('settings-lead:account.openWebsite')}
                 >
                   <ExternalLink className="h-4 w-4" />
                 </Button>
@@ -185,7 +185,7 @@ export function AccountSettingsSection() {
           disabled={isSaving}
           className="w-full"
         >
-          {isSaving ? "Guardando..." : t('settings-lead:account.save')}
+          {isSaving ? t('settings-lead:account.saving') : t('settings-lead:account.save')}
         </Button>
       </CardContent>
     </Card>

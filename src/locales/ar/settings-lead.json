@@ -6,7 +6,8 @@
     "notifications": "الإشعارات",
     "subscription": "الاشتراك",
     "dashboard": "لوحة التحكم",
-    "team": "الفريق"
+    "team": "الفريق",
+    "installation": "التثبيت"
   },
   "account": {
     "title": "معلومات الحساب",
@@ -22,7 +23,10 @@
     "companyName": "الشركة",
     "companyWebsite": "موقع الشركة الإلكتروني",
     "companyRole": "دورك في الشركة",
-    "companyInfoNote": "تم تسجيل هذه المعلومات عند إنشاء حسابك ولا يمكن تعديلها"
+    "companyInfoNote": "تم تسجيل هذه المعلومات عند إنشاء حسابك ولا يمكن تعديلها",
+    "saving": "جارٍ الحفظ...",
+    "errorSaving": "خطأ في الحفظ",
+    "openWebsite": "فتح الموقع"
   },
   "notifications": {
     "title": "تفضيلات الإشعارات",
@@ -45,7 +49,17 @@
     "employeesUsed": "الموظفات المسجلات",
     "manageSubscription": "إدارة الاشتراك",
     "viewPlans": "عرض الخطط المتاحة",
-    "manageInStripe": "إدارة في Stripe"
+    "manageInStripe": "إدارة في Stripe",
+    "errorOpening": "خطأ في فتح البوابة",
+    "tryAgainLater": "حاول مرة أخرى لاحقاً",
+    "noSubscription": "لا يوجد اشتراك",
+    "unknownPlan": "خطة غير معروفة",
+    "planNames": {
+      "basic": "الخطة الأساسية",
+      "standard": "الخطة القياسية",
+      "premium": "الخطة المميزة",
+      "individual": "الخطة الفردية"
+    }
   },
   "dashboard": {
     "title": "تفضيلات لوحة التحكم",
@@ -68,6 +82,44 @@
     "available": "متاح",
     "welcomeMessage": "رسالة الترحيب",
     "welcomeMessageDesc": "سيتم إرسال هذه الرسالة إلى الموظفات الجدد عند التسجيل",
-    "saved": "تم حفظ الإعداد"
+    "saved": "تم حفظ الإعداد",
+    "message": "رسالة",
+    "messagePlaceholder": "اكتب رسالة الترحيب للموظفات الجديدات...",
+    "saving": "جارٍ الحفظ...",
+    "employees": "موظفات"
+  },
+  "installation": {
+    "title": "حالة التطبيق",
+    "subtitle": "معلومات حول تثبيت Refugio",
+    "installed": "مُثبّت",
+    "installSuccess": "تم تثبيت التطبيق بنجاح",
+    "installDescription": "تم تثبيت Refugio على جهازك ويعمل بشكل صحيح.",
+    "installBenefits": "قم بتثبيت Refugio على جهازك من أجل:",
+    "benefit1": "وصول أسرع من شاشتك الرئيسية",
+    "benefit2": "إشعارات فورية للتنبيهات",
+    "benefit3": "يعمل بدون اتصال (دون إنترنت)",
+    "benefit4": "تجربة تطبيق أصلي",
+    "viewInstructions": "عرض تعليمات التثبيت",
+    "installApp": "تثبيت التطبيق",
+    "notAvailable": "التثبيت غير متاح في هذا المتصفح. حاول فتح Refugio في Chrome (Android) أو Safari (iOS).",
+    "shareTitle": "مشاركة مع الموظفات",
+    "shareDescription": "شارك رابط Refugio مع موظفاتك حتى يتمكنوا من تثبيته",
+    "copyLink": "نسخ الرابط",
+    "share": "مشاركة",
+    "linkCopied": "تم نسخ الرابط!",
+    "linkCopiedDescription": "يمكنك مشاركة هذا الرابط مع موظفاتك",
+    "errorCopying": "خطأ في النسخ",
+    "errorCopyingDescription": "تعذر نسخ الرابط",
+    "iosInstructions": "التثبيت على iPhone/iPad",
+    "iosStep1": "انقر على زر المشاركة في Safari",
+    "iosStep2": "مرر لأسفل واختر \"إضافة إلى الشاشة الرئيسية\"",
+    "iosStep3": "انقر على \"إضافة\" في الزاوية العلوية اليمنى",
+    "iosNote": "هذه الميزة متاحة فقط في Safari على iOS",
+    "resources": "الموارد",
+    "resourcesDescription": "أدلة وموارد حول التثبيت",
+    "resource1": "يتم تثبيت التحديثات تلقائياً",
+    "resource2": "يعمل التطبيق دون اتصال بعد التثبيت",
+    "resource3": "تلقي إشعارات فورية للتنبيهات",
+    "tip": "ستتمكن موظفاتك من تثبيت التطبيق مباشرة من هذا الرابط"
   }
 }

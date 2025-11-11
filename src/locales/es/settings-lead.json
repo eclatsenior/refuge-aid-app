@@ -6,7 +6,8 @@
     "notifications": "Notificaciones",
     "subscription": "Suscripción",
     "dashboard": "Dashboard",
-    "team": "Equipo"
+    "team": "Equipo",
+    "installation": "Instalación"
   },
   "account": {
     "title": "Información de Cuenta",
@@ -22,7 +23,10 @@
     "companyName": "Empresa",
     "companyWebsite": "Sitio web de la empresa",
     "companyRole": "Tu rol en la empresa",
-    "companyInfoNote": "Esta información se registró al crear tu cuenta y no puede modificarse"
+    "companyInfoNote": "Esta información se registró al crear tu cuenta y no puede modificarse",
+    "saving": "Guardando...",
+    "errorSaving": "Error al guardar",
+    "openWebsite": "Abrir sitio web"
   },
   "notifications": {
     "title": "Preferencias de Notificaciones",
@@ -45,7 +49,17 @@
     "employeesUsed": "Empleadas registradas",
     "manageSubscription": "Gestionar suscripción",
     "viewPlans": "Ver planes disponibles",
-    "manageInStripe": "Gestionar en Stripe"
+    "manageInStripe": "Gestionar en Stripe",
+    "errorOpening": "Error al abrir el portal",
+    "tryAgainLater": "Intenta de nuevo más tarde",
+    "noSubscription": "Sin suscripción",
+    "unknownPlan": "Plan Desconocido",
+    "planNames": {
+      "basic": "Plan Básico",
+      "standard": "Plan Estándar",
+      "premium": "Plan Premium",
+      "individual": "Plan Individual"
+    }
   },
   "dashboard": {
     "title": "Preferencias del Dashboard",
@@ -68,6 +82,44 @@
     "available": "Disponibles",
     "welcomeMessage": "Mensaje de bienvenida",
     "welcomeMessageDesc": "Este mensaje se enviará a las nuevas empleadas al registrarse",
-    "saved": "Configuración guardada"
+    "saved": "Configuración guardada",
+    "message": "Mensaje",
+    "messagePlaceholder": "Escribe el mensaje de bienvenida para las nuevas empleadas...",
+    "saving": "Guardando...",
+    "employees": "empleadas"
+  },
+  "installation": {
+    "title": "Estado de la Aplicación",
+    "subtitle": "Información sobre la instalación de Refugio",
+    "installed": "Instalada",
+    "installSuccess": "App instalada correctamente",
+    "installDescription": "Refugio está instalada en tu dispositivo y funcionando correctamente.",
+    "installBenefits": "Instala Refugio en tu dispositivo para:",
+    "benefit1": "Acceso más rápido desde tu pantalla de inicio",
+    "benefit2": "Notificaciones instantáneas de alertas",
+    "benefit3": "Funciona sin conexión (offline)",
+    "benefit4": "Experiencia de app nativa",
+    "viewInstructions": "Ver instrucciones de instalación",
+    "installApp": "Instalar aplicación",
+    "notAvailable": "La instalación no está disponible en este navegador. Intenta abrir Refugio en Chrome (Android) o Safari (iOS).",
+    "shareTitle": "Compartir con Empleadas",
+    "shareDescription": "Comparte el enlace de Refugio con tus empleadas para que puedan instalarlo",
+    "copyLink": "Copiar enlace",
+    "share": "Compartir",
+    "linkCopied": "¡Enlace copiado!",
+    "linkCopiedDescription": "Puedes compartir este enlace con tus empleadas",
+    "errorCopying": "Error al copiar",
+    "errorCopyingDescription": "No se pudo copiar el enlace",
+    "iosInstructions": "Instalar en iPhone/iPad",
+    "iosStep1": "Toca el botón de Compartir en Safari",
+    "iosStep2": "Desplázate hacia abajo y selecciona \"Añadir a pantalla de inicio\"",
+    "iosStep3": "Toca \"Añadir\" en la esquina superior derecha",
+    "iosNote": "Esta función solo está disponible en Safari en iOS",
+    "resources": "Recursos",
+    "resourcesDescription": "Guías y recursos sobre la instalación",
+    "resource1": "Las actualizaciones se instalan automáticamente",
+    "resource2": "La app funciona offline una vez instalada",
+    "resource3": "Recibe notificaciones instantáneas de alertas",
+    "tip": "Tus empleadas podrán instalar la app directamente desde este enlace"
   }
 }

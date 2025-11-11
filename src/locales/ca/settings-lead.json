@@ -6,7 +6,8 @@
     "notifications": "Notificacions",
     "subscription": "Subscripció",
     "dashboard": "Dashboard",
-    "team": "Equip"
+    "team": "Equip",
+    "installation": "Instal·lació"
   },
   "account": {
     "title": "Informació del Compte",
@@ -22,7 +23,10 @@
     "companyName": "Empresa",
     "companyWebsite": "Lloc web de l'empresa",
     "companyRole": "El teu rol a l'empresa",
-    "companyInfoNote": "Aquesta informació es va registrar en crear el teu compte i no es pot modificar"
+    "companyInfoNote": "Aquesta informació es va registrar en crear el teu compte i no es pot modificar",
+    "saving": "Guardant...",
+    "errorSaving": "Error en guardar",
+    "openWebsite": "Obrir lloc web"
   },
   "notifications": {
     "title": "Preferències de Notificacions",
@@ -45,7 +49,17 @@
     "employeesUsed": "Empleades registrades",
     "manageSubscription": "Gestionar subscripció",
     "viewPlans": "Veure plans disponibles",
-    "manageInStripe": "Gestionar a Stripe"
+    "manageInStripe": "Gestionar a Stripe",
+    "errorOpening": "Error en obrir el portal",
+    "tryAgainLater": "Intenta-ho més tard",
+    "noSubscription": "Sense subscripció",
+    "unknownPlan": "Pla Desconegut",
+    "planNames": {
+      "basic": "Pla Bàsic",
+      "standard": "Pla Estàndard",
+      "premium": "Pla Premium",
+      "individual": "Pla Individual"
+    }
   },
   "dashboard": {
     "title": "Preferències del Dashboard",
@@ -68,6 +82,44 @@
     "available": "Disponibles",
     "welcomeMessage": "Missatge de benvinguda",
     "welcomeMessageDesc": "Aquest missatge s'enviarà a les noves empleades en registrar-se",
-    "saved": "Configuració guardada"
+    "saved": "Configuració guardada",
+    "message": "Missatge",
+    "messagePlaceholder": "Escriu el missatge de benvinguda per a les noves empleades...",
+    "saving": "Guardant...",
+    "employees": "empleades"
+  },
+  "installation": {
+    "title": "Estat de l'Aplicació",
+    "subtitle": "Informació sobre la instal·lació de Refugio",
+    "installed": "Instal·lada",
+    "installSuccess": "App instal·lada correctament",
+    "installDescription": "Refugio està instal·lada al teu dispositiu i funcionant correctament.",
+    "installBenefits": "Instal·la Refugio al teu dispositiu per a:",
+    "benefit1": "Accés més ràpid des de la teva pantalla d'inici",
+    "benefit2": "Notificacions instantànies d'alertes",
+    "benefit3": "Funciona sense connexió (offline)",
+    "benefit4": "Experiència d'app nativa",
+    "viewInstructions": "Veure instruccions d'instal·lació",
+    "installApp": "Instal·lar aplicació",
+    "notAvailable": "La instal·lació no està disponible en aquest navegador. Intenta obrir Refugio a Chrome (Android) o Safari (iOS).",
+    "shareTitle": "Compartir amb Empleades",
+    "shareDescription": "Comparteix l'enllaç de Refugio amb les teves empleades perquè puguin instal·lar-lo",
+    "copyLink": "Copiar enllaç",
+    "share": "Compartir",
+    "linkCopied": "Enllaç copiat!",
+    "linkCopiedDescription": "Pots compartir aquest enllaç amb les teves empleades",
+    "errorCopying": "Error en copiar",
+    "errorCopyingDescription": "No s'ha pogut copiar l'enllaç",
+    "iosInstructions": "Instal·lar a iPhone/iPad",
+    "iosStep1": "Toca el botó de Compartir a Safari",
+    "iosStep2": "Desplaça't cap avall i selecciona \"Afegir a la pantalla d'inici\"",
+    "iosStep3": "Toca \"Afegir\" a la cantonada superior dreta",
+    "iosNote": "Aquesta funció només està disponible a Safari a iOS",
+    "resources": "Recursos",
+    "resourcesDescription": "Guies i recursos sobre la instal·lació",
+    "resource1": "Les actualitzacions s'instal·len automàticament",
+    "resource2": "L'app funciona offline un cop instal·lada",
+    "resource3": "Rep notificacions instantànies d'alertes",
+    "tip": "Les teves empleades podran instal·lar l'app directament des d'aquest enllaç"
   }
 }

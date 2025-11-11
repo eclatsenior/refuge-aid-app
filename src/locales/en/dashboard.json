@@ -67,5 +67,43 @@
     "title": "Vault Reset Requests",
     "pending": "Pending requests",
     "noRequests": "No pending vault reset requests"
+  },
+  "notifications": {
+    "dataLoaded": "Data loaded successfully",
+    "dataUpdated": "Information has been updated successfully",
+    "dashboardUpdated": "Dashboard updated",
+    "errorLoading": "Error loading data",
+    "errorLoadingDesc": "There was a problem loading the dashboard information",
+    "errorUpdating": "Error",
+    "errorUpdatingDesc": "Could not update information",
+    "alertsEnabled": "✅ Alerts enabled",
+    "alertsEnabledDesc": "You will receive audio alerts and notifications",
+    "alertsEnabledNoAudio": "You will receive notifications (audio not available)",
+    "alertsDisabled": "Alerts disabled",
+    "alertsDisabledDesc": "You can enable them later from settings",
+    "audioDisabled": "Audio disabled",
+    "audioDisabledDesc": "Audio alerts are disabled",
+    "audioEnabled": "Audio enabled",
+    "audioEnabledDesc": "Audio alerts are enabled",
+    "sessionClosed": "Session closed",
+    "sessionClosedDesc": "You have successfully logged out",
+    "enableAlerts": "Could not enable alerts"
+  },
+  "actions": {
+    "disableAudioAlerts": "Disable audio alerts",
+    "enableAudioAlerts": "Enable audio alerts"
+  },
+  "plans": {
+    "title": "Available Plans"
+  },
+  "emergencyAlerts": {
+    "title": "Emergency Alerts"
+  },
+  "employeeList": {
+    "title": "Assigned Employees",
+    "searchPlaceholder": "Search employees...",
+    "noEmployees": "No employees",
+    "noEmployeesFiltered": "No employees found matching the applied filters.",
+    "noEmployeesYet": "You have no assigned employees at this time."
   }
 }

@@ -80,7 +80,7 @@ export default function SettingsLeadPage({ onNavigate }: SettingsLeadPageProps =
             <TabsTrigger value="subscription">{t('settings-lead:tabs.subscription')}</TabsTrigger>
             <TabsTrigger value="dashboard">{t('settings-lead:tabs.dashboard')}</TabsTrigger>
             <TabsTrigger value="team">{t('settings-lead:tabs.team')}</TabsTrigger>
-            <TabsTrigger value="installation">Instalación</TabsTrigger>
+            <TabsTrigger value="installation">{t('settings-lead:tabs.installation')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="account">

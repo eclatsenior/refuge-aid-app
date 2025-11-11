@@ -44,22 +44,22 @@ export function SubscriptionSettingsSection() {
     } catch (error) {
       console.error('Error opening customer portal:', error);
       toast({
-        title: "Error al abrir el portal",
-        description: "Intenta de nuevo más tarde",
+        title: t('settings-lead:subscription.errorOpening'),
+        description: t('settings-lead:subscription.tryAgainLater'),
         variant: "destructive"
       });
     }
   };
 
   const getPlanName = () => {
-    if (!subscription?.product_id) return "Sin suscripción";
+    if (!subscription?.product_id) return t('settings-lead:subscription.noSubscription');
     const products: Record<string, string> = {
-      'prod_TD9UPvCIbUg6iG': 'Plan Inicial',
-      'prod_TD9UX3KBJM3B0I': 'Plan Intermedio',
-      'prod_TD9UlYvHdxbCo8': 'Plan Avanzado',
-      'prod_TD9UdEM6XDdBZT': 'Plan Individual'
+      'prod_TD9UPvCIbUg6iG': t('settings-lead:subscription.planNames.basic'),
+      'prod_TD9UX3KBJM3B0I': t('settings-lead:subscription.planNames.standard'),
+      'prod_TD9UlYvHdxbCo8': t('settings-lead:subscription.planNames.premium'),
+      'prod_TD9UdEM6XDdBZT': t('settings-lead:subscription.planNames.individual')
     };
-    return products[subscription.product_id] || "Plan Desconocido";
+    return products[subscription.product_id] || t('settings-lead:subscription.unknownPlan');
   };
 
   const formatDate = (dateString: string | null) => {

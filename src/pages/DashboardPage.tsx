@@ -83,13 +83,13 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
         ]);
         
         toast({
-          title: "Dashboard actualizado",
-          description: "Datos cargados correctamente",
+          title: t('notifications.dashboardUpdated'),
+          description: t('notifications.dataLoaded'),
         });
       } catch (error) {
         toast({
-          title: "Error al cargar datos",
-          description: "Hubo un problema al cargar la información del dashboard",
+          title: t('notifications.errorLoading'),
+          description: t('notifications.errorLoadingDesc'),
           variant: "destructive",
         });
       } finally {
@@ -147,16 +147,16 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
       setShowPermissionDialog(false);
       
       toast({
-        title: "✅ Alertas habilitadas",
+        title: t('notifications.alertsEnabled'),
         description: audioSuccess 
-          ? "Recibirás alertas sonoras y notificaciones" 
-          : "Recibirás notificaciones (audio no disponible)",
+          ? t('notifications.alertsEnabledDesc')
+          : t('notifications.alertsEnabledNoAudio'),
       });
     } catch (error) {
       console.error('Error enabling permissions:', error);
       toast({
-        title: "Error",
-        description: "No se pudieron habilitar las alertas",
+        title: t('notifications.errorUpdating'),
+        description: t('notifications.enableAlerts'),
         variant: "destructive"
       });
     }
@@ -167,8 +167,8 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
     setShowPermissionDialog(false);
     
     toast({
-      title: "Alertas deshabilitadas",
-      description: "Puedes habilitarlas más tarde desde la configuración",
+      title: t('notifications.alertsDisabled'),
+      description: t('notifications.alertsDisabledDesc'),
     });
   };
 
@@ -177,16 +177,16 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
       audioManager.disable();
       setAudioEnabled(false);
       toast({
-        title: "Audio deshabilitado",
-        description: "Las alertas sonoras están desactivadas"
+        title: t('notifications.audioDisabled'),
+        description: t('notifications.audioDisabledDesc')
       });
     } else {
       const success = await audioManager.initialize();
       setAudioEnabled(success);
       if (success) {
         toast({
-          title: "Audio habilitado",
-          description: "Las alertas sonoras están activadas"
+          title: t('notifications.audioEnabled'),
+          description: t('notifications.audioEnabledDesc')
         });
       }
     }
@@ -195,8 +195,8 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
   const handleLogout = () => {
     logout();
     toast({
-      title: "Sesión cerrada",
-      description: "Has cerrado sesión correctamente"
+      title: t('notifications.sessionClosed'),
+      description: t('notifications.sessionClosedDesc')
     });
   };
 
@@ -209,13 +209,13 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
         loadLeadSettings()
       ]);
       toast({
-        title: "Datos actualizados",
-        description: "La información se ha actualizado correctamente"
+        title: t('notifications.dashboardUpdated'),
+        description: t('notifications.dataUpdated')
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "No se pudo actualizar la información",
+        title: t('notifications.errorUpdating'),
+        description: t('notifications.errorUpdatingDesc'),
         variant: "destructive"
       });
     } finally {
@@ -276,7 +276,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
                 variant="ghost" 
                 size="sm"
                 onClick={toggleAudio}
-                title={audioEnabled ? "Deshabilitar alertas sonoras" : "Habilitar alertas sonoras"}
+                title={audioEnabled ? t('actions.disableAudioAlerts') : t('actions.enableAudioAlerts')}
               >
                 {audioEnabled ? (
                   <Volume2 className="h-4 w-4 text-primary" />
@@ -327,7 +327,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
           
           {showPlans && (
             <div className="animate-fade-in">
-              <h2 className="text-2xl font-bold text-center mb-6">Planes Disponibles</h2>
+              <h2 className="text-2xl font-bold text-center mb-6">{t('plans.title')}</h2>
               <SubscriptionPlans 
                 currentProductId={subscription?.product_id}
                 onCheckoutStart={() => setShowPlans(false)}
@@ -367,7 +367,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-destructive">
                 <AlertTriangle className="h-5 w-5" />
-                Alertas de Emergencia ({activeAlerts.length})
+                {t('emergencyAlerts.title')} ({activeAlerts.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -393,7 +393,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
               <div className="flex items-center gap-2">
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  Empleadas Asignadas ({filteredEmployees.length})
+                  {t('employeeList.title')} ({filteredEmployees.length})
                 </CardTitle>
                 
                 <div className="flex items-center space-x-2">
@@ -417,7 +417,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar empleadas..."
+                  placeholder={t('employeeList.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -446,12 +446,12 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
               <div className="text-center py-8">
                 <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground mb-2">
-                  No hay empleadas
+                  {t('employeeList.noEmployees')}
                 </h3>
                 <p className="text-muted-foreground">
                   {searchTerm || filterStatus !== 'all' 
-                    ? 'No se encontraron empleadas que coincidan con los filtros aplicados.'
-                    : 'No tienes empleadas asignadas en este momento.'
+                    ? t('employeeList.noEmployeesFiltered')
+                    : t('employeeList.noEmployeesYet')
                   }
                 </p>
               </div>

@@ -6,7 +6,8 @@
     "notifications": "Notifications",
     "subscription": "Subscription",
     "dashboard": "Dashboard",
-    "team": "Team"
+    "team": "Team",
+    "installation": "Installation"
   },
   "account": {
     "title": "Account Information",
@@ -22,7 +23,10 @@
     "companyName": "Company",
     "companyWebsite": "Company website",
     "companyRole": "Your role at the company",
-    "companyInfoNote": "This information was registered when you created your account and cannot be modified"
+    "companyInfoNote": "This information was registered when you created your account and cannot be modified",
+    "saving": "Saving...",
+    "errorSaving": "Error saving",
+    "openWebsite": "Open website"
   },
   "notifications": {
     "title": "Notification Preferences",
@@ -45,7 +49,17 @@
     "employeesUsed": "Registered employees",
     "manageSubscription": "Manage subscription",
     "viewPlans": "View available plans",
-    "manageInStripe": "Manage in Stripe"
+    "manageInStripe": "Manage in Stripe",
+    "errorOpening": "Error opening portal",
+    "tryAgainLater": "Try again later",
+    "noSubscription": "No subscription",
+    "unknownPlan": "Unknown Plan",
+    "planNames": {
+      "basic": "Basic Plan",
+      "standard": "Standard Plan",
+      "premium": "Premium Plan",
+      "individual": "Individual Plan"
+    }
   },
   "dashboard": {
     "title": "Dashboard Preferences",
@@ -68,6 +82,44 @@
     "available": "Available",
     "welcomeMessage": "Welcome message",
     "welcomeMessageDesc": "This message will be sent to new employees upon registration",
-    "saved": "Configuration saved"
+    "saved": "Configuration saved",
+    "message": "Message",
+    "messagePlaceholder": "Write the welcome message for new employees...",
+    "saving": "Saving...",
+    "employees": "employees"
+  },
+  "installation": {
+    "title": "App Status",
+    "subtitle": "Information about Refugio installation",
+    "installed": "Installed",
+    "installSuccess": "App installed successfully",
+    "installDescription": "Refugio is installed on your device and working properly.",
+    "installBenefits": "Install Refugio on your device to:",
+    "benefit1": "Faster access from your home screen",
+    "benefit2": "Instant alert notifications",
+    "benefit3": "Works offline",
+    "benefit4": "Native app experience",
+    "viewInstructions": "View installation instructions",
+    "installApp": "Install app",
+    "notAvailable": "Installation is not available in this browser. Try opening Refugio in Chrome (Android) or Safari (iOS).",
+    "shareTitle": "Share with Employees",
+    "shareDescription": "Share the Refugio link with your employees so they can install it",
+    "copyLink": "Copy link",
+    "share": "Share",
+    "linkCopied": "Link copied!",
+    "linkCopiedDescription": "You can share this link with your employees",
+    "errorCopying": "Error copying",
+    "errorCopyingDescription": "Could not copy the link",
+    "iosInstructions": "Install on iPhone/iPad",
+    "iosStep1": "Tap the Share button in Safari",
+    "iosStep2": "Scroll down and select \"Add to Home Screen\"",
+    "iosStep3": "Tap \"Add\" in the top right corner",
+    "iosNote": "This feature is only available in Safari on iOS",
+    "resources": "Resources",
+    "resourcesDescription": "Guides and resources about installation",
+    "resource1": "Updates are installed automatically",
+    "resource2": "The app works offline once installed",
+    "resource3": "Receive instant alert notifications",
+    "tip": "Your employees can install the app directly from this link"
   }
 }

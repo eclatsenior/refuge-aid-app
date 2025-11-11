@@ -5,6 +5,7 @@ import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 
 export const InstallationSettingsSection = () => {
+  const { t } = useTranslation();
   const { canInstall, isInstalled, isIOS, install } = usePWAInstall();
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
@@ -25,15 +27,15 @@ export const InstallationSettingsSection = () => {
       await navigator.clipboard.writeText(appUrl);
       setCopied(true);
       toast({
-        title: "¡Enlace copiado!",
-        description: "Puedes compartir este enlace con tus empleadas"
+        title: t('settings-lead:installation.linkCopied'),
+        description: t('settings-lead:installation.linkCopiedDescription')
       });
       
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       toast({
-        title: "Error al copiar",
-        description: "No se pudo copiar el enlace",
+        title: t('settings-lead:installation.errorCopying'),
+        description: t('settings-lead:installation.errorCopyingDescription'),
         variant: "destructive"
       });
     }
@@ -60,8 +62,8 @@ export const InstallationSettingsSection = () => {
     
     if (success) {
       toast({
-        title: "¡App instalada!",
-        description: "Refugio se ha instalado correctamente"
+        title: t('settings-lead:installation.installSuccess'),
+        description: t('settings-lead:installation.installDescription')
       });
     }
   };
@@ -75,17 +77,17 @@ export const InstallationSettingsSection = () => {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Smartphone className="h-5 w-5" />
-                Estado de la Aplicación
+                {t('settings-lead:installation.title')}
               </CardTitle>
               <CardDescription>
-                Información sobre la instalación de Refugio
+                {t('settings-lead:installation.subtitle')}
               </CardDescription>
             </div>
             
             {isInstalled && (
               <Badge variant="default" className="gap-1">
                 <CheckCircle className="h-3 w-3" />
-                Instalada
+                {t('settings-lead:installation.installed')}
               </Badge>
             )}
           </div>
@@ -95,22 +97,22 @@ export const InstallationSettingsSection = () => {
             <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="h-5 w-5 text-primary" />
-                <p className="font-semibold text-foreground">App instalada correctamente</p>
+                <p className="font-semibold text-foreground">{t('settings-lead:installation.installSuccess')}</p>
               </div>
               <p className="text-sm text-muted-foreground">
-                Refugio está instalada en tu dispositivo y funcionando correctamente.
+                {t('settings-lead:installation.installDescription')}
               </p>
             </div>
           ) : canInstall ? (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                Instala Refugio en tu dispositivo para:
+                {t('settings-lead:installation.installBenefits')}
               </p>
               <ul className="text-sm text-muted-foreground space-y-1 ml-4">
-                <li>• Acceso más rápido desde tu pantalla de inicio</li>
-                <li>• Notificaciones instantáneas de alertas</li>
-                <li>• Funciona sin conexión (offline)</li>
-                <li>• Experiencia de app nativa</li>
+                <li>• {t('settings-lead:installation.benefit1')}</li>
+                <li>• {t('settings-lead:installation.benefit2')}</li>
+                <li>• {t('settings-lead:installation.benefit3')}</li>
+                <li>• {t('settings-lead:installation.benefit4')}</li>
               </ul>
               
               {isIOS ? (
@@ -118,24 +120,24 @@ export const InstallationSettingsSection = () => {
                   <DialogTrigger asChild>
                     <Button className="w-full gap-2">
                       <Download className="h-4 w-4" />
-                      Ver instrucciones de instalación
+                      {t('settings-lead:installation.viewInstructions')}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Instalar en iPhone/iPad</DialogTitle>
+                      <DialogTitle>{t('settings-lead:installation.iosInstructions')}</DialogTitle>
                       <DialogDescription className="text-left space-y-4 pt-4">
-                        <p>Para instalar Refugio en tu dispositivo iOS:</p>
+                        <p>{t('settings-lead:installation.iosInstructions')}:</p>
                         
                         <ol className="list-decimal list-inside space-y-2 text-sm">
-                          <li>Toca el botón de <strong>Compartir</strong> <Share className="inline h-4 w-4" /> en Safari</li>
-                          <li>Desplázate hacia abajo y selecciona <strong>"Añadir a pantalla de inicio"</strong></li>
-                          <li>Toca <strong>"Añadir"</strong> en la esquina superior derecha</li>
+                          <li>{t('settings-lead:installation.iosStep1')} <Share className="inline h-4 w-4" /></li>
+                          <li>{t('settings-lead:installation.iosStep2')}</li>
+                          <li>{t('settings-lead:installation.iosStep3')}</li>
                         </ol>
 
                         <div className="bg-muted p-3 rounded-lg">
                           <p className="text-xs text-muted-foreground">
-                            💡 <strong>Nota:</strong> Esta función solo está disponible en Safari en iOS
+                            💡 <strong>{t('common:note')}:</strong> {t('settings-lead:installation.iosNote')}
                           </p>
                         </div>
                       </DialogDescription>
@@ -145,14 +147,14 @@ export const InstallationSettingsSection = () => {
               ) : (
                 <Button onClick={handleInstall} className="w-full gap-2">
                   <Download className="h-4 w-4" />
-                  Instalar aplicación
+                  {t('settings-lead:installation.installApp')}
                 </Button>
               )}
             </div>
           ) : (
             <div className="p-4 rounded-lg bg-muted">
               <p className="text-sm text-muted-foreground">
-                La instalación no está disponible en este navegador. Intenta abrir Refugio en Chrome (Android) o Safari (iOS).
+                {t('settings-lead:installation.notAvailable')}
               </p>
             </div>
           )}
@@ -164,10 +166,10 @@ export const InstallationSettingsSection = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Share className="h-5 w-5" />
-            Compartir con Empleadas
+            {t('settings-lead:installation.shareTitle')}
           </CardTitle>
           <CardDescription>
-            Comparte el enlace de Refugio con tus empleadas para que puedan instalarlo
+            {t('settings-lead:installation.shareDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -190,20 +192,20 @@ export const InstallationSettingsSection = () => {
           <div className="flex gap-2">
             <Button onClick={copyLink} variant="outline" className="flex-1 gap-2">
               <Copy className="h-4 w-4" />
-              Copiar enlace
+              {t('settings-lead:installation.copyLink')}
             </Button>
             
             {navigator.share && (
               <Button onClick={shareLink} variant="outline" className="flex-1 gap-2">
                 <Share className="h-4 w-4" />
-                Compartir
+                {t('settings-lead:installation.share')}
               </Button>
             )}
           </div>
 
           <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
             <p className="text-xs text-blue-800 dark:text-blue-200">
-              💡 <strong>Tip:</strong> Tus empleadas podrán instalar la app directamente desde este enlace
+              💡 <strong>Tip:</strong> {t('settings-lead:installation.tip')}
             </p>
           </div>
         </CardContent>
@@ -214,25 +216,25 @@ export const InstallationSettingsSection = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ExternalLink className="h-5 w-5" />
-            Recursos
+            {t('settings-lead:installation.resources')}
           </CardTitle>
           <CardDescription>
-            Guías y recursos sobre la instalación
+            {t('settings-lead:installation.resourcesDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2 text-sm">
             <li className="flex items-center gap-2 text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-primary"></span>
-              <span>Las actualizaciones se instalan automáticamente</span>
+              <span>{t('settings-lead:installation.resource1')}</span>
             </li>
             <li className="flex items-center gap-2 text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-primary"></span>
-              <span>La app funciona offline una vez instalada</span>
+              <span>{t('settings-lead:installation.resource2')}</span>
             </li>
             <li className="flex items-center gap-2 text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-primary"></span>
-              <span>Recibe notificaciones instantáneas de alertas</span>
+              <span>{t('settings-lead:installation.resource3')}</span>
             </li>
           </ul>
         </CardContent>
