@@ -240,7 +240,10 @@
     "lastMonth": "Último mes",
     "lastQuarter": "Último trimestre",
     "generatingPDF": "Generando PDF...",
-    "downloadPDF": "Descargar PDF"
+    "downloadPDF": "Descargar PDF",
+    "noData": "Sin datos",
+    "noActivity": "No hay actividad de las empleadas asignadas en el período seleccionado.",
+    "noProgress": "Aún no hay progreso de formación registrado."
   },
   "vaultResetSection": {
     "sectionTitle": "Solicitudes de Reset de Caja Fuerte",

@@ -19,11 +19,9 @@ export function TrainingTab({ employees }: { employees: any[] }) {
 
   const fetchTrainingData = async () => {
     try {
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get assigned employees
       const { data: assignments } = await supabase
         .from('employee_assignments')
         .select('employee_id')
@@ -99,7 +97,27 @@ export function TrainingTab({ employees }: { employees: any[] }) {
     };
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Si no hay progreso, mostrar estado vacío
+  if (videoProgress.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center">
+          <div className="text-muted-foreground space-y-2">
+            <p className="text-lg font-medium">{t('reporting.noData')}</p>
+            <p className="text-sm">{t('reporting.noProgress')}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const totalVideos = routes.reduce((sum, r) => sum + r.total_videos, 0);
   const employeesWithProgress = employees.filter(e => 

@@ -240,7 +240,10 @@
     "lastMonth": "Últim mes",
     "lastQuarter": "Últim trimestre",
     "generatingPDF": "Generant PDF...",
-    "downloadPDF": "Descarregar PDF"
+    "downloadPDF": "Descarregar PDF",
+    "noData": "Sense dades",
+    "noActivity": "No hi ha activitat de les empleades assignades en el període seleccionat.",
+    "noProgress": "Encara no hi ha progrés de formació registrat."
   },
   "vaultResetSection": {
     "sectionTitle": "Sol·licituds de Reset de Caixa Forta",

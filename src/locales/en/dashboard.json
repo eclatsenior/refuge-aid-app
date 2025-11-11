@@ -240,7 +240,10 @@
     "lastMonth": "Last month",
     "lastQuarter": "Last quarter",
     "generatingPDF": "Generating PDF...",
-    "downloadPDF": "Download PDF"
+    "downloadPDF": "Download PDF",
+    "noData": "No data",
+    "noActivity": "No activity from assigned employees in the selected period.",
+    "noProgress": "No training progress recorded yet."
   },
   "vaultResetSection": {
     "sectionTitle": "Vault Reset Requests",

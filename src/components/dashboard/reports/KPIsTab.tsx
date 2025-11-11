@@ -8,13 +8,14 @@ import { TrendingUp, TrendingDown, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface KPIData {
-  active_risk: { score: number; trend_7d: number; trend_30d: number };
+  has_data: boolean;
+  active_risk: { score: number | null; trend_7d: number | null; trend_30d: number | null };
   incidents_today: number;
   incidents_week: number;
   incidents_open: number;
   incidents_in_progress: number;
   incidents_closed: number;
-  avg_mood: number;
+  avg_mood: number | null;
   checkins_count: number;
   training_completion: number;
 }
@@ -110,11 +111,31 @@ export function KPIsTab({ employees }: { employees: any[] }) {
   };
 
   const topRiskEmployees = employees
-    .filter(e => e.risk_score)
+    .filter(e => typeof e.risk_score === 'number')
     .sort((a, b) => b.risk_score - a.risk_score)
     .slice(0, 5);
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Si no hay datos, mostrar estado vacío
+  if (!kpis?.has_data) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center">
+          <div className="text-muted-foreground space-y-2">
+            <p className="text-lg font-medium">{t('reporting.noData')}</p>
+            <p className="text-sm">{t('reporting.noActivity')}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -125,7 +146,9 @@ export function KPIsTab({ employees }: { employees: any[] }) {
             <CardTitle className="text-sm font-medium text-muted-foreground">{t('kpisTabs.riskActive')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{kpis?.active_risk.score.toFixed(0) || 0}</div>
+            <div className="text-3xl font-bold">
+              {typeof kpis?.active_risk?.score === 'number' ? kpis.active_risk.score.toFixed(0) : '0'}
+            </div>
             <div className="flex items-center mt-2 text-sm">
               {(kpis?.active_risk.trend_7d || 0) >= 0 ? (
                 <TrendingUp className="h-4 w-4 text-destructive mr-1" />
@@ -157,7 +180,9 @@ export function KPIsTab({ employees }: { employees: any[] }) {
             <CardTitle className="text-sm font-medium text-muted-foreground">{t('kpisTabs.averageMood')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{kpis?.avg_mood.toFixed(1) || 0}</div>
+            <div className="text-3xl font-bold">
+              {typeof kpis?.avg_mood === 'number' ? kpis.avg_mood.toFixed(1) : '-'}
+            </div>
             <div className="text-sm text-muted-foreground mt-2">
               {kpis?.checkins_count || 0} {t('kpisTabs.checkInsThisWeek')}
             </div>
@@ -179,73 +204,81 @@ export function KPIsTab({ employees }: { employees: any[] }) {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('kpisTabs.riskTrendTitle')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={riskTrend}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="value" name={t('kpisTabs.scoreAverage')} stroke="hsl(var(--destructive))" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      {(riskTrend.length > 0 || incidentsTrend.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {riskTrend.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('kpisTabs.riskTrendTitle')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={riskTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="value" name={t('kpisTabs.scoreAverage')} stroke="hsl(var(--destructive))" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('kpisTabs.incidentsPerWeek')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={incidentsTrend}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="count" name={t('kpisTabs.incidents')} fill="hsl(var(--primary))" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+          {incidentsTrend.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('kpisTabs.incidentsPerWeek')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={incidentsTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="week" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="count" name={t('kpisTabs.incidents')} fill="hsl(var(--primary))" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
 
       {/* Top Risk Employees */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('kpisTabs.topRiskEmployees')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {topRiskEmployees.map((emp, idx) => (
-              <div key={emp.employee_id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold">
-                    {idx + 1}
+      {topRiskEmployees.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('kpisTabs.topRiskEmployees')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {topRiskEmployees.map((emp, idx) => (
+                <div key={emp.employee_id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold">
+                      {idx + 1}
+                    </div>
+                    <div>
+                      <div className="font-medium">{emp.full_name}</div>
+                      <div className="text-sm text-muted-foreground">{emp.email}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-medium">{emp.full_name}</div>
-                    <div className="text-sm text-muted-foreground">{emp.email}</div>
+                  <div className="flex items-center gap-2">
+                    {emp.risk_chips?.map((chip: string, i: number) => (
+                      <Badge key={i} variant="outline" className="text-xs">{chip}</Badge>
+                    ))}
+                    <Badge variant="destructive" className="ml-2">{emp.risk_score}</Badge>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {emp.risk_chips?.map((chip: string, i: number) => (
-                    <Badge key={i} variant="outline" className="text-xs">{chip}</Badge>
-                  ))}
-                  <Badge variant="destructive" className="ml-2">{emp.risk_score}</Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

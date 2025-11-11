@@ -202,7 +202,10 @@
     "lastMonth": "الشهر الماضي",
     "lastQuarter": "الربع الأخير",
     "generatingPDF": "جاري إنشاء PDF...",
-    "downloadPDF": "تحميل PDF"
+    "downloadPDF": "تحميل PDF",
+    "noData": "لا توجد بيانات",
+    "noActivity": "لا يوجد نشاط من الموظفات المعينات في الفترة المحددة.",
+    "noProgress": "لم يتم تسجيل أي تقدم تدريبي بعد."
   },
   "vaultResetSection": {
     "sectionTitle": "طلبات إعادة تعيين الخزانة",

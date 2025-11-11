@@ -20,11 +20,9 @@ export function MoodTab({ employees }: { employees: any[] }) {
 
   const fetchMoodData = async () => {
     try {
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get assigned employees
       const { data: assignments } = await supabase
         .from('employee_assignments')
         .select('employee_id')
@@ -32,7 +30,6 @@ export function MoodTab({ employees }: { employees: any[] }) {
       
       const assignedEmployeeIds = assignments?.map(a => a.employee_id) || [];
 
-      // Fetch mood check-ins - FILTERED
       const { data: checkIns } = await supabase
         .from('mood_check_ins')
         .select('mood_level, created_at, employee_id')
@@ -91,83 +88,110 @@ export function MoodTab({ employees }: { employees: any[] }) {
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Si no hay check-ins, mostrar estado vacío
+  const hasMoodData = moodEvolution.length > 0 || moodDistribution.some(d => d.count > 0);
+  if (!hasMoodData) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center">
+          <div className="text-muted-foreground space-y-2">
+            <p className="text-lg font-medium">{t('reporting.noData')}</p>
+            <p className="text-sm">{t('reporting.noActivity')}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Evolution Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('mood.evolutionTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={moodEvolution}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis domain={[0, 10]} />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="mood" name={t('mood.averageMood')} stroke="hsl(var(--primary))" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      {moodEvolution.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('mood.evolutionTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={moodEvolution}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis domain={[0, 10]} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="mood" name={t('mood.averageMood')} stroke="hsl(var(--primary))" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Distribution Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('mood.distributionTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={moodDistribution}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="level" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" name={t('mood.checkIns')} fill="hsl(var(--primary))" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      {moodDistribution.some(d => d.count > 0) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('mood.distributionTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={moodDistribution}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="level" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" name={t('mood.checkIns')} fill="hsl(var(--primary))" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Per Employee Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('mood.employeeMoodTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {employeeMoods.map((emp) => (
-              <div key={emp.employee_id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <div className="flex-1">
-                  <div className="font-medium">{emp.full_name}</div>
-                  <div className="text-sm text-muted-foreground">{emp.email}</div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="text-sm text-muted-foreground">{t('mood.checkIns')}</div>
-                    <div className="font-medium">{emp.count}</div>
+      {employeeMoods.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('mood.employeeMoodTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {employeeMoods.map((emp) => (
+                <div key={emp.employee_id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <div className="flex-1">
+                    <div className="font-medium">{emp.full_name}</div>
+                    <div className="text-sm text-muted-foreground">{emp.email}</div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={parseFloat(emp.avg) < 5 ? "destructive" : parseFloat(emp.avg) < 7 ? "outline" : "secondary"}>
-                      {t('mood.average')}: {emp.avg}
-                    </Badge>
-                    {emp.trend !== 0 && (
-                      <Badge variant={emp.trend < 0 ? "destructive" : "secondary"} className="gap-1">
-                        {emp.trend < 0 ? <TrendingDown className="h-3 w-3" /> : <TrendingUp className="h-3 w-3" />}
-                        {Math.abs(emp.trend).toFixed(1)}
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className="text-sm text-muted-foreground">{t('mood.checkIns')}</div>
+                      <div className="font-medium">{emp.count}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={parseFloat(emp.avg) < 5 ? "destructive" : parseFloat(emp.avg) < 7 ? "outline" : "secondary"}>
+                        {t('mood.average')}: {emp.avg}
                       </Badge>
-                    )}
+                      {emp.trend !== 0 && (
+                        <Badge variant={emp.trend < 0 ? "destructive" : "secondary"} className="gap-1">
+                          {emp.trend < 0 ? <TrendingDown className="h-3 w-3" /> : <TrendingUp className="h-3 w-3" />}
+                          {Math.abs(emp.trend).toFixed(1)}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
