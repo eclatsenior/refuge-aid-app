@@ -46,6 +46,7 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3}'],
         maximumFileSizeToCacheInBytes: 500 * 1024 * 1024, // 500 MB para videos
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/v1\/object\/public\/therapy-videos\/.*/i,
@@ -62,14 +63,10 @@ export default defineConfig(({ mode }) => ({
             }
           },
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-            handler: 'NetworkFirst',
+            urlPattern: /^https:\/\/(?!.*\/storage\/v1\/object\/public\/therapy-videos\/).*\.supabase\.co\/.*/i,
+            handler: 'NetworkOnly',
             options: {
-              cacheName: 'supabase-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 // 24 horas
-              }
+              cacheName: 'supabase-api-bypass'
             }
           },
           {

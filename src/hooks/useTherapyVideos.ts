@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TherapyVideo {
@@ -13,30 +13,52 @@ export function useTherapyVideos() {
   const [videos, setVideos] = useState<Record<string, TherapyVideo>>({});
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        const { data, error } = await supabase
+  const fetchVideos = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('therapy_videos')
+        .select('*');
+
+      if (error) throw error;
+
+      // Si obtenemos 0 videos, reintentar una vez después de 1.5s
+      if (!data || data.length === 0) {
+        console.debug('[useTherapyVideos] Primera carga: 0 videos. Reintentando en 1.5s...');
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        const { data: retryData, error: retryError } = await supabase
           .from('therapy_videos')
           .select('*');
-
-        if (error) throw error;
-
+        
+        if (retryError) throw retryError;
+        
         const videoMap: Record<string, TherapyVideo> = {};
-        data?.forEach(video => {
+        retryData?.forEach(video => {
           const key = `${video.route_id}-${video.module_id}`;
           videoMap[key] = video;
         });
-
+        
+        setVideos(videoMap);
+        console.debug('[useTherapyVideos] Reintento exitoso. Videos:', Object.keys(videoMap));
+      } else {
+        const videoMap: Record<string, TherapyVideo> = {};
+        data.forEach(video => {
+          const key = `${video.route_id}-${video.module_id}`;
+          videoMap[key] = video;
+        });
+        
         setVideos(videoMap);
         console.debug('[useTherapyVideos] Loaded videos:', Object.keys(videoMap));
-      } catch (error) {
-        console.error('[useTherapyVideos] Error loading therapy videos:', error);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('[useTherapyVideos] Error loading therapy videos:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
     fetchVideos();
 
     // Suscripción Realtime para actualizaciones en vivo
@@ -69,14 +91,25 @@ export function useTherapyVideos() {
       )
       .subscribe();
 
+    // Recargar cuando el usuario vuelve a la pestaña
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.debug('[useTherapyVideos] Pestaña visible, recargando videos...');
+        fetchVideos();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       supabase.removeChannel(channel);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [fetchVideos]);
 
   const getVideoForModule = (routeId: string, moduleId: string) => {
     return videos[`${routeId}-${moduleId}`];
   };
 
-  return { videos, loading, getVideoForModule };
+  return { videos, loading, getVideoForModule, refresh: fetchVideos };
 }

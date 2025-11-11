@@ -7,9 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
-import { Upload, Trash2, Video, Lock } from 'lucide-react';
+import { Upload, Trash2, Video, Lock, RefreshCw } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import * as tus from 'tus-js-client';
+import { formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 const ROUTES = [
   { id: 'estabilizacion', name: 'Estabilización emocional' },
@@ -78,6 +80,8 @@ export function AdminUploadVideosPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [last413Error, setLast413Error] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   const [selectedRoute, setSelectedRoute] = useState('');
   const [selectedModule, setSelectedModule] = useState('');
@@ -100,11 +104,17 @@ export function AdminUploadVideosPage() {
   };
 
   const loadVideos = async () => {
-    const { data } = await supabase
-      .from('therapy_videos')
-      .select('*')
-      .order('created_at', { ascending: false });
-    setVideos(data || []);
+    setIsRefreshing(true);
+    try {
+      const { data } = await supabase
+        .from('therapy_videos')
+        .select('*')
+        .order('created_at', { ascending: false });
+      setVideos(data || []);
+      setLastRefresh(new Date());
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const handleUpload = async () => {
@@ -441,7 +451,23 @@ export function AdminUploadVideosPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Videos Subidos ({videos.length})</CardTitle>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Videos Subidos ({videos.length})</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Actualizado hace {formatDistanceToNow(lastRefresh, { locale: es, addSuffix: false })}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={loadVideos}
+                disabled={isRefreshing}
+              >
+                <RefreshCw size={16} className={`mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                Recargar
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -474,9 +500,19 @@ export function AdminUploadVideosPage() {
               ))}
 
               {videos.length === 0 && (
-                <p className="text-center text-muted-foreground py-8">
-                  No hay videos subidos todavía
-                </p>
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-2">
+                    No hay videos subidos todavía
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={loadVideos}
+                  >
+                    <RefreshCw size={14} className="mr-1" />
+                    Reintentar carga
+                  </Button>
+                </div>
               )}
             </div>
           </CardContent>
