@@ -53,21 +53,23 @@ serve(async (req) => {
     const userId = authData.user.id;
     console.log('User created with ID:', userId);
 
-    // Step 2: Create profile
-    console.log('Step 2: Creating profile...');
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .insert({
-        user_id: userId,
-        email: email,
-        full_name: fullName,
-        role: 'refugi_lead'
-      });
+    // Step 2: Wait for trigger to create profile (on_auth_user_created)
+    console.log('Step 2: Waiting for profile creation by trigger...');
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second for trigger
 
-    if (profileError) {
-      console.error('Profile error:', profileError);
-      throw new Error(`Failed to create profile: ${profileError.message}`);
+    // Verify profile was created
+    const { data: profileData, error: profileCheckError } = await supabaseAdmin
+      .from('profiles')
+      .select('user_id')
+      .eq('user_id', userId)
+      .single();
+
+    if (profileCheckError || !profileData) {
+      console.error('Profile check error:', profileCheckError);
+      throw new Error('Profile was not created by trigger');
     }
+
+    console.log('Profile created successfully by trigger');
 
     // Step 3: Create subscription with Basic Plan
     console.log('Step 3: Creating Basic Plan subscription...');
