@@ -12,7 +12,8 @@
     "nearLimit": "T'estàs acostant al límit del teu pla",
     "atLimit": "Has assolit el límit del teu pla",
     "error": "Error",
-    "errorDesc": "No s'ha pogut obrir el portal de gestió. Torna-ho a provar."
+    "errorDesc": "No s'ha pogut obrir el portal de gestió. Torna-ho a provar.",
+    "noDate": "No disponible"
   },
   "plans": {
     "current": "El Teu Pla Actual",

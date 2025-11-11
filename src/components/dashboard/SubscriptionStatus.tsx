@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { getDateFnsLocale } from '@/lib/dateUtils';
 
 interface SubscriptionStatusProps {
   subscription: {
@@ -28,7 +30,7 @@ export function SubscriptionStatus({
   onViewPlans 
 }: SubscriptionStatusProps) {
   const { toast } = useToast();
-  const { t } = useTranslation('subscription');
+  const { t, i18n } = useTranslation('subscription');
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -90,12 +92,10 @@ export function SubscriptionStatus({
 
   const planName = getPlanNameByProductId(subscription.product_id);
   const endDate = subscription.subscription_end 
-    ? new Date(subscription.subscription_end).toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+    ? format(new Date(subscription.subscription_end), 'PPP', {
+        locale: getDateFnsLocale(i18n.language)
       })
-    : 'No disponible';
+    : t('status.noDate');
 
   return (
     <Card className="border-primary">

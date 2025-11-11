@@ -12,7 +12,8 @@
     "nearLimit": "You are approaching your plan limit",
     "atLimit": "You have reached your plan limit",
     "error": "Error",
-    "errorDesc": "Could not open the management portal. Please try again."
+    "errorDesc": "Could not open the management portal. Please try again.",
+    "noDate": "Not available"
   },
   "plans": {
     "current": "Your Current Plan",

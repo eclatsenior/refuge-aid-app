@@ -7,9 +7,11 @@ import { useAppStore } from "@/store/useAppStore";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ExternalLink } from "lucide-react";
+import { format } from 'date-fns';
+import { getDateFnsLocale } from '@/lib/dateUtils';
 
 export function SubscriptionSettingsSection() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { subscription, assignedEmployees } = useAppStore();
   const { toast } = useToast();
 
@@ -64,7 +66,9 @@ export function SubscriptionSettingsSection() {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString('es-ES');
+    return format(new Date(dateString), 'PP', { 
+      locale: getDateFnsLocale(i18n.language) 
+    });
   };
 
   return (

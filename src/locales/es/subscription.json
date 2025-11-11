@@ -12,7 +12,8 @@
     "nearLimit": "Te estás acercando al límite de tu plan",
     "atLimit": "Has alcanzado el límite de tu plan",
     "error": "Error",
-    "errorDesc": "No se pudo abrir el portal de gestión. Intenta de nuevo."
+    "errorDesc": "No se pudo abrir el portal de gestión. Intenta de nuevo.",
+    "noDate": "No disponible"
   },
   "plans": {
     "current": "Tu Plan Actual",
