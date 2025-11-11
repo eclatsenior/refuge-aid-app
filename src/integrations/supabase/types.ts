@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_sessions: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          employee_id: string
+          ended_at: string | null
+          id: string
+          started_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          employee_id: string
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          employee_id?: string
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -892,6 +919,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      video_progress: {
+        Row: {
+          completed_at: string
+          created_at: string
+          employee_id: string
+          id: string
+          module_id: string
+          route_id: string
+          video_id: string
+          watched_duration_seconds: number | null
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          employee_id: string
+          id?: string
+          module_id: string
+          route_id: string
+          video_id: string
+          watched_duration_seconds?: number | null
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          employee_id?: string
+          id?: string
+          module_id?: string
+          route_id?: string
+          video_id?: string
+          watched_duration_seconds?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_progress_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "therapy_videos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
