@@ -54,10 +54,88 @@
       "unflaggedDesc": "S'ha tret la marca de seguiment"
     }
   },
+  "edit": {
+    "title": "Editar Empleada",
+    "description": "Modifica les dades de l'empleada",
+    "fullName": "Nom Complet",
+    "email": "Email",
+    "phone": "Telèfon",
+    "save": "Desar canvis",
+    "cancel": "Cancel·lar",
+    "saving": "Desant...",
+    "validations": {
+      "nameMin": "El nom ha de tenir almenys 3 caràcters",
+      "nameMax": "El nom no pot tenir més de 100 caràcters",
+      "emailInvalid": "L'email no és vàlid",
+      "emailMax": "L'email no pot tenir més de 255 caràcters",
+      "phoneInvalid": "El telèfon ha de ser un número espanyol vàlid"
+    }
+  },
+  "delete": {
+    "title": "Eliminar empleada?",
+    "description": "Aquesta acció és permanent i irreversible. S'eliminaran:",
+    "warning": "⚠️ Advertència: Aquesta acció no es pot desfer",
+    "warningMessages": "Tots els missatges i alertes",
+    "warningStatus": "Estat d'ànim i progrés terapèutic",
+    "warningAccess": "Accés a l'aplicació",
+    "employeeToDelete": "Empleada a eliminar:",
+    "confirmLabel": "Escriu el nom complet de l'empleada per confirmar",
+    "confirmPlaceholder": "Nom de l'empleada",
+    "confirmHint": "Escriu: {{name}}",
+    "confirmError": "El nom no coincideix",
+    "cancel": "Cancel·lar",
+    "delete": "Eliminar permanentment",
+    "deleting": "Eliminant..."
+  },
+  "card": {
+    "status": {
+      "emergency": "Emergència",
+      "offline": "Desconnectada",
+      "needsAttention": "Necessita atenció",
+      "good": "Bé",
+      "online": "En línia",
+      "noData": "Sense dades"
+    },
+    "mood": "Estat d'ànim",
+    "therapy": "Progrés terapèutic",
+    "lastCheckIn": "Últim check-in",
+    "connected": "Connectada",
+    "actions": {
+      "call": "Trucar",
+      "sms": "Enviar SMS",
+      "whatsapp": "WhatsApp",
+      "internalMessage": "Missatge intern",
+      "viewDetails": "Veure detalls",
+      "flagForFollowUp": "Marcar per seguiment",
+      "unflagForFollowUp": "Treure marca de seguiment",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "toast": {
+      "callInitiated": "Trucada iniciada",
+      "callInitiatedDesc": "Obrint aplicació de telèfon...",
+      "smsInitiated": "SMS iniciat",
+      "smsInitiatedDesc": "Obrint aplicació de missatges...",
+      "whatsappInitiated": "WhatsApp iniciat",
+      "whatsappInitiatedDesc": "Obrint WhatsApp...",
+      "flagged": "Marcada per seguiment",
+      "flaggedDesc": "L'empleada ha estat marcada per seguiment",
+      "unflagged": "Marca eliminada",
+      "unflaggedDesc": "S'ha tret la marca de seguiment"
+    }
+  },
   "notifications": {
     "registered": "Empleada registrada",
     "registeredDesc": "L'empleada ha estat registrada correctament",
+    "updated": "Empleada actualitzada",
+    "updatedDesc": "Les dades de {{name}} han estat actualitzades correctament",
+    "deleted": "Empleada eliminada",
+    "deletedDesc": "{{name}} ha estat eliminada del sistema",
     "error": "Error en registrar",
-    "errorDesc": "No s'ha pogut registrar l'empleada. Torna-ho a provar."
+    "errorDesc": "No s'ha pogut registrar l'empleada. Torna-ho a provar.",
+    "errorUpdating": "Error en actualitzar",
+    "errorUpdatingDesc": "No s'ha pogut actualitzar l'empleada. Torna-ho a provar.",
+    "errorDeleting": "Error en eliminar",
+    "errorDeletingDesc": "No s'ha pogut eliminar l'empleada. Torna-ho a provar."
   }
 }

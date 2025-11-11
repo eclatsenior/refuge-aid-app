@@ -54,10 +54,88 @@
       "unflaggedDesc": "Se ha quitado la marca de seguimiento"
     }
   },
+  "edit": {
+    "title": "Editar Empleada",
+    "description": "Modifica los datos de la empleada",
+    "fullName": "Nombre Completo",
+    "email": "Email",
+    "phone": "Teléfono",
+    "save": "Guardar cambios",
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "validations": {
+      "nameMin": "El nombre debe tener al menos 3 caracteres",
+      "nameMax": "El nombre no puede tener más de 100 caracteres",
+      "emailInvalid": "El email no es válido",
+      "emailMax": "El email no puede tener más de 255 caracteres",
+      "phoneInvalid": "El teléfono debe ser un número español válido"
+    }
+  },
+  "delete": {
+    "title": "¿Eliminar empleada?",
+    "description": "Esta acción es permanente e irreversible. Se eliminarán:",
+    "warning": "⚠️ Advertencia: Esta acción no se puede deshacer",
+    "warningMessages": "Todos los mensajes y alertas",
+    "warningStatus": "Estado de ánimo y progreso terapéutico",
+    "warningAccess": "Acceso a la aplicación",
+    "employeeToDelete": "Empleada a eliminar:",
+    "confirmLabel": "Escribe el nombre completo de la empleada para confirmar",
+    "confirmPlaceholder": "Nombre de la empleada",
+    "confirmHint": "Escribe: {{name}}",
+    "confirmError": "El nombre no coincide",
+    "cancel": "Cancelar",
+    "delete": "Eliminar permanentemente",
+    "deleting": "Eliminando..."
+  },
+  "card": {
+    "status": {
+      "emergency": "Emergencia",
+      "offline": "Desconectada",
+      "needsAttention": "Necesita atención",
+      "good": "Bien",
+      "online": "En línea",
+      "noData": "Sin datos"
+    },
+    "mood": "Estado de ánimo",
+    "therapy": "Progreso terapéutico",
+    "lastCheckIn": "Último check-in",
+    "connected": "Conectada",
+    "actions": {
+      "call": "Llamar",
+      "sms": "Enviar SMS",
+      "whatsapp": "WhatsApp",
+      "internalMessage": "Mensaje interno",
+      "viewDetails": "Ver detalles",
+      "flagForFollowUp": "Marcar para seguimiento",
+      "unflagForFollowUp": "Quitar marca de seguimiento",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "toast": {
+      "callInitiated": "Llamada iniciada",
+      "callInitiatedDesc": "Abriendo aplicación de teléfono...",
+      "smsInitiated": "SMS iniciado",
+      "smsInitiatedDesc": "Abriendo aplicación de mensajes...",
+      "whatsappInitiated": "WhatsApp iniciado",
+      "whatsappInitiatedDesc": "Abriendo WhatsApp...",
+      "flagged": "Marcada para seguimiento",
+      "flaggedDesc": "La empleada ha sido marcada para seguimiento",
+      "unflagged": "Marca eliminada",
+      "unflaggedDesc": "Se ha quitado la marca de seguimiento"
+    }
+  },
   "notifications": {
     "registered": "Empleada registrada",
     "registeredDesc": "La empleada ha sido registrada correctamente",
+    "updated": "Empleada actualizada",
+    "updatedDesc": "Los datos de {{name}} han sido actualizados correctamente",
+    "deleted": "Empleada eliminada",
+    "deletedDesc": "{{name}} ha sido eliminada del sistema",
     "error": "Error al registrar",
-    "errorDesc": "No se pudo registrar la empleada. Intenta de nuevo."
+    "errorDesc": "No se pudo registrar la empleada. Intenta de nuevo.",
+    "errorUpdating": "Error al actualizar",
+    "errorUpdatingDesc": "No se pudo actualizar la empleada. Intenta de nuevo.",
+    "errorDeleting": "Error al eliminar",
+    "errorDeletingDesc": "No se pudo eliminar la empleada. Intenta de nuevo."
   }
 }

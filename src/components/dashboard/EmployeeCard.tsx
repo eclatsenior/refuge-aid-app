@@ -10,7 +10,9 @@ import {
   Phone,
   MessageSquare,
   MoreVertical,
-  MessageCircle
+  MessageCircle,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +32,8 @@ import { getDateFnsLocale } from "@/lib/dateUtils";
 import { useToast } from "@/hooks/use-toast";
 import { useAppStore } from "@/store/useAppStore";
 import { MessageDialog } from "@/components/messaging/MessageDialog";
+import { EditEmployeeDialog } from "@/components/dashboard/EditEmployeeDialog";
+import { DeleteEmployeeDialog } from "@/components/dashboard/DeleteEmployeeDialog";
 import { useTranslation } from "react-i18next";
 
 interface EmployeeCardProps {
@@ -37,9 +41,11 @@ interface EmployeeCardProps {
 }
 
 export function EmployeeCard({ employee }: EmployeeCardProps) {
-  const { t, i18n } = useTranslation('dashboard');
+  const { t, i18n } = useTranslation(['dashboard', 'employees']);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showMessageDialog, setShowMessageDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { toast } = useToast();
   const { messages } = useAppStore();
 
@@ -199,6 +205,24 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
                   <Clock className="mr-2 h-4 w-4" />
                   {t('employeeCard.markFollowUp')}
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={(e) => {
+                  e.stopPropagation();
+                  setShowEditDialog(true);
+                }}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  {t('employees:card.actions.edit')}
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDeleteDialog(true);
+                  }}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t('employees:card.actions.delete')}
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -305,6 +329,30 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
         onClose={() => setShowMessageDialog(false)}
         recipientId={employee.employee_id}
         recipientName={employee.employee_name}
+      />
+      
+      <EditEmployeeDialog
+        employee={employee}
+        isOpen={showEditDialog}
+        onClose={() => setShowEditDialog(false)}
+        onEmployeeUpdated={() => {
+          toast({
+            title: t('employees:notifications.updated'),
+            description: t('employees:notifications.updatedDesc', { name: employee.employee_name })
+          });
+        }}
+      />
+
+      <DeleteEmployeeDialog
+        employee={employee}
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onEmployeeDeleted={() => {
+          toast({
+            title: t('employees:notifications.deleted'),
+            description: t('employees:notifications.deletedDesc', { name: employee.employee_name })
+          });
+        }}
       />
     </Card>
   );

@@ -54,10 +54,88 @@
       "unflaggedDesc": "تمت إزالة علامة المتابعة"
     }
   },
+  "edit": {
+    "title": "تعديل الموظفة",
+    "description": "تعديل بيانات الموظفة",
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "save": "حفظ التغييرات",
+    "cancel": "إلغاء",
+    "saving": "جاري الحفظ...",
+    "validations": {
+      "nameMin": "يجب أن يكون الاسم 3 أحرف على الأقل",
+      "nameMax": "لا يمكن أن يتجاوز الاسم 100 حرف",
+      "emailInvalid": "البريد الإلكتروني غير صالح",
+      "emailMax": "لا يمكن أن يتجاوز البريد الإلكتروني 255 حرفاً",
+      "phoneInvalid": "يجب أن يكون الهاتف رقماً إسبانياً صالحاً"
+    }
+  },
+  "delete": {
+    "title": "حذف الموظفة؟",
+    "description": "هذا الإجراء دائم ولا رجعة فيه. سيتم حذف:",
+    "warning": "⚠️ تحذير: لا يمكن التراجع عن هذا الإجراء",
+    "warningMessages": "جميع الرسائل والتنبيهات",
+    "warningStatus": "الحالة المزاجية والتقدم العلاجي",
+    "warningAccess": "الوصول إلى التطبيق",
+    "employeeToDelete": "الموظفة المراد حذفها:",
+    "confirmLabel": "اكتب الاسم الكامل للموظفة للتأكيد",
+    "confirmPlaceholder": "اسم الموظفة",
+    "confirmHint": "اكتب: {{name}}",
+    "confirmError": "الاسم غير مطابق",
+    "cancel": "إلغاء",
+    "delete": "حذف نهائي",
+    "deleting": "جاري الحذف..."
+  },
+  "card": {
+    "status": {
+      "emergency": "طوارئ",
+      "offline": "غير متصلة",
+      "needsAttention": "بحاجة إلى اهتمام",
+      "good": "جيد",
+      "online": "متصلة",
+      "noData": "لا توجد بيانات"
+    },
+    "mood": "الحالة المزاجية",
+    "therapy": "التقدم العلاجي",
+    "lastCheckIn": "آخر تسجيل دخول",
+    "connected": "متصلة",
+    "actions": {
+      "call": "اتصال",
+      "sms": "إرسال رسالة نصية",
+      "whatsapp": "واتساب",
+      "internalMessage": "رسالة داخلية",
+      "viewDetails": "عرض التفاصيل",
+      "flagForFollowUp": "وضع علامة للمتابعة",
+      "unflagForFollowUp": "إزالة علامة المتابعة",
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "toast": {
+      "callInitiated": "بدء الاتصال",
+      "callInitiatedDesc": "فتح تطبيق الهاتف...",
+      "smsInitiated": "بدء الرسالة النصية",
+      "smsInitiatedDesc": "فتح تطبيق الرسائل...",
+      "whatsappInitiated": "بدء واتساب",
+      "whatsappInitiatedDesc": "فتح واتساب...",
+      "flagged": "تم وضع علامة للمتابعة",
+      "flaggedDesc": "تم وضع علامة على الموظفة للمتابعة",
+      "unflagged": "تمت إزالة العلامة",
+      "unflaggedDesc": "تمت إزالة علامة المتابعة"
+    }
+  },
   "notifications": {
     "registered": "تم تسجيل الموظفة",
     "registeredDesc": "تم تسجيل الموظفة بنجاح",
+    "updated": "تم تحديث الموظفة",
+    "updatedDesc": "تم تحديث بيانات {{name}} بنجاح",
+    "deleted": "تم حذف الموظفة",
+    "deletedDesc": "تم حذف {{name}} من النظام",
     "error": "خطأ في التسجيل",
-    "errorDesc": "تعذر تسجيل الموظفة. يرجى المحاولة مرة أخرى."
+    "errorDesc": "تعذر تسجيل الموظفة. يرجى المحاولة مرة أخرى.",
+    "errorUpdating": "خطأ في التحديث",
+    "errorUpdatingDesc": "تعذر تحديث الموظفة. يرجى المحاولة مرة أخرى.",
+    "errorDeleting": "خطأ في الحذف",
+    "errorDeletingDesc": "تعذر حذف الموظفة. يرجى المحاولة مرة أخرى."
   }
 }

@@ -233,6 +233,8 @@ interface AppState {
   setupRealtimeSubscriptions: () => (() => void) | undefined;
   updateEmployeePresence: (isOnline?: boolean) => Promise<void>;
   registerEmployee: (data: { email: string; fullName: string; password: string; phone?: string }) => Promise<void>;
+  updateEmployee: (employeeId: string, data: { fullName?: string; email?: string; phone?: string }) => Promise<void>;
+  deleteEmployee: (employeeId: string) => Promise<void>;
   loadVaultResetRequests: () => Promise<void>;
   approveVaultReset: (requestId: string, notes?: string) => Promise<void>;
   rejectVaultReset: (requestId: string, notes?: string) => Promise<void>;
@@ -921,6 +923,66 @@ export const useAppStore = create<AppState>()(
           console.log('✅ Employee registered successfully:', result);
         } catch (error: any) {
           console.error('❌ Error registering employee:', error);
+          throw error;
+        }
+      },
+
+      // Update employee
+      updateEmployee: async (employeeId: string, data: { fullName?: string; email?: string; phone?: string }) => {
+        try {
+          const { user } = get();
+          if (!user) throw new Error('No estás autenticado');
+
+          console.log('✏️ Updating employee:', employeeId);
+
+          const { data: result, error } = await supabase.functions.invoke('update-employee', {
+            body: {
+              employeeId,
+              fullName: data.fullName,
+              email: data.email,
+              phone: data.phone,
+              refugiLeadId: user.id,
+            },
+          });
+
+          if (error) throw error;
+          if (!result?.success) throw new Error(result?.message || 'Error al actualizar empleada');
+
+          console.log('✅ Employee updated successfully:', result);
+
+          // Reload employee data to show changes
+          await get().loadEmployeeData();
+        } catch (error: any) {
+          console.error('❌ Error updating employee:', error);
+          throw error;
+        }
+      },
+
+      // Delete employee
+      deleteEmployee: async (employeeId: string) => {
+        try {
+          const { user } = get();
+          if (!user) throw new Error('No estás autenticado');
+
+          console.log('🗑️ Deleting employee:', employeeId);
+
+          const { data: result, error } = await supabase.functions.invoke('delete-employee', {
+            body: {
+              employeeId,
+              refugiLeadId: user.id,
+            },
+          });
+
+          if (error) throw error;
+          if (!result?.success) throw new Error(result?.message || 'Error al eliminar empleada');
+
+          console.log('✅ Employee deleted successfully:', result);
+
+          // Reload employee data and subscription status
+          await get().loadEmployeeData();
+          await get().loadSubscriptionStatus();
+        } catch (error: any) {
+          console.error('❌ Error deleting employee:', error);
           throw error;
         }
       },

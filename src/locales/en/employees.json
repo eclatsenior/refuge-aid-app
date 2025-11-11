@@ -54,10 +54,88 @@
       "unflaggedDesc": "Follow-up flag has been removed"
     }
   },
+  "edit": {
+    "title": "Edit Employee",
+    "description": "Modify employee data",
+    "fullName": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "save": "Save changes",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "validations": {
+      "nameMin": "Name must be at least 3 characters",
+      "nameMax": "Name cannot exceed 100 characters",
+      "emailInvalid": "Email is invalid",
+      "emailMax": "Email cannot exceed 255 characters",
+      "phoneInvalid": "Phone must be a valid Spanish number"
+    }
+  },
+  "delete": {
+    "title": "Delete employee?",
+    "description": "This action is permanent and irreversible. The following will be deleted:",
+    "warning": "⚠️ Warning: This action cannot be undone",
+    "warningMessages": "All messages and alerts",
+    "warningStatus": "Mood status and therapy progress",
+    "warningAccess": "Access to the application",
+    "employeeToDelete": "Employee to delete:",
+    "confirmLabel": "Type the employee's full name to confirm",
+    "confirmPlaceholder": "Employee name",
+    "confirmHint": "Type: {{name}}",
+    "confirmError": "Name does not match",
+    "cancel": "Cancel",
+    "delete": "Delete permanently",
+    "deleting": "Deleting..."
+  },
+  "card": {
+    "status": {
+      "emergency": "Emergency",
+      "offline": "Offline",
+      "needsAttention": "Needs attention",
+      "good": "Good",
+      "online": "Online",
+      "noData": "No data"
+    },
+    "mood": "Mood",
+    "therapy": "Therapy progress",
+    "lastCheckIn": "Last check-in",
+    "connected": "Connected",
+    "actions": {
+      "call": "Call",
+      "sms": "Send SMS",
+      "whatsapp": "WhatsApp",
+      "internalMessage": "Internal message",
+      "viewDetails": "View details",
+      "flagForFollowUp": "Flag for follow-up",
+      "unflagForFollowUp": "Remove follow-up flag",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "toast": {
+      "callInitiated": "Call initiated",
+      "callInitiatedDesc": "Opening phone app...",
+      "smsInitiated": "SMS initiated",
+      "smsInitiatedDesc": "Opening messages app...",
+      "whatsappInitiated": "WhatsApp initiated",
+      "whatsappInitiatedDesc": "Opening WhatsApp...",
+      "flagged": "Flagged for follow-up",
+      "flaggedDesc": "Employee has been flagged for follow-up",
+      "unflagged": "Flag removed",
+      "unflaggedDesc": "Follow-up flag has been removed"
+    }
+  },
   "notifications": {
     "registered": "Employee registered",
     "registeredDesc": "Employee has been registered successfully",
+    "updated": "Employee updated",
+    "updatedDesc": "{{name}}'s data has been updated successfully",
+    "deleted": "Employee deleted",
+    "deletedDesc": "{{name}} has been removed from the system",
     "error": "Registration error",
-    "errorDesc": "Could not register employee. Please try again."
+    "errorDesc": "Could not register employee. Please try again.",
+    "errorUpdating": "Update error",
+    "errorUpdatingDesc": "Could not update employee. Please try again.",
+    "errorDeleting": "Deletion error",
+    "errorDeletingDesc": "Could not delete employee. Please try again."
   }
 }

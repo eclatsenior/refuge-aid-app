@@ -33,6 +33,12 @@ verify_jwt = true
 [functions.register-employee]
 verify_jwt = true
 
+[functions.update-employee]
+verify_jwt = true
+
+[functions.delete-employee]
+verify_jwt = true
+
 [functions.create-checkout]
 verify_jwt = true
 
