@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { TrendingDown, TrendingUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function MoodTab({ employees }: { employees: any[] }) {
+  const { t } = useTranslation('dashboard');
   const [moodEvolution, setMoodEvolution] = useState<any[]>([]);
   const [moodDistribution, setMoodDistribution] = useState<any[]>([]);
   const [employeeMoods, setEmployeeMoods] = useState<any[]>([]);
@@ -83,7 +85,7 @@ export function MoodTab({ employees }: { employees: any[] }) {
       {/* Evolution Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Evolución de Ánimo Promedio - 30 días</CardTitle>
+          <CardTitle>{t('mood.evolutionTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -93,7 +95,7 @@ export function MoodTab({ employees }: { employees: any[] }) {
               <YAxis domain={[0, 10]} />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="mood" name="Ánimo Promedio" stroke="hsl(var(--primary))" strokeWidth={2} />
+              <Line type="monotone" dataKey="mood" name={t('mood.averageMood')} stroke="hsl(var(--primary))" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -102,7 +104,7 @@ export function MoodTab({ employees }: { employees: any[] }) {
       {/* Distribution Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Distribución de Check-ins por Nivel</CardTitle>
+          <CardTitle>{t('mood.distributionTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -112,7 +114,7 @@ export function MoodTab({ employees }: { employees: any[] }) {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="count" name="Check-ins" fill="hsl(var(--primary))" />
+              <Bar dataKey="count" name={t('mood.checkIns')} fill="hsl(var(--primary))" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -121,7 +123,7 @@ export function MoodTab({ employees }: { employees: any[] }) {
       {/* Per Employee Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Estado de Ánimo por Empleada</CardTitle>
+          <CardTitle>{t('mood.employeeMoodTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -133,12 +135,12 @@ export function MoodTab({ employees }: { employees: any[] }) {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <div className="text-sm text-muted-foreground">Check-ins</div>
+                    <div className="text-sm text-muted-foreground">{t('mood.checkIns')}</div>
                     <div className="font-medium">{emp.count}</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={parseFloat(emp.avg) < 5 ? "destructive" : parseFloat(emp.avg) < 7 ? "outline" : "secondary"}>
-                      Promedio: {emp.avg}
+                      {t('mood.average')}: {emp.avg}
                     </Badge>
                     {emp.trend !== 0 && (
                       <Badge variant={emp.trend < 0 ? "destructive" : "secondary"} className="gap-1">

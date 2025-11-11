@@ -5,13 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const COURSES = [
-  { code: 'VG_101', name: 'Violencia de Género 101' },
-  { code: 'ACOSO_PREV', name: 'Prevención de Acoso' }
+  { code: 'VG_101', name: 'training.courses.VG_101' },
+  { code: 'ACOSO_PREV', name: 'training.courses.ACOSO_PREV' }
 ];
 
 export function TrainingTab({ employees }: { employees: any[] }) {
+  const { t } = useTranslation('dashboard');
   const [completions, setCompletions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,20 +55,20 @@ export function TrainingTab({ employees }: { employees: any[] }) {
           return (
             <Card key={course.code}>
               <CardHeader>
-                <CardTitle>{course.name}</CardTitle>
+                <CardTitle>{t(course.name)}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Progreso</span>
+                  <span className="text-sm text-muted-foreground">{t('training.progress')}</span>
                   <span className="text-2xl font-bold">{stats.percentage.toFixed(0)}%</span>
                 </div>
                 <Progress value={stats.percentage} className="h-2" />
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">
-                    {stats.completed} de {stats.total} completadas
+                    {stats.completed} {t('training.completed').split(' ')[0]} {stats.total} {t('training.completed')}
                   </span>
                   <Badge variant={stats.percentage === 100 ? "secondary" : "outline"}>
-                    {stats.total - stats.completed} pendientes
+                    {stats.total - stats.completed} {t('training.pending')}
                   </Badge>
                 </div>
               </CardContent>
@@ -78,16 +80,16 @@ export function TrainingTab({ employees }: { employees: any[] }) {
       {/* Overall Statistics */}
       <Card>
         <CardHeader>
-          <CardTitle>Estadísticas Generales</CardTitle>
+          <CardTitle>{t('training.generalStats')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 rounded-lg bg-muted/50">
-              <div className="text-sm text-muted-foreground">Total Empleadas</div>
+              <div className="text-sm text-muted-foreground">{t('training.totalEmployees')}</div>
               <div className="text-2xl font-bold">{employees.length}</div>
             </div>
             <div className="p-4 rounded-lg bg-muted/50">
-              <div className="text-sm text-muted-foreground">Todas las Formaciones</div>
+              <div className="text-sm text-muted-foreground">{t('training.allTrainings')}</div>
               <div className="text-2xl font-bold text-green-600">
                 {employees.filter(emp => {
                   const empCompletions = getEmployeeCompletions(emp.employee_id);
@@ -96,7 +98,7 @@ export function TrainingTab({ employees }: { employees: any[] }) {
               </div>
             </div>
             <div className="p-4 rounded-lg bg-muted/50">
-              <div className="text-sm text-muted-foreground">Sin Formación</div>
+              <div className="text-sm text-muted-foreground">{t('training.noTraining')}</div>
               <div className="text-2xl font-bold text-destructive">
                 {employees.filter(emp => {
                   const empCompletions = getEmployeeCompletions(emp.employee_id);
@@ -111,7 +113,7 @@ export function TrainingTab({ employees }: { employees: any[] }) {
       {/* Employee Detail Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Detalle por Empleada</CardTitle>
+          <CardTitle>{t('training.detailPerEmployee')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">

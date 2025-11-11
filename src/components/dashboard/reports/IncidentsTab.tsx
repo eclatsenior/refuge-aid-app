@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+import { getDateFnsLocale } from "@/lib/dateUtils";
 import { Search, AlertCircle, Clock, CheckCircle2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Incident {
   id: string;
@@ -23,6 +24,7 @@ interface Incident {
 }
 
 export function IncidentsTab() {
+  const { t, i18n } = useTranslation('dashboard');
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [filteredIncidents, setFilteredIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +59,7 @@ export function IncidentsTab() {
           
           return {
             ...incident,
-            employee: empData || { full_name: 'Desconocido', email: '' }
+            employee: empData || { full_name: t('incidents.unknown'), email: '' }
           };
         })
       );
@@ -92,12 +94,7 @@ export function IncidentsTab() {
       in_progress: "outline",
       closed: "secondary"
     };
-    const labels: { [key: string]: string } = {
-      open: "Abierto",
-      in_progress: "En Proceso",
-      closed: "Cerrado"
-    };
-    return <Badge variant={variants[status] || "outline"}>{labels[status] || status}</Badge>;
+    return <Badge variant={variants[status] || "outline"}>{t(`incidents.statusBadges.${status}`) || status}</Badge>;
   };
 
   const stats = {
@@ -117,31 +114,31 @@ export function IncidentsTab() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">{stats.total}</div>
-            <div className="text-sm text-muted-foreground">Total</div>
+            <div className="text-sm text-muted-foreground">{t('incidents.total')}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-destructive">{stats.open}</div>
-            <div className="text-sm text-muted-foreground">Abiertos</div>
+            <div className="text-sm text-muted-foreground">{t('incidents.open')}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">{stats.in_progress}</div>
-            <div className="text-sm text-muted-foreground">En Proceso</div>
+            <div className="text-sm text-muted-foreground">{t('incidents.inProgress')}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-green-600">{stats.closed}</div>
-            <div className="text-sm text-muted-foreground">Cerrados</div>
+            <div className="text-sm text-muted-foreground">{t('incidents.closed')}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-orange-600">{stats.breached}</div>
-            <div className="text-sm text-muted-foreground">SLA Breached</div>
+            <div className="text-sm text-muted-foreground">{t('incidents.slaBreached')}</div>
           </CardContent>
         </Card>
       </div>
@@ -149,14 +146,14 @@ export function IncidentsTab() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Filtros</CardTitle>
+          <CardTitle>{t('incidents.filters')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por empleada, email o tipo..."
+                placeholder={t('incidents.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -164,13 +161,13 @@ export function IncidentsTab() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="Estado" />
+                <SelectValue placeholder={t('incidents.status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos los estados</SelectItem>
-                <SelectItem value="open">Abiertos</SelectItem>
-                <SelectItem value="in_progress">En Proceso</SelectItem>
-                <SelectItem value="closed">Cerrados</SelectItem>
+                <SelectItem value="all">{t('incidents.allStatus')}</SelectItem>
+                <SelectItem value="open">{t('incidents.open')}</SelectItem>
+                <SelectItem value="in_progress">{t('incidents.inProgress')}</SelectItem>
+                <SelectItem value="closed">{t('incidents.closed')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -180,25 +177,25 @@ export function IncidentsTab() {
       {/* Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Incidentes ({filteredIncidents.length})</CardTitle>
+          <CardTitle>{t('incidents.incidentsCount', { count: filteredIncidents.length })}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Empleada</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Abierto</TableHead>
-                <TableHead>Cerrado</TableHead>
-                <TableHead>SLA</TableHead>
+                <TableHead>{t('incidents.employee')}</TableHead>
+                <TableHead>{t('incidents.type')}</TableHead>
+                <TableHead>{t('incidents.status')}</TableHead>
+                <TableHead>{t('incidents.opened')}</TableHead>
+                <TableHead>{t('incidents.closedAt')}</TableHead>
+                <TableHead>{t('incidents.sla')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredIncidents.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-muted-foreground">
-                    No se encontraron incidentes
+                    {t('incidents.noIncidents')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -213,21 +210,21 @@ export function IncidentsTab() {
                     <TableCell>{incident.type}</TableCell>
                     <TableCell>{getStatusBadge(incident.status)}</TableCell>
                     <TableCell className="text-sm">
-                      {formatDistanceToNow(new Date(incident.opened_at), { addSuffix: true, locale: es })}
+                      {formatDistanceToNow(new Date(incident.opened_at), { addSuffix: true, locale: getDateFnsLocale(i18n.language) })}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {incident.closed_at ? formatDistanceToNow(new Date(incident.closed_at), { addSuffix: true, locale: es }) : '-'}
+                      {incident.closed_at ? formatDistanceToNow(new Date(incident.closed_at), { addSuffix: true, locale: getDateFnsLocale(i18n.language) }) : '-'}
                     </TableCell>
                     <TableCell>
                       {incident.sla_breached_bool ? (
                         <Badge variant="destructive" className="gap-1">
                           <AlertCircle className="h-3 w-3" />
-                          Breached
+                          {t('incidents.breached')}
                         </Badge>
                       ) : (
                         <Badge variant="secondary" className="gap-1">
                           <CheckCircle2 className="h-3 w-3" />
-                          OK
+                          {t('incidents.ok')}
                         </Badge>
                       )}
                     </TableCell>

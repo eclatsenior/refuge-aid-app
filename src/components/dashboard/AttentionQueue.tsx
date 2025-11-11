@@ -2,6 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Phone, UserPlus, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface QueueItem {
   employee_id: string;
@@ -13,12 +14,13 @@ interface QueueItem {
 }
 
 export function AttentionQueue({ items }: { items: QueueItem[] }) {
+  const { t } = useTranslation('dashboard');
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Clock className="h-5 w-5" />
-          Necesita Atención Ahora ({items.length})
+          {t('attentionQueue.title')} ({items.length})
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -32,7 +34,7 @@ export function AttentionQueue({ items }: { items: QueueItem[] }) {
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{item.employee_name}</span>
                   <Badge variant={item.risk_score > 70 ? 'destructive' : 'outline'}>
-                    Riesgo: {item.risk_score}
+                    {t('attentionQueue.risk')}: {item.risk_score}
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">{item.reason}</p>
@@ -40,13 +42,13 @@ export function AttentionQueue({ items }: { items: QueueItem[] }) {
               </div>
 
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" title="Abrir caso">
+                <Button size="sm" variant="outline" title={t('attentionQueue.openCase')}>
                   <UserPlus className="h-4 w-4" />
                 </Button>
-                <Button size="sm" variant="outline" title="Contactar">
+                <Button size="sm" variant="outline" title={t('attentionQueue.contact')}>
                   <Phone className="h-4 w-4" />
                 </Button>
-                <Button size="sm" variant="outline" title="Derivar a psicología">
+                <Button size="sm" variant="outline" title={t('attentionQueue.referToPsychology')}>
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
@@ -55,7 +57,7 @@ export function AttentionQueue({ items }: { items: QueueItem[] }) {
 
           {items.length === 0 && (
             <p className="text-center text-muted-foreground py-4">
-              ✅ No hay empleadas que requieran atención inmediata
+              {t('attentionQueue.noAttention')}
             </p>
           )}
         </div>

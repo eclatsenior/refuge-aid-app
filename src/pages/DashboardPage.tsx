@@ -398,10 +398,10 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
                 
                 <div className="flex items-center space-x-2">
                   <Badge variant="outline" className="text-xs">
-                    {assignedEmployees.filter(e => e.is_online).length} conectadas
+                    {assignedEmployees.filter(e => e.is_online).length} {t('stats.connected')}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    {assignedEmployees.filter(e => e.emergency_alert).length} alertas
+                    {assignedEmployees.filter(e => e.emergency_alert).length} {t('filters.alerts')}
                   </Badge>
                 </div>
               </div>
@@ -433,9 +433,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
                     onClick={() => setFilterStatus(status)}
                     className="capitalize"
                   >
-                    {status === 'all' ? 'Todas' : 
-                     status === 'online' ? 'En línea' :
-                     status === 'alert' ? 'Alertas' : 'Desconectadas'}
+                    {t(`filters.${status === 'alert' ? 'alerts' : status}`)}
                   </Button>
                 ))}
               </div>

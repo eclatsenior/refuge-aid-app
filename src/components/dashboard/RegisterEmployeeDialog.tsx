@@ -23,23 +23,24 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/useAppStore";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 const registerEmployeeSchema = z.object({
   fullName: z.string()
-    .min(3, "El nombre debe tener al menos 3 caracteres")
-    .max(100, "El nombre no puede superar los 100 caracteres")
+    .min(3)
+    .max(100)
     .trim(),
   email: z.string()
-    .email("Email inválido")
-    .max(255, "El email no puede superar los 255 caracteres")
+    .email()
+    .max(255)
     .trim(),
   phone: z.string()
-    .regex(/^(\+34|0034|34)?[6789]\d{8}$/, "Número de teléfono español inválido (ej: +34612345678)")
+    .regex(/^(\+34|0034|34)?[6789]\d{8}$/)
     .optional()
     .or(z.literal('')),
   password: z.string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres")
-    .max(100, "La contraseña no puede superar los 100 caracteres"),
+    .min(8)
+    .max(100),
 });
 
 type RegisterEmployeeFormData = z.infer<typeof registerEmployeeSchema>;
@@ -49,6 +50,7 @@ interface RegisterEmployeeDialogProps {
 }
 
 export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmployeeDialogProps) {
+  const { t } = useTranslation('dashboard');
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -56,7 +58,57 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
   const { toast } = useToast();
 
   const form = useForm<RegisterEmployeeFormData>({
-    resolver: zodResolver(registerEmployeeSchema),
+    resolver: zodResolver(registerEmployeeSchema.superRefine((data, ctx) => {
+      if (data.fullName.length < 3) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('registerEmployee.validations.nameMin'),
+          path: ['fullName']
+        });
+      }
+      if (data.fullName.length > 100) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('registerEmployee.validations.nameMax'),
+          path: ['fullName']
+        });
+      }
+      if (!z.string().email().safeParse(data.email).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('registerEmployee.validations.emailInvalid'),
+          path: ['email']
+        });
+      }
+      if (data.email.length > 255) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('registerEmployee.validations.emailMax'),
+          path: ['email']
+        });
+      }
+      if (data.phone && !/^(\+34|0034|34)?[6789]\d{8}$/.test(data.phone)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('registerEmployee.validations.phoneInvalid'),
+          path: ['phone']
+        });
+      }
+      if (data.password.length < 8) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('registerEmployee.validations.passwordMin'),
+          path: ['password']
+        });
+      }
+      if (data.password.length > 100) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('registerEmployee.validations.passwordMax'),
+          path: ['password']
+        });
+      }
+    })),
     defaultValues: {
       fullName: "",
       email: "",
@@ -82,8 +134,8 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
       await navigator.clipboard.writeText(password);
       setCopied(true);
       toast({
-        title: "Contraseña copiada",
-        description: "La contraseña ha sido copiada al portapapeles"
+        title: t('registerEmployee.passwordCopied'),
+        description: t('registerEmployee.passwordCopiedDesc')
       });
       setTimeout(() => setCopied(false), 2000);
     }
@@ -92,8 +144,8 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
   const onSubmit = async (data: RegisterEmployeeFormData) => {
     if (!canAddEmployee()) {
       toast({
-        title: "Límite alcanzado",
-        description: `Has alcanzado el límite de ${subscription?.employee_limit} empleadas de tu plan.`,
+        title: t('registerEmployee.limitReached'),
+        description: t('registerEmployee.limitReachedDesc', { limit: subscription?.employee_limit }),
         variant: "destructive"
       });
       return;
@@ -109,8 +161,8 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
       });
 
       toast({
-        title: "¡Empleada registrada!",
-        description: `${data.fullName} ha sido registrada exitosamente.`,
+        title: t('registerEmployee.employeeRegistered'),
+        description: t('registerEmployee.employeeRegisteredDesc', { name: data.fullName }),
       });
 
       form.reset();
@@ -121,8 +173,8 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
       }
     } catch (error: any) {
       toast({
-        title: "Error al registrar empleada",
-        description: error.message || "Hubo un problema al registrar la empleada",
+        title: t('registerEmployee.errorRegistering'),
+        description: error.message || t('registerEmployee.errorRegisteringDesc'),
         variant: "destructive",
       });
     } finally {
@@ -138,20 +190,20 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
         <Button 
           className="gap-2"
           disabled={isAtLimit}
-          title={isAtLimit ? `Límite de ${subscription?.employee_limit} empleadas alcanzado` : ''}
+          title={isAtLimit ? t('registerEmployee.limitTooltip', { limit: subscription?.employee_limit }) : ''}
         >
           <UserPlus className="h-4 w-4" />
-          Registrar Nueva Empleada
+          {t('registerEmployee.title')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
-            Registrar Nueva Empleada
+            {t('registerEmployee.title')}
           </DialogTitle>
           <DialogDescription>
-            Completa los datos para crear una nueva empleada. Se asignará automáticamente a tu equipo.
+            {t('registerEmployee.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -161,20 +213,20 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
               control={form.control}
               name="fullName"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre Completo</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        placeholder="Ej: María García López" 
-                        className="pl-10"
-                        {...field} 
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+              <FormItem>
+                <FormLabel>{t('registerEmployee.fullName')}</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      placeholder={t('registerEmployee.fullNamePlaceholder')}
+                      className="pl-10"
+                      {...field} 
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
               )}
             />
 
@@ -182,21 +234,21 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        type="email"
-                        placeholder="maria.garcia@ejemplo.com" 
-                        className="pl-10"
-                        {...field} 
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+              <FormItem>
+                <FormLabel>{t('registerEmployee.email')}</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      type="email"
+                      placeholder={t('registerEmployee.emailPlaceholder')}
+                      className="pl-10"
+                      {...field} 
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
               )}
             />
 
@@ -204,24 +256,24 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
               control={form.control}
               name="phone"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Teléfono (Opcional)</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        type="tel"
-                        placeholder="+34612345678 o 612345678" 
-                        className="pl-10"
-                        {...field} 
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                  <p className="text-xs text-muted-foreground">
-                    Para llamadas y mensajes de emergencia
-                  </p>
-                </FormItem>
+              <FormItem>
+                <FormLabel>{t('registerEmployee.phone')}</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      type="tel"
+                      placeholder={t('registerEmployee.phonePlaceholder')}
+                      className="pl-10"
+                      {...field} 
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+                <p className="text-xs text-muted-foreground">
+                  {t('registerEmployee.phoneHelp')}
+                </p>
+              </FormItem>
               )}
             />
 
@@ -229,50 +281,50 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Contraseña Temporal</FormLabel>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={generatePassword}
-                      className="h-auto p-0 text-xs text-primary hover:text-primary/80"
-                    >
-                      Generar automática
-                    </Button>
+              <FormItem>
+                <div className="flex items-center justify-between">
+                  <FormLabel>{t('registerEmployee.temporaryPassword')}</FormLabel>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={generatePassword}
+                    className="h-auto p-0 text-xs text-primary hover:text-primary/80"
+                  >
+                    {t('registerEmployee.generateAuto')}
+                  </Button>
+                </div>
+                <FormControl>
+                  <div className="relative">
+                    <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      type="text"
+                      placeholder={t('registerEmployee.passwordPlaceholder')}
+                      className="pl-10 pr-10 font-mono text-sm"
+                      {...field} 
+                    />
+                    {field.value && (
+                      <button
+                        type="button"
+                        onClick={copyPassword}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        title={t('registerEmployee.passwordCopied')}
+                      >
+                        {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                      </button>
+                    )}
                   </div>
-                  <FormControl>
-                    <div className="relative">
-                      <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        type="text"
-                        placeholder="Mínimo 8 caracteres" 
-                        className="pl-10 pr-10 font-mono text-sm"
-                        {...field} 
-                      />
-                      {field.value && (
-                        <button
-                          type="button"
-                          onClick={copyPassword}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                          title="Copiar contraseña"
-                        >
-                          {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                        </button>
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">
-                      ⚠️ Esta contraseña será proporcionada a la empleada para su primer acceso.
-                    </p>
-                    <p className="text-xs text-amber-600 dark:text-amber-500 font-medium">
-                      💡 Importante: Distingue mayúsculas/minúsculas y no tiene espacios.
-                    </p>
-                  </div>
-                </FormItem>
+                </FormControl>
+                <FormMessage />
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">
+                    {t('registerEmployee.passwordWarning')}
+                  </p>
+                  <p className="text-xs text-amber-600 dark:text-amber-500 font-medium">
+                    {t('registerEmployee.passwordImportant')}
+                  </p>
+                </div>
+              </FormItem>
               )}
             />
 
@@ -283,18 +335,18 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
                 onClick={() => setOpen(false)}
                 disabled={isSubmitting}
               >
-                Cancelar
+                {t('registerEmployee.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Registrando...
+                    {t('registerEmployee.registering')}
                   </>
                 ) : (
                   <>
                     <UserPlus className="mr-2 h-4 w-4" />
-                    Registrar Empleada
+                    {t('registerEmployee.register')}
                   </>
                 )}
               </Button>

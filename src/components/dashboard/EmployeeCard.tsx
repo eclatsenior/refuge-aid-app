@@ -78,8 +78,8 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
   const handleContact = (method: 'phone' | 'message') => {
     if (!employee.employee_phone) {
       toast({
-        title: "Teléfono no disponible",
-        description: `${employee.employee_name} no tiene teléfono registrado`,
+        title: t('employeeCard.contactingEmployee'),
+        description: t('emergencyAlerts.phoneUnavailableDesc', { name: employee.employee_name }),
         variant: "destructive"
       });
       return;
@@ -88,20 +88,20 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
     if (method === 'phone') {
       window.open(`tel:${employee.employee_phone}`, '_system');
     } else {
-      const message = encodeURIComponent(`Hola ${employee.employee_name.split(' ')[0]}, ¿cómo estás?`);
+      const message = encodeURIComponent(t('emergencyAlerts.emergencyMessage', { name: employee.employee_name.split(' ')[0] }));
       window.open(`sms:${employee.employee_phone}?body=${message}`, '_system');
     }
     
     toast({
-      title: "Contactando empleada",
-      description: `Iniciando ${method === 'phone' ? 'llamada' : 'mensaje'} con ${employee.employee_name}...`
+      title: t('employeeCard.contactingEmployee'),
+      description: t('employeeCard.initiatingWith', { method: method === 'phone' ? t('employeeCard.call') : t('employeeCard.message'), name: employee.employee_name })
     });
   };
 
   const handleMarkFollowUp = () => {
     toast({
-      title: "Seguimiento marcado",
-      description: `Se ha marcado seguimiento para ${employee.employee_name}`
+      title: t('employeeCard.followUpMarked'),
+      description: t('employeeCard.followUpMarkedDesc', { name: employee.employee_name })
     });
   };
 
@@ -172,16 +172,16 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
                   disabled={!employee.employee_phone}
                 >
                   <Phone className="mr-2 h-4 w-4" />
-                  Llamar
-                  {!employee.employee_phone && <span className="ml-auto text-xs text-muted-foreground">No disponible</span>}
+                  {t('employeeCard.call')}
+                  {!employee.employee_phone && <span className="ml-auto text-xs text-muted-foreground">{t('emergencyAlerts.notAvailable')}</span>}
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => handleContact('message')}
                   disabled={!employee.employee_phone}
                 >
                   <MessageSquare className="mr-2 h-4 w-4" />
-                  Mensaje
-                  {!employee.employee_phone && <span className="ml-auto text-xs text-muted-foreground">No disponible</span>}
+                  {t('employeeCard.message')}
+                  {!employee.employee_phone && <span className="ml-auto text-xs text-muted-foreground">{t('emergencyAlerts.notAvailable')}</span>}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={(e) => {
@@ -189,7 +189,7 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
                   setShowMessageDialog(true);
                 }}>
                   <MessageCircle className="mr-2 h-4 w-4 text-primary" />
-                  Mensaje interno
+                  {t('emergencyAlerts.internalMessage')}
                   {unreadCount > 0 && (
                     <Badge variant="destructive" className="ml-auto text-xs">{unreadCount}</Badge>
                   )}
@@ -197,7 +197,7 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleMarkFollowUp}>
                   <Clock className="mr-2 h-4 w-4" />
-                  Marcar seguimiento
+                  {t('employeeCard.markFollowUp')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -210,7 +210,7 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
             <div className="flex items-center space-x-2">
               <AlertTriangle className="h-4 w-4 text-destructive animate-pulse" />
               <span className="text-sm font-medium text-destructive">
-                Alerta de emergencia activa
+                {t('employeeCard.activeEmergencyAlert')}
               </span>
             </div>
           </div>
@@ -225,12 +225,12 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
               {employee.is_online ? (
                 <>
                   <Wifi className="h-4 w-4 text-safe" />
-                  <span className="text-muted-foreground">En línea</span>
+                  <span className="text-muted-foreground">{t('employeeCard.online')}</span>
                 </>
               ) : (
                 <>
                   <WifiOff className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Desconectada</span>
+                  <span className="text-muted-foreground">{t('employeeCard.disconnected')}</span>
                 </>
               )}
             </div>
@@ -246,7 +246,7 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Heart className="h-4 w-4 text-coral" />
-                <span className="text-sm text-muted-foreground">Estado de ánimo</span>
+                <span className="text-sm text-muted-foreground">{t('employeeCard.moodState')}</span>
               </div>
               {employee.mood_level !== null ? (
                 <div className="flex items-center space-x-1">
@@ -254,7 +254,7 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
                   <span className="text-sm font-medium">{employee.mood_level}/10</span>
                 </div>
               ) : (
-                <span className="text-sm text-muted-foreground">Sin datos</span>
+                <span className="text-sm text-muted-foreground">{t('employeeCard.noData')}</span>
               )}
             </div>
             <Progress 
@@ -268,7 +268,7 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <TrendingUp className="h-4 w-4 text-cyan" />
-                <span className="text-sm text-muted-foreground">Progreso terapéutico</span>
+                <span className="text-sm text-muted-foreground">{t('employeeCard.therapeuticProgress')}</span>
               </div>
               <span className="text-sm font-medium">{employee.therapy_progress ?? 0}%</span>
             </div>
@@ -283,15 +283,15 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
             <div className="pt-3 border-t border-border/20 space-y-2">
               <div className="text-xs text-muted-foreground">
                 <div className="flex justify-between py-1">
-                  <span>Último check-in:</span>
-                  <span>{lastCheckInDate ? lastCheckInDate.toLocaleDateString('es-ES') : 'Sin registro'}</span>
+                  <span>{t('employeeCard.lastCheckIn')}</span>
+                  <span>{lastCheckInDate ? lastCheckInDate.toLocaleDateString(i18n.language === 'es' ? 'es-ES' : i18n.language === 'ca' ? 'ca-ES' : i18n.language === 'ar' ? 'ar-SA' : 'en-US') : t('employeeCard.noRecord')}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span>Tiempo en línea hoy:</span>
+                  <span>{t('employeeCard.timeOnlineToday')}</span>
                   <span>{employee.is_online ? '2h 15m' : '0m'}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span>Alertas esta semana:</span>
+                  <span>{t('employeeCard.alertsThisWeek')}</span>
                   <span>{employee.emergency_alert ? '1' : '0'}</span>
                 </div>
               </div>
