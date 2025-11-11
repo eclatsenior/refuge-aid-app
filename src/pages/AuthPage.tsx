@@ -220,13 +220,13 @@ export function AuthPage() {
         
         // Also show toast for immediate feedback
         const message = role === 'refugi_lead' 
-          ? t('common.auth.emailVerification.leadMessage')
-          : t('common.auth.emailVerification.individualMessage');
+          ? t('auth.emailVerification.leadMessage')
+          : t('auth.emailVerification.individualMessage');
         
         toast({
           title: role === 'refugi_lead' 
-            ? t('common.auth.emailVerification.leadTitle')
-            : t('common.auth.emailVerification.individualTitle'),
+            ? t('auth.emailVerification.leadTitle')
+            : t('auth.emailVerification.individualTitle'),
           description: message,
           duration: 10000
         });
@@ -281,8 +281,8 @@ export function AuthPage() {
         });
       } else {
         toast({
-          title: t('common.auth.emailVerification.resendSuccess'),
-          description: t('common.auth.emailVerification.checkSpam'),
+          title: t('auth.emailVerification.resendSuccess'),
+          description: t('auth.emailVerification.checkSpam'),
           duration: 8000
         });
         setShowResendVerification(false);
@@ -525,8 +525,8 @@ export function AuthPage() {
                             : 'text-pink-900 dark:text-pink-100'
                         }`}>
                           {registeredRole === 'refugi_lead' 
-                            ? t('common.auth.emailVerification.leadTitle')
-                            : t('common.auth.emailVerification.individualTitle')}
+                            ? t('auth.emailVerification.leadTitle')
+                            : t('auth.emailVerification.individualTitle')}
                         </h3>
                         <p className={`text-sm leading-relaxed ${
                           registeredRole === 'refugi_lead' 
@@ -534,8 +534,8 @@ export function AuthPage() {
                             : 'text-pink-800 dark:text-pink-200'
                         }`}>
                           {registeredRole === 'refugi_lead' 
-                            ? t('common.auth.emailVerification.leadMessage')
-                            : t('common.auth.emailVerification.individualMessage')}
+                            ? t('auth.emailVerification.leadMessage')
+                            : t('auth.emailVerification.individualMessage')}
                         </p>
                         <div className="mt-3 space-y-2">
                           <p className={`text-xs ${
@@ -543,14 +543,14 @@ export function AuthPage() {
                               ? 'text-blue-700 dark:text-blue-300' 
                               : 'text-pink-700 dark:text-pink-300'
                           }`}>
-                            💡 {t('common.auth.emailVerification.checkSpam')}
+                            💡 {t('auth.emailVerification.checkSpam')}
                           </p>
                           <p className={`text-xs ${
                             registeredRole === 'refugi_lead' 
                               ? 'text-blue-700 dark:text-blue-300' 
                               : 'text-pink-700 dark:text-pink-300'
                           }`}>
-                            ⏱️ {t('common.auth.emailVerification.expiresIn')}
+                            ⏱️ {t('auth.emailVerification.expiresIn')}
                           </p>
                         </div>
                       </div>
@@ -576,7 +576,7 @@ export function AuthPage() {
                           : 'border-pink-500 text-pink-700 hover:bg-pink-100 dark:text-pink-300 dark:hover:bg-pink-900'
                       }`}
                     >
-                      {t('common.auth.emailVerification.resendButton')}
+                      {t('auth.emailVerification.resendButton')}
                     </Button>
                   </div>
                 )}
