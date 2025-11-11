@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Plus, Bell, Lock, MapPin } from "lucide-react";
+import { ArrowLeft, Plus, Bell, Lock, MapPin, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -39,6 +39,34 @@ export default function SettingsPage({ onNavigate }: SettingsPageProps) {
   const handleToggleShareLocation = (checked: boolean) => {
     updateSettings({ locationConsent: checked });
     toast.success(checked ? t('privacy.locationEnabled') : t('privacy.locationDisabled'));
+  };
+
+  const handleResetApp = async () => {
+    try {
+      // Unregister all service workers
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map(reg => reg.unregister()));
+        console.log('✅ Service workers eliminados');
+      }
+      
+      // Delete all caches
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        console.log('✅ Caches eliminados');
+      }
+      
+      toast.success('App reiniciada. Recargando...');
+      
+      // Reload page
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (error) {
+      console.error('Error resetting app:', error);
+      toast.error('Error al reiniciar la app');
+    }
   };
 
   return (
@@ -165,6 +193,32 @@ export default function SettingsPage({ onNavigate }: SettingsPageProps) {
                 onCheckedChange={handleToggleShareLocation}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Troubleshooting Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <RefreshCw className="h-5 w-5" />
+              Solucionar problemas
+            </CardTitle>
+            <CardDescription>
+              Si la app muestra versiones desactualizadas o no carga correctamente
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={handleResetApp}
+              variant="outline"
+              className="w-full"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Reconstruir app
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              Esto eliminará cachés y forzará una recarga completa
+            </p>
           </CardContent>
         </Card>
       </div>

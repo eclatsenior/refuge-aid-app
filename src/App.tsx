@@ -29,6 +29,7 @@ import { EmailVerifiedPage } from "@/pages/EmailVerifiedPage";
 import { AdminUploadVideosPage } from "@/pages/AdminUploadVideosPage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
+import { PWAUpdater } from "@/components/pwa/PWAUpdater";
 import "@/i18n/config";
 
 const queryClient = new QueryClient();
@@ -293,6 +294,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <PWAUpdater />
         <div className="min-h-screen bg-background">
           {renderApp()}
         </div>
