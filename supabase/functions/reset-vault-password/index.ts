@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.2.4/mod.ts";
+
 import { verify } from "https://deno.land/x/djwt@v3.0.1/mod.ts";
 
 const corsHeaders = {
@@ -59,16 +59,26 @@ serve(async (req) => {
       throw new Error('Token de reset inválido o expirado');
     }
 
-    // Generar nuevo salt y hash
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(newPassword, salt);
+    // Generar nuevo salt y hash con PBKDF2
+    const enc = new TextEncoder();
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2,'0')).join('');
+    const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(newPassword), 'PBKDF2', false, ['deriveBits']);
+    const iterations = 210000;
+    const derivedBits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', hash: 'SHA-256', salt: saltBytes, iterations },
+      keyMaterial,
+      256
+    );
+    const hashHex = Array.from(new Uint8Array(derivedBits)).map(b => b.toString(16).padStart(2,'0')).join('');
+    const passwordHash = `pbkdf2$sha256$${iterations}$${hashHex}`;
 
     // Actualizar contraseña
     const { error: updateError } = await supabaseClient
       .from('vault_passwords')
       .update({
         password_hash: passwordHash,
-        salt: salt,
+        salt: saltHex,
         reset_approved_at: new Date().toISOString(),
       })
       .eq('user_id', user.id);

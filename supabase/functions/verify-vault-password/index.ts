@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.2.4/mod.ts";
+
 import { create } from "https://deno.land/x/djwt@v3.0.1/mod.ts";
 
 const corsHeaders = {
@@ -53,8 +53,39 @@ serve(async (req) => {
       throw new Error('No hay contraseña de caja fuerte configurada');
     }
 
-    // Verificar contraseña
-    const isValid = await bcrypt.compare(password, vaultPassword.password_hash);
+    // Verificar contraseña con PBKDF2 (sin Workers)
+    const scheme = String(vaultPassword.password_hash || '');
+    let isValid = false;
+
+    if (scheme.startsWith('pbkdf2$')) {
+      // Formato: pbkdf2$sha256$<iteraciones>$<hashHex>
+      const parts = scheme.split('$');
+      const iterations = parseInt(parts[2]);
+      const storedHashHex = parts[3];
+      const saltHex = String(vaultPassword.salt || '');
+      if (!saltHex) throw new Error('Salt no disponible');
+
+      const hexToBytes = (hex: string) => new Uint8Array(hex.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
+      const saltBytes = hexToBytes(saltHex);
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+      const derivedBits = await crypto.subtle.deriveBits(
+        { name: 'PBKDF2', hash: 'SHA-256', salt: saltBytes, iterations },
+        keyMaterial,
+        256
+      );
+      const computedHex = Array.from(new Uint8Array(derivedBits)).map(b => b.toString(16).padStart(2,'0')).join('');
+      // Comparación en tiempo constante
+      if (computedHex.length === storedHashHex.length) {
+        let diff = 0;
+        for (let i = 0; i < computedHex.length; i++) {
+          diff |= computedHex.charCodeAt(i) ^ storedHashHex.charCodeAt(i);
+        }
+        isValid = (diff === 0);
+      }
+    } else {
+      throw new Error('Formato de hash no soportado');
+    }
 
     if (!isValid) {
       console.log('Intento de contraseña incorrecta para usuario:', user.id);

@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.2.4/mod.ts";
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -54,9 +54,19 @@ serve(async (req) => {
       throw new Error('La contraseña debe tener al menos 8 caracteres');
     }
 
-    // Generar salt y hash
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
+    // Generar salt y hash con PBKDF2 (sin Workers)
+    const enc = new TextEncoder();
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+    const iterations = 210000;
+    const derivedBits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', hash: 'SHA-256', salt: saltBytes, iterations },
+      keyMaterial,
+      256
+    );
+    const hashHex = Array.from(new Uint8Array(derivedBits)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const passwordHash = `pbkdf2$sha256$${iterations}$${hashHex}`;
 
     // Verificar si ya existe una contraseña
     const { data: existing } = await supabaseAdmin
@@ -75,7 +85,7 @@ serve(async (req) => {
       .insert({
         user_id: user.id,
         password_hash: passwordHash,
-        salt: salt,
+        salt: saltHex,
       });
 
     if (insertError) {
