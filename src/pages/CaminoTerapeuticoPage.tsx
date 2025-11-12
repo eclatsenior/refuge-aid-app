@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "@/hooks/use-toast";
 import { VideoPlayer } from "@/components/therapy/VideoPlayer";
 import { useTherapyVideos } from "@/hooks/useTherapyVideos";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CaminoTerapeuticoPageProps {
   onNavigate: (path: string) => void;
@@ -283,6 +284,25 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     });
   };
 
+  const handleVideoCompleted = async (videoId: string, routeId: string, moduleId: string, duration: number) => {
+    try {
+      const { error } = await supabase.functions.invoke('track-video-progress', {
+        body: {
+          video_id: videoId,
+          route_id: routeId,
+          module_id: moduleId,
+          watched_duration_seconds: Math.floor(duration)
+        }
+      });
+      
+      if (error) throw error;
+      
+      console.log('✅ Video progress tracked:', { videoId, routeId, moduleId });
+    } catch (error) {
+      console.error('❌ Error tracking video progress:', error);
+    }
+  };
+
   const getRouteProgress = (route: Route) => {
     const completed = route.modules.filter(module => 
       completedModules.includes(module.id)
@@ -513,8 +533,12 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                 <VideoPlayer
                   videoUrl={videoData.video_url}
                   videoName={videoData.video_name || undefined}
+                  videoId={videoData.id}
+                  routeId={selectedRoute.id}
+                  moduleId={module.id}
                   required={videoData.is_required}
                   onVideoWatched={setVideoWatchedPercentage}
+                  onVideoCompleted={handleVideoCompleted}
                 />
               ) : (
                 <div className="p-4 bg-muted/30 border border-muted rounded-lg text-center">
