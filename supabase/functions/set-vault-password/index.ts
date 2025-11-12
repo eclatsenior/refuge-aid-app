@@ -14,33 +14,39 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get('Authorization');
-    console.log('[SET-VAULT-PASSWORD] Auth header present:', !!authHeader);
+    console.log('[SET-VAULT-PASSWORD] Starting function');
+    console.log('[SET-VAULT-PASSWORD] Auth header:', authHeader ? 'present' : 'missing');
     
     if (!authHeader) {
-      console.error('[SET-VAULT-PASSWORD] No authorization header found');
+      console.error('[SET-VAULT-PASSWORD] No authorization header');
       throw new Error('No autorizado - falta cabecera de autorización');
     }
 
-    const supabaseClient = createClient(
+    // Create admin client to verify user
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: authHeader },
-        },
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser();
+    // Extract token from header
+    const token = authHeader.replace('Bearer ', '');
+    console.log('[SET-VAULT-PASSWORD] Token length:', token.length);
 
-    console.log('[SET-VAULT-PASSWORD] User authenticated:', user?.id);
+    // Verify the JWT token
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    
+    console.log('[SET-VAULT-PASSWORD] Auth result:', { 
+      userId: user?.id, 
+      hasError: !!authError,
+      errorMessage: authError?.message 
+    });
 
-    if (!user) {
-      console.error('[SET-VAULT-PASSWORD] No user found after auth check');
-      throw new Error('No autorizado - usuario no encontrado');
+    if (authError || !user) {
+      console.error('[SET-VAULT-PASSWORD] Auth failed:', authError);
+      throw new Error('No autorizado - sesión inválida');
     }
+
+    console.log('[SET-VAULT-PASSWORD] User authenticated:', user.id);
 
     const { password } = await req.json();
 
@@ -53,7 +59,7 @@ serve(async (req) => {
     const passwordHash = await bcrypt.hash(password, salt);
 
     // Verificar si ya existe una contraseña
-    const { data: existing } = await supabaseClient
+    const { data: existing } = await supabaseAdmin
       .from('vault_passwords')
       .select('id')
       .eq('user_id', user.id)
@@ -64,7 +70,7 @@ serve(async (req) => {
     }
 
     // Insertar nueva contraseña
-    const { error: insertError } = await supabaseClient
+    const { error: insertError } = await supabaseAdmin
       .from('vault_passwords')
       .insert({
         user_id: user.id,
