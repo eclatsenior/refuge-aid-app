@@ -111,11 +111,18 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { email, userName } = await req.json();
 
+    console.log('[SEND-VERIFICATION] Function invoked with:', {
+      email,
+      userName,
+      hasEmail: !!email,
+      hasUserName: !!userName
+    });
+
     if (!email) {
       throw new Error("Email is required");
     }
 
-    console.log("Sending verification email to:", email);
+    console.log("[SEND-VERIFICATION] Sending verification email to:", email);
 
     // Crear cliente de Supabase con service role para acceso completo
     const supabaseAdmin = createClient(

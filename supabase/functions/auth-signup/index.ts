@@ -235,7 +235,14 @@ serve(async (req: Request) => {
     }
 
     // Invoke send-verification-email to send our branded email
-    console.log('[AUTH-SIGNUP] Invoking send-verification-email...');
+    console.log('[AUTH-SIGNUP] About to invoke send-verification-email with:', {
+      email,
+      fullName,
+      userId: userData.user.id,
+      role,
+      send_custom_verification
+    });
+    
     const { data: emailData, error: emailError } = await supabaseAdmin.functions.invoke(
       'send-verification-email',
       {
@@ -257,10 +264,17 @@ serve(async (req: Request) => {
     );
 
     if (emailError) {
-      console.error('[AUTH-SIGNUP] Error sending verification email:', emailError);
+      console.error('[AUTH-SIGNUP] Error sending verification email:', {
+        error: emailError,
+        message: emailError.message,
+        details: emailError
+      });
       // Don't fail the signup if email fails
     } else {
-      console.log('[AUTH-SIGNUP] Verification email sent successfully');
+      console.log('[AUTH-SIGNUP] Verification email sent successfully:', {
+        data: emailData,
+        emailSent: true
+      });
     }
 
     console.log('[AUTH-SIGNUP] Signup completed successfully');

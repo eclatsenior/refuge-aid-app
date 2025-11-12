@@ -221,12 +221,6 @@ export function AuthPage() {
         setRegisteredEmail(normalizedEmail);
         setRegisteredUserName(normalizedFullName);
         setRegisteredRole(role);
-        
-        // Enviar email con código de verificación
-        await supabase.functions.invoke('send-verification-email', {
-          body: { email: normalizedEmail, userName: normalizedFullName }
-        });
-        
         setShowEmailVerificationDialog(true);
         
         toast({
