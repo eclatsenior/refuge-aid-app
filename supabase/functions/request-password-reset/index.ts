@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.0";
 import { Resend } from "npm:resend@2.0.0";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.2.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -66,9 +65,13 @@ serve(async (req) => {
     // Generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Hash the code with bcrypt
-    const salt = await bcrypt.genSalt(10);
-    const codeHash = await bcrypt.hash(code, salt);
+    // Hash code using salted SHA-256 (avoids Workers)
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    const data = new TextEncoder().encode(`${saltHex}:${code}`);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const codeHash = `sha256:${saltHex}:${hashHex}`;
 
     // Store in database with 15-minute expiration
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();

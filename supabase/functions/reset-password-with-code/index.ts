@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.0";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.2.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -71,13 +70,26 @@ serve(async (req) => {
       );
     }
 
-    // Verify the code with bcrypt
-    let validCode = null;
-    for (const dbCode of codes) {
-      const isMatch = await bcrypt.compare(normalizedCode, dbCode.code_hash);
-      if (isMatch) {
-        validCode = dbCode;
-        break;
+    // Verify the code using sha256 scheme (no bcrypt)
+    const toHex = (buf: ArrayBuffer) => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    let validCode = null as any;
+    for (const dbCode of codes as any[]) {
+      const parts = String(dbCode.code_hash || '').split(':');
+      if (parts.length === 3 && parts[0] === 'sha256') {
+        const [, saltHex, storedHash] = parts;
+        const data = new TextEncoder().encode(`${saltHex}:${normalizedCode}`);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        const computed = toHex(digest);
+        if (computed.length === storedHash.length) {
+          let diff = 0;
+          for (let i = 0; i < computed.length; i++) {
+            diff |= computed.charCodeAt(i) ^ storedHash.charCodeAt(i);
+          }
+          if (diff === 0) {
+            validCode = dbCode;
+            break;
+          }
+        }
       }
     }
 
