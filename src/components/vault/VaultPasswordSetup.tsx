@@ -64,7 +64,10 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
       }
       
       const { data, error } = await supabase.functions.invoke('set-vault-password', {
-        body: { password }
+        body: { password },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
       
       if (error) throw error;
