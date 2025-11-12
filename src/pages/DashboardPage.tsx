@@ -24,6 +24,7 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { RegisterEmployeeDialog } from "@/components/dashboard/RegisterEmployeeDialog";
 import { useToast } from "@/hooks/use-toast";
 import { KPIsSection } from "@/components/dashboard/KPIsSection";
+import { supabase } from "@/integrations/supabase/client";
 import { AttentionQueue } from "@/components/dashboard/AttentionQueue";
 import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import { SubscriptionPlans } from "@/components/dashboard/SubscriptionPlans";
@@ -81,6 +82,47 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
           loadSubscriptionStatus(),
           loadVaultResetRequests()
         ]);
+        
+        // Check if we need to calculate risk scores
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: assignments } = await supabase
+            .from('employee_assignments')
+            .select('employee_id')
+            .eq('refugi_lead_id', user.id);
+          
+          const assignedIds = assignments?.map(a => a.employee_id) || [];
+          
+          if (assignedIds.length > 0) {
+            // Check if risk_scores exist for assigned employees
+            const { data: existingScores } = await supabase
+              .from('risk_scores')
+              .select('employee_id')
+              .in('employee_id', assignedIds);
+            
+            const missingScores = assignedIds.filter(
+              id => !existingScores?.some(score => score.employee_id === id)
+            );
+            
+            // If missing risk scores, calculate them
+            if (missingScores.length > 0) {
+              console.log(`🔄 Calculating risk scores for ${missingScores.length} employees...`);
+              
+              toast({
+                title: t('notifications.calculatingRisks'),
+                description: t('notifications.calculatingRisksDesc'),
+              });
+              
+              const { error } = await supabase.functions.invoke('calculate-risk-scores');
+              
+              if (error) {
+                console.error('Error calculating risk scores:', error);
+              } else {
+                console.log('✅ Risk scores calculated successfully');
+              }
+            }
+          }
+        }
         
         toast({
           title: t('notifications.dashboardUpdated'),

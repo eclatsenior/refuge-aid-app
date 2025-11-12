@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { KPICard } from './KPICard';
-import { Activity, AlertTriangle, BookOpen, Heart } from 'lucide-react';
+import { Activity, AlertTriangle, BookOpen, Heart, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
 
 interface KPIData {
   active_risk: { score: number; trend_7d: number; trend_30d: number };
@@ -20,34 +21,61 @@ export function KPIsSection() {
   const { t } = useTranslation('dashboard');
   const [kpis, setKpis] = useState<KPIData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRecalculating, setIsRecalculating] = useState(false);
   const { toast } = useToast();
 
+  const loadKPIs = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('dashboard-kpis', {
+        body: { scope: {} }
+      });
+
+      if (error) throw error;
+      setKpis(data);
+    } catch (error: any) {
+      console.error('Error loading KPIs:', error);
+      toast({
+        title: 'Error al cargar KPIs',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRecalculateRisks = async () => {
+    setIsRecalculating(true);
+    try {
+      const { error } = await supabase.functions.invoke('calculate-risk-scores');
+      
+      if (error) throw error;
+      
+      toast({
+        title: t('kpis.riskRecalculated'),
+        description: t('kpis.riskRecalculatedDesc'),
+      });
+      
+      // Reload KPIs after recalculation
+      await loadKPIs();
+    } catch (error: any) {
+      console.error('Error recalculating risks:', error);
+      toast({
+        title: t('notifications.error'),
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsRecalculating(false);
+    }
+  };
+
   useEffect(() => {
-    const loadKPIs = async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke('dashboard-kpis', {
-          body: { scope: {} }
-        });
-
-        if (error) throw error;
-        setKpis(data);
-      } catch (error: any) {
-        console.error('Error loading KPIs:', error);
-        toast({
-          title: 'Error al cargar KPIs',
-          description: error.message,
-          variant: 'destructive'
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadKPIs();
     
     const interval = setInterval(loadKPIs, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [toast]);
+  }, []);
 
   if (loading) {
     return (
@@ -61,7 +89,18 @@ export function KPIsSection() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">{t('kpisSection.sectionTitle')}</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">{t('kpisSection.sectionTitle')}</h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRecalculateRisks}
+          disabled={isRecalculating}
+        >
+          <RefreshCw className={`h-4 w-4 mr-2 ${isRecalculating ? 'animate-spin' : ''}`} />
+          {t('kpis.recalculateRisks')}
+        </Button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
           title={t('kpisSection.activeRisk')}
