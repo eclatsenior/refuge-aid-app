@@ -13,12 +13,20 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization');
+    console.log('[SET-VAULT-PASSWORD] Auth header present:', !!authHeader);
+    
+    if (!authHeader) {
+      console.error('[SET-VAULT-PASSWORD] No authorization header found');
+      throw new Error('No autorizado - falta cabecera de autorización');
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+          headers: { Authorization: authHeader },
         },
       }
     );
@@ -27,8 +35,11 @@ serve(async (req) => {
       data: { user },
     } = await supabaseClient.auth.getUser();
 
+    console.log('[SET-VAULT-PASSWORD] User authenticated:', user?.id);
+
     if (!user) {
-      throw new Error('No autorizado');
+      console.error('[SET-VAULT-PASSWORD] No user found after auth check');
+      throw new Error('No autorizado - usuario no encontrado');
     }
 
     const { password } = await req.json();

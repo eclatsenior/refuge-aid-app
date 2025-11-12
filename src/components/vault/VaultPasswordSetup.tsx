@@ -57,22 +57,14 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
     setIsLoading(true);
     
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error('No hay sesión activa');
-      }
-      
+      // SDK automatically includes auth headers
       const { data, error } = await supabase.functions.invoke('set-vault-password', {
-        body: { password },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
+        body: { password }
       });
       
       if (error) throw error;
       
-      if (data.error) {
+      if (data?.error) {
         throw new Error(data.error);
       }
       
