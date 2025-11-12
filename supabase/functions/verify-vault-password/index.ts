@@ -1,16 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
-import { create } from "https://deno.land/x/djwt@v3.0.1/mod.ts";
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const JWT_SECRET = new TextEncoder().encode(
-  Deno.env.get('SUPABASE_JWT_SECRET') || 'your-secret-key'
-);
+async function getJWTSecret(): Promise<CryptoKey> {
+  const secret = Deno.env.get('SUPABASE_JWT_SECRET') || 'your-secret-key';
+  const enc = new TextEncoder();
+  return await crypto.subtle.importKey(
+    'raw',
+    enc.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign', 'verify']
+  );
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -111,16 +117,23 @@ serve(async (req) => {
     }
 
     // Generar token temporal (30 minutos)
-    const vaultToken = await create(
-      { alg: "HS256", typ: "JWT" },
-      {
-        sub: user.id,
-        exp: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutos
-        iat: Math.floor(Date.now() / 1000),
-        vault_access: true,
-      },
-      JWT_SECRET
-    );
+    const jwtSecret = await getJWTSecret();
+    const payload = {
+      sub: user.id,
+      exp: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutos
+      iat: Math.floor(Date.now() / 1000),
+      vault_access: true,
+    };
+    
+    // Create JWT manually using Web Crypto
+    const header = { alg: "HS256", typ: "JWT" };
+    const encodedHeader = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const encodedPayload = btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const dataToSign = `${encodedHeader}.${encodedPayload}`;
+    const enc = new TextEncoder();
+    const signature = await crypto.subtle.sign('HMAC', jwtSecret, enc.encode(dataToSign));
+    const encodedSignature = btoa(String.fromCharCode(...new Uint8Array(signature))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const vaultToken = `${dataToSign}.${encodedSignature}`;
 
     console.log('Caja fuerte desbloqueada para usuario:', user.id);
 

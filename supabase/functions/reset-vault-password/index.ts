@@ -1,16 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
-import { verify } from "https://deno.land/x/djwt@v3.0.1/mod.ts";
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const JWT_SECRET = new TextEncoder().encode(
-  Deno.env.get('SUPABASE_JWT_SECRET') || 'your-secret-key'
-);
+async function getJWTSecret(): Promise<CryptoKey> {
+  const secret = Deno.env.get('SUPABASE_JWT_SECRET') || 'your-secret-key';
+  const enc = new TextEncoder();
+  return await crypto.subtle.importKey(
+    'raw',
+    enc.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign', 'verify']
+  );
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -59,12 +65,32 @@ serve(async (req) => {
     }
 
     // Verificar token de reset
-    let payload;
     try {
-      payload = await verify(resetToken, JWT_SECRET);
+      // Manually verify JWT
+      const jwtSecret = await getJWTSecret();
+      const parts = resetToken.split('.');
+      if (parts.length !== 3) {
+        throw new Error('Token inválido');
+      }
+      
+      const [headerB64, payloadB64, signatureB64] = parts;
+      const dataToVerify = `${headerB64}.${payloadB64}`;
+      const enc = new TextEncoder();
+      const signature = await crypto.subtle.sign('HMAC', jwtSecret, enc.encode(dataToVerify));
+      const computedSignature = btoa(String.fromCharCode(...new Uint8Array(signature))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+      
+      if (computedSignature !== signatureB64) {
+        throw new Error('Token inválido');
+      }
+      
+      const payload = JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/')));
       
       if (!payload.vault_reset || payload.sub !== user.id) {
         throw new Error('Token inválido');
+      }
+      
+      if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+        throw new Error('Token expirado');
       }
     } catch (error) {
       console.error('Error al verificar token:', error);
