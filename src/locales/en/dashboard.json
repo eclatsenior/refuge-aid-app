@@ -87,7 +87,15 @@
     "audioEnabledDesc": "Audio alerts are enabled",
     "sessionClosed": "Session closed",
     "sessionClosedDesc": "You have successfully logged out",
-    "enableAlerts": "Could not enable alerts"
+    "enableAlerts": "Could not enable alerts",
+    "calculatingRisks": "Calculating Risks",
+    "calculatingRisksDesc": "Processing risk scores for your team...",
+    "error": "Error"
+  },
+  "kpis": {
+    "recalculateRisks": "Recalculate Risks",
+    "riskRecalculated": "Risks Recalculated",
+    "riskRecalculatedDesc": "Risk scores have been updated successfully"
   },
   "actions": {
     "disableAudioAlerts": "Disable audio alerts",

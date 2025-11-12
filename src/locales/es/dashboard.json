@@ -87,7 +87,15 @@
     "audioEnabledDesc": "Las alertas sonoras están activadas",
     "sessionClosed": "Sesión cerrada",
     "sessionClosedDesc": "Has cerrado sesión correctamente",
-    "enableAlerts": "No se pudieron habilitar las alertas"
+    "enableAlerts": "No se pudieron habilitar las alertas",
+    "calculatingRisks": "Calculando Riesgos",
+    "calculatingRisksDesc": "Procesando puntuaciones de riesgo para tu equipo...",
+    "error": "Error"
+  },
+  "kpis": {
+    "recalculateRisks": "Recalcular Riesgos",
+    "riskRecalculated": "Riesgos Recalculados",
+    "riskRecalculatedDesc": "Las puntuaciones de riesgo se han actualizado correctamente"
   },
   "actions": {
     "disableAudioAlerts": "Deshabilitar alertas sonoras",

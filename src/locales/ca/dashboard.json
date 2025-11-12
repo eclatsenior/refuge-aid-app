@@ -87,7 +87,15 @@
     "audioEnabledDesc": "Les alertes sonores estan activades",
     "sessionClosed": "Sessió tancada",
     "sessionClosedDesc": "Has tancat la sessió correctament",
-    "enableAlerts": "No s'han pogut habilitar les alertes"
+    "enableAlerts": "No s'han pogut habilitar les alertes",
+    "calculatingRisks": "Calculant Riscs",
+    "calculatingRisksDesc": "Processant puntuacions de risc per al teu equip...",
+    "error": "Error"
+  },
+  "kpis": {
+    "recalculateRisks": "Recalcular Riscs",
+    "riskRecalculated": "Riscs Recalculats",
+    "riskRecalculatedDesc": "Les puntuacions de risc s'han actualitzat correctament"
   },
   "actions": {
     "disableAudioAlerts": "Deshabilitar alertes sonores",
