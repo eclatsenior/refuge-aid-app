@@ -18,22 +18,34 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
+    const authHeader = req.headers.get('Authorization');
+    console.log('[VERIFY-VAULT-PASSWORD] Starting function');
+    
+    if (!authHeader) {
+      console.error('[VERIFY-VAULT-PASSWORD] No authorization header');
+      throw new Error('No autorizado - falta cabecera de autorización');
+    }
+
+    // Create admin client to verify user
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser();
+    // Extract token from header
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify the JWT token
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    
+    console.log('[VERIFY-VAULT-PASSWORD] Auth result:', { 
+      userId: user?.id, 
+      hasError: !!authError 
+    });
 
-    if (!user) {
-      throw new Error('No autorizado');
+    if (authError || !user) {
+      console.error('[VERIFY-VAULT-PASSWORD] Auth failed:', authError);
+      throw new Error('No autorizado - sesión inválida');
     }
 
     const { password } = await req.json();
@@ -43,7 +55,7 @@ serve(async (req) => {
     }
 
     // Obtener hash almacenado
-    const { data: vaultPassword, error: fetchError } = await supabaseClient
+    const { data: vaultPassword, error: fetchError } = await supabaseAdmin
       .from('vault_passwords')
       .select('password_hash, salt')
       .eq('user_id', user.id)
@@ -99,7 +111,7 @@ serve(async (req) => {
     }
 
     // Generar token temporal (30 minutos)
-    const token = await create(
+    const vaultToken = await create(
       { alg: "HS256", typ: "JWT" },
       {
         sub: user.id,
@@ -115,7 +127,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        token,
+        token: vaultToken,
         message: 'Caja fuerte desbloqueada' 
       }),
       {

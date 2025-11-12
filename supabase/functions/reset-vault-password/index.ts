@@ -18,22 +18,34 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
+    const authHeader = req.headers.get('Authorization');
+    console.log('[RESET-VAULT-PASSWORD] Starting function');
+    
+    if (!authHeader) {
+      console.error('[RESET-VAULT-PASSWORD] No authorization header');
+      throw new Error('No autorizado - falta cabecera de autorización');
+    }
+
+    // Create admin client to verify user
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser();
+    // Extract token from header
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify the JWT token
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    
+    console.log('[RESET-VAULT-PASSWORD] Auth result:', { 
+      userId: user?.id, 
+      hasError: !!authError 
+    });
 
-    if (!user) {
-      throw new Error('No autorizado');
+    if (authError || !user) {
+      console.error('[RESET-VAULT-PASSWORD] Auth failed:', authError);
+      throw new Error('No autorizado - sesión inválida');
     }
 
     const { resetToken, newPassword } = await req.json();
@@ -74,7 +86,7 @@ serve(async (req) => {
     const passwordHash = `pbkdf2$sha256$${iterations}$${hashHex}`;
 
     // Actualizar contraseña
-    const { error: updateError } = await supabaseClient
+    const { error: updateError } = await supabaseAdmin
       .from('vault_passwords')
       .update({
         password_hash: passwordHash,
