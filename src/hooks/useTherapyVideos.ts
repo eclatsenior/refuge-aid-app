@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TherapyVideo {
+  id: string;
   route_id: string;
   module_id: string;
   video_url: string;
