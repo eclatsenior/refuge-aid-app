@@ -83,7 +83,7 @@ serve(async (req) => {
         product_id: 'prod_TD9YFQnIPhkgz4', // Basic Plan
         price_id: 'price_1SGjFHR3C9Xn67YcDTCa71lq',
         status: 'active',
-        employee_limit: 10,
+        employee_limit: 15,
         current_period_end: subscriptionEndDate.toISOString(),
         stripe_customer_id: `test_cus_${userId.substring(0, 8)}`,
         stripe_subscription_id: `test_sub_${userId.substring(0, 8)}`

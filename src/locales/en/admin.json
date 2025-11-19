@@ -24,7 +24,7 @@
       "email": "Email",
       "password": "Password",
       "plan": "Plan",
-      "planValue": "Basic Plan (10 employees)",
+      "planValue": "Basic Plan (15 employees)",
       "subscription": "Active subscription until",
       "userId": "User ID",
       "loginTitle": "To login:",

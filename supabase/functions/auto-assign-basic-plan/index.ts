@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
     const basicPlan = {
       product_id: 'prod_TD9YFQnIPhkgz4',
       price_id: 'price_1SGjFHR3C9Xn67YcDTCa71lq',
-      employee_limit: 10
+      employee_limit: 15
     };
 
     const currentPeriodEnd = new Date();
