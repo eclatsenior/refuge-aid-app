@@ -1025,9 +1025,7 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
-      get_dashboard_kpis:
-        | { Args: { scope_filter?: Json }; Returns: Json }
-        | { Args: { lead_user_id: string }; Returns: Json }
+      get_dashboard_kpis: { Args: { lead_user_id: string }; Returns: Json }
       get_employee_average_mood_24h: {
         Args: { emp_id: string }
         Returns: number
