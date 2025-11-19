@@ -69,6 +69,7 @@
     "noRequests": "لا توجد طلبات معلقة لإعادة تعيين الخزانة"
   },
   "emergencyAlerts": {
+    "title": "التنبيهات النشطة",
     "active": "نشطة",
     "calling": "يتصل...",
     "phoneUnavailable": "الهاتف غير متوفر",
