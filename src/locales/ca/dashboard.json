@@ -104,9 +104,6 @@
   "plans": {
     "title": "Plans Disponibles"
   },
-  "emergencyAlerts": {
-    "title": "Alertes actives"
-  },
   "employeeList": {
     "title": "Empleades Assignades",
     "searchPlaceholder": "Cercar empleades...",
@@ -115,6 +112,7 @@
     "noEmployeesYet": "No tens empleades assignades en aquest moment."
   },
   "emergencyAlerts": {
+    "title": "Alerta d'emergència",
     "active": "Activa",
     "calling": "Trucant...",
     "phoneUnavailable": "Telèfon no disponible",

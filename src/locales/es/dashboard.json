@@ -104,9 +104,6 @@
   "plans": {
     "title": "Planes Disponibles"
   },
-  "emergencyAlerts": {
-    "title": "Alertas activas"
-  },
   "employeeList": {
     "title": "Empleadas Asignadas",
     "searchPlaceholder": "Buscar empleadas...",
@@ -115,6 +112,7 @@
     "noEmployeesYet": "No tienes empleadas asignadas en este momento."
   },
   "emergencyAlerts": {
+    "title": "Alerta de Emergencia",
     "active": "Activa",
     "calling": "Llamando...",
     "phoneUnavailable": "Teléfono no disponible",

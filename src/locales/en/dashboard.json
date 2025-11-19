@@ -104,9 +104,6 @@
   "plans": {
     "title": "Available Plans"
   },
-  "emergencyAlerts": {
-    "title": "Active Alerts"
-  },
   "employeeList": {
     "title": "Assigned Employees",
     "searchPlaceholder": "Search employees...",
@@ -115,6 +112,7 @@
     "noEmployeesYet": "You have no assigned employees at this time."
   },
   "emergencyAlerts": {
+    "title": "Emergency Alert",
     "active": "Active",
     "calling": "Calling...",
     "phoneUnavailable": "Phone unavailable",
