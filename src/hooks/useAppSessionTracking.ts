@@ -15,12 +15,19 @@ export function useAppSessionTracking() {
           return;
         }
 
+        console.debug('[AppSession] Starting session for user:', session.user.id);
+
         const { data, error } = await supabase.functions.invoke('track-app-session', {
           body: { action: 'start' }
         });
 
         if (error) {
-          console.error('[AppSession] Error starting session:', error);
+          // If auth error, the session might be stale - just log and skip
+          if (error.message?.includes('Unauthorized') || error.message?.includes('Auth')) {
+            console.warn('[AppSession] Auth error (possibly stale session), will retry on next interaction');
+          } else {
+            console.error('[AppSession] Error starting session:', error);
+          }
           return;
         }
 
