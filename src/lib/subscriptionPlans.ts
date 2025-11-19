@@ -21,10 +21,10 @@ export const SUBSCRIPTION_PLANS = {
     price_id: 'price_1SGjFHR3C9Xn67YcDTCa71lq',
     name: 'Plan Básico',
     price: 99.95,
-    employee_limit: 10,
+    employee_limit: 15,
     popular: false,
     features: [
-      'Hasta 10 empleadas',
+      'Hasta 15 empleadas',
       'Dashboard completo',
       'Alertas de emergencia',
       'Registro de estado de ánimo',
