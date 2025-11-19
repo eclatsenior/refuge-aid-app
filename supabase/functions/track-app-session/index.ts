@@ -12,15 +12,28 @@ serve(async (req) => {
   }
 
   try {
+    // Verify authorization header exists
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('[track-app-session] No authorization header');
+      throw new Error('Unauthorized: No authorization header');
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+      { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Unauthorized');
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.error('[track-app-session] Auth error:', userError?.message || 'No user');
+      throw new Error('Unauthorized: ' + (userError?.message || 'Invalid session'));
+    }
 
+    console.log('[track-app-session] User authenticated:', user.id);
+    
     const { action, session_id } = await req.json();
 
     if (action === 'start') {
@@ -73,10 +86,14 @@ serve(async (req) => {
 
     throw new Error('Invalid action');
   } catch (error: any) {
-    console.error('Error tracking session:', error);
+    console.error('[track-app-session] Error:', error.message);
+    
+    // Return 401 for auth errors, 400 for others
+    const isAuthError = error.message?.includes('Unauthorized') || error.message?.includes('Auth');
+    
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
+      status: isAuthError ? 401 : 400,
     });
   }
 });

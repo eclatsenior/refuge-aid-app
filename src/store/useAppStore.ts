@@ -200,7 +200,7 @@ interface AppState {
   leadSettings: LeadSettings | null;
   
   // Paywall & Access Control
-  accessType: 'managed' | 'individual' | 'refugi_lead' | 'none' | null;
+  accessType: 'managed' | 'individual' | 'refugi_lead' | 'none' | 'pending' | null;
   showPaywall: boolean;
   
   // Security
@@ -1151,9 +1151,20 @@ export const useAppStore = create<AppState>()(
 
           console.log('💳 Loading subscription status...');
 
+          // Add small delay to ensure session is fully established
+          await new Promise(resolve => setTimeout(resolve, 100));
+
           const { data, error } = await supabase.functions.invoke('check-subscription');
 
-          if (error) throw error;
+          if (error) {
+            // If auth error, log but don't fail completely - might be temp issue
+            if (error.message?.includes('session missing') || error.message?.includes('Unauthorized')) {
+              console.warn('⚠️ Auth error loading subscription (session may be initializing):', error.message);
+              set({ subscription: null });
+              return;
+            }
+            throw error;
+          }
 
           console.log('✅ Subscription status loaded:', data);
           set({ subscription: data });
@@ -1191,9 +1202,19 @@ export const useAppStore = create<AppState>()(
         // Para empleados, verificar suscripción
         if (profile.role === 'employee') {
           try {
+            // Add small delay to ensure session is ready
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
             const { data, error } = await supabase.functions.invoke('check-subscription');
             
             if (error) {
+              // If auth error, log warning but don't immediately show paywall
+              if (error.message?.includes('session missing') || error.message?.includes('Unauthorized')) {
+                console.warn('⚠️ Auth error checking access (session may be initializing)');
+                // Give the benefit of the doubt temporarily
+                set({ showPaywall: false, accessType: 'pending' });
+                return;
+              }
               console.error('Error checking subscription:', error);
               set({ showPaywall: true, accessType: 'none' });
               return;
