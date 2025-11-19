@@ -387,7 +387,20 @@ serve(async (req) => {
       alerts: emergencyAlerts.length,
       employees: employeeProfiles.length,
       mood_checkins: moodCheckins.length,
-      risk_scores: riskScores.length
+      risk_scores: riskScores.length,
+      training_completions: trainingCompletions.length,
+      cases: cases.length,
+      psych_referrals: psychReferrals.length,
+      hris_data: hrisData.length,
+      timeline_events: timeline.length,
+      statistics: {
+        incidents_total: stats.incidents.total,
+        alerts_total: stats.alerts.total,
+        mood_total: stats.mood.total_checkins,
+        risk_high: stats.risk.high_risk,
+        risk_medium: stats.risk.medium_risk,
+        risk_low: stats.risk.low_risk
+      }
     });
 
     return new Response(JSON.stringify(reportData), {
