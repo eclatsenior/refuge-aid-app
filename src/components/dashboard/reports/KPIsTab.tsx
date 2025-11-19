@@ -46,8 +46,19 @@ export function KPIsTab({ employees }: { employees: any[] }) {
       const assignedEmployeeIds = assignments?.map(a => a.employee_id) || [];
 
       // Fetch KPIs (already filtered in edge function)
-      const { data: kpiData } = await supabase.functions.invoke('dashboard-kpis');
-      if (kpiData) setKpis(kpiData);
+      try {
+        const { data: kpiData, error } = await supabase.functions.invoke('dashboard-kpis');
+        
+        if (error) {
+          console.warn('KPIs fetch warning:', error);
+          // No mostrar error al usuario - los datos se cargarán en el siguiente intento
+        } else if (kpiData) {
+          setKpis(kpiData);
+        }
+      } catch (error) {
+        console.warn('KPIs fetch error (will retry):', error);
+        // No lanzar el error ni mostrar mensaje - es transitorio
+      }
 
       // Fetch risk trend - FILTERED
       const { data: riskData } = await supabase

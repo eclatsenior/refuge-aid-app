@@ -34,11 +34,19 @@ export function KPIsSection() {
       setKpis(data);
     } catch (error: any) {
       console.error('Error loading KPIs:', error);
-      toast({
-        title: 'Error al cargar KPIs',
-        description: error.message,
-        variant: 'destructive'
-      });
+      
+      // No mostrar toast para errores de autenticación transitorios
+      const isAuthError = error.message?.toLowerCase().includes('unauthorized') || 
+                          error.message?.toLowerCase().includes('auth') ||
+                          error.message?.toLowerCase().includes('session');
+      
+      if (!isAuthError) {
+        toast({
+          title: 'Error al cargar KPIs',
+          description: error.message,
+          variant: 'destructive'
+        });
+      }
     } finally {
       setLoading(false);
     }
