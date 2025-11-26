@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Search, Star, StarOff, Edit, Trash2, Save, X, Lock, Vault, Heart, ArrowLeft, Download, Shield, AlertTriangle } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,6 +22,7 @@ interface NotesPageProps {
 }
 
 export function NotesPage({ onNavigate }: NotesPageProps) {
+  const { t } = useTranslation('notes');
   const { 
     notes, addNote, updateNote, deleteNote, toggleVaultStatus, 
     toggleTherapyFlag, quickDeleteNote, settings, showDecoyScreen, 
@@ -75,8 +77,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
             setShowVaultReset(false);
             
             toast({
-              title: '✅ Solicitud aprobada',
-              description: 'Tu Refugi Lead aprobó tu solicitud. Establece tu nueva contraseña.',
+              title: t('toast.requestApproved'),
+              description: t('toast.requestApprovedDescription'),
             });
           }
         })
@@ -157,8 +159,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     setShowVaultSetup(false);
     setHasVaultPassword(true);
     toast({
-      title: '🔒 Caja Fuerte configurada',
-      description: 'Tu espacio seguro está listo',
+      title: t('vault.setup.successTitle'),
+      description: t('vault.setup.successDescription'),
     });
   };
 
@@ -209,8 +211,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const handleSaveNote = async () => {
     if (!title.trim()) {
       toast({
-        title: "Error",
-        description: "El título es obligatorio",
+        title: t('toast.errorTitle', { defaultValue: 'Error' }),
+        description: t('errors.titleRequired'),
         variant: "destructive"
       });
       return;
@@ -228,8 +230,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
       } catch (error) {
         console.error('Error encrypting note:', error);
         toast({
-          title: 'Error',
-          description: 'No se pudo cifrar la nota',
+          title: t('toast.errorTitle', { defaultValue: 'Error' }),
+          description: t('errors.encryptionFailed'),
           variant: 'destructive',
         });
         return;
@@ -242,8 +244,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
         content: finalContent
       });
       toast({
-        title: "Nota actualizada",
-        description: "Los cambios se han guardado correctamente"
+        title: t('toast.noteUpdated'),
+        description: t('toast.noteUpdatedDescription')
       });
     } else {
       addNote({
@@ -252,10 +254,10 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
         timestamp: new Date()
       });
       toast({
-        title: isVaultMode ? "Nota guardada en Caja Fuerte" : "Nota creada",
+        title: isVaultMode ? t('toast.noteSavedVault') : t('toast.noteCreated'),
         description: isVaultMode 
-          ? "Tu memoria sensible se ha guardado de forma segura y cifrada"
-          : "Tu nota se ha guardado de forma segura"
+          ? t('toast.noteSavedVaultDescription')
+          : t('toast.noteCreatedDescription')
       });
     }
 
@@ -267,11 +269,11 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   };
 
   const handleDeleteNote = (id: string) => {
-    if (confirm("¿Estás segura de que quieres eliminar esta nota? Esta acción no se puede deshacer.")) {
+    if (confirm(t('confirmDelete.title') + ' ' + t('confirmDelete.description'))) {
       deleteNote(id);
       toast({
-        title: "Nota eliminada",
-        description: "La nota ha sido eliminada permanentemente"
+        title: t('toast.noteDeleted'),
+        description: t('toast.noteDeletedDescription')
       });
     }
   };
@@ -279,15 +281,15 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const handleQuickDelete = (id: string) => {
     if (quickDeleteNote(id, deleteConfirmWord)) {
       toast({
-        title: "Nota eliminada",
-        description: "La nota ha sido eliminada permanentemente"
+        title: t('toast.noteDeleted'),
+        description: t('toast.noteDeletedDescription')
       });
       setShowQuickDelete(null);
       setDeleteConfirmWord("");
     } else {
       toast({
-        title: "Error",
-        description: "Escribe 'BORRAR' para confirmar la eliminación",
+        title: t('toast.errorTitle', { defaultValue: 'Error' }),
+        description: t('errors.confirmDeleteError'),
         variant: "destructive"
       });
     }
@@ -305,8 +307,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     a.click();
     
     toast({
-      title: "Exportado para terapia",
-      description: "Archivo descargado (en app real sería PDF protegido)"
+      title: t('toast.exportedTherapy'),
+      description: t('toast.exportedTherapyDescription')
     });
   };
 
@@ -335,8 +337,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const handleEmergencyHide = () => {
     activateDecoyScreen();
     toast({
-      title: "Modo discreto activado",
-      description: "Toca el ícono del corazón para volver"
+      title: t('toast.emergencyHideActivated'),
+      description: t('toast.emergencyHideDescription')
     });
   };
 
@@ -345,9 +347,9 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     return (
       <div className="min-h-screen bg-background p-4 pb-20">
         <header className="mb-6">
-          <h1 className="text-2xl font-bold mb-2">Mis Notas</h1>
+          <h1 className="text-2xl font-bold mb-2">{t('decoy.title')}</h1>
           <p className="text-muted-foreground">
-            Escribe y organiza tus pensamientos
+            {t('decoy.description')}
           </p>
         </header>
         
@@ -356,12 +358,12 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
             className="mx-auto h-16 w-16 text-muted-foreground mb-4 cursor-pointer" 
             onClick={deactivateDecoyScreen}
           />
-          <h3 className="text-xl font-semibold mb-2">No hay notas</h3>
+          <h3 className="text-xl font-semibold mb-2">{t('decoy.empty')}</h3>
           <p className="text-muted-foreground mb-8">
-            Crea tu primera nota para empezar
+            {t('decoy.emptyDescription')}
           </p>
           <Button onClick={deactivateDecoyScreen}>
-            Crear nota
+            {t('decoy.createButton')}
           </Button>
         </div>
       </div>
@@ -375,10 +377,10 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
           <h1 className="text-2xl font-bold flex items-center gap-2">
             {isVaultMode && <Vault className="h-6 w-6 text-primary" />}
             {editingId 
-              ? 'Editar Nota' 
+              ? t('editing.title')
               : isVaultMode 
-                ? 'Nueva Memoria - Caja Fuerte'
-                : 'Nueva Nota'
+                ? t('editing.newVaultNote')
+                : t('editing.newNote')
             }
           </h1>
           <Button
@@ -400,17 +402,17 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
             <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
               <div className="flex items-center gap-2 mb-2">
                 <Vault className="h-5 w-5 text-primary" />
-                <span className="font-medium text-primary">Caja Fuerte</span>
+                <span className="font-medium text-primary">{t('editing.vaultBadge')}</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Esta memoria se guardará en tu espacio más seguro. Puedes marcarla para trabajar en terapia.
+                {t('editing.vaultDescription')}
               </p>
             </div>
           )}
           
           <div>
             <Input
-              placeholder={isVaultMode ? "¿Qué memoria quieres guardar?" : "Título de la nota..."}
+              placeholder={isVaultMode ? t('editing.titlePlaceholderVault') : t('editing.titlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="text-lg font-medium"
@@ -420,8 +422,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
           <div>
             <Textarea
               placeholder={isVaultMode 
-                ? "Este es tu espacio seguro. Escribe sin juicio, sin prisa..."
-                : "Escribe aquí el contenido de tu nota..."
+                ? t('editing.contentPlaceholderVault')
+                : t('editing.contentPlaceholder')
               }
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -431,11 +433,11 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
           
           <div className="flex justify-between items-center pt-4">
             <div className="text-sm text-muted-foreground">
-              🔒 Esta nota se guardará de forma segura y encriptada
+              {t('editing.encryptionNote')}
             </div>
             <Button onClick={handleSaveNote} className="gap-2">
               <Save size={16} />
-              Guardar {isVaultMode ? 'en Caja Fuerte' : 'nota'}
+              {isVaultMode ? t('buttons.saveVault') : t('buttons.saveNote')}
             </Button>
           </div>
         </div>
@@ -476,7 +478,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
             <Input
-              placeholder="Buscar en tu diario..."
+              placeholder={t('search.placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -485,11 +487,11 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
           <div className="flex gap-2 shrink-0">
             <Button onClick={() => handleCreateNote(false)} variant="outline" className="gap-2">
               <Plus size={16} />
-              Nota
+              {t('buttons.createNote')}
             </Button>
             <Button onClick={() => handleCreateNote(true)} className="gap-2">
               <Vault size={16} />
-              Caja Fuerte
+              {t('buttons.createVaultNote')}
             </Button>
           </div>
         </div>
@@ -500,20 +502,20 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
           {searchTerm ? (
             <>
               <Search className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No se encontraron notas</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('emptySearch.title')}</h3>
               <p className="text-muted-foreground mb-6">
-                Intenta con otros términos de búsqueda
+                {t('emptySearch.description')}
               </p>
               <Button onClick={() => setSearchTerm("")} variant="outline">
-                Limpiar búsqueda
+                {t('buttons.cancel')}
               </Button>
             </>
           ) : (
             <>
               <Vault className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Tu Diario Caja Fuerte</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('title')}</h3>
               <p className="text-muted-foreground mb-2">
-                Un espacio protegido para lo que pesa y para lo que salva.
+                {t('subtitle')}
               </p>
               <p className="text-sm text-muted-foreground/80 mb-6 italic">
                 "No eres débil por estar herida, sino poderosa por estar de pie."
@@ -521,11 +523,11 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
               <div className="flex gap-3 justify-center">
                 <Button onClick={() => handleCreateNote(false)} variant="outline" className="gap-2">
                   <Plus size={16} />
-                  Primera nota
+                  {t('empty.button')}
                 </Button>
                 <Button onClick={() => handleCreateNote(true)} className="gap-2">
                   <Vault size={16} />
-                  Memoria segura
+                  {t('buttons.createVaultNote')}
                 </Button>
               </div>
             </>
@@ -538,7 +540,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Vault className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold text-primary">Caja Fuerte</h2>
+                <h2 className="text-lg font-semibold text-primary">{t('sections.vault')}</h2>
                 <Badge variant="secondary" className="bg-primary/10 text-primary">
                   {vaultNotes.length}
                 </Badge>
@@ -553,9 +555,9 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold mb-2">Caja Fuerte Protegida</h3>
+                      <h3 className="text-lg font-semibold mb-2">{t('vault.unlock.title')}</h3>
                       <p className="text-muted-foreground text-sm mb-4">
-                        Ingresa tu contraseña para acceder a tus memorias más sensibles
+                        {t('vault.unlock.description')}
                       </p>
                     </div>
                     <Button 
@@ -564,7 +566,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
                       className="gap-2"
                     >
                       <Vault size={14} />
-                      Desbloquear Caja Fuerte
+                      {t('vault.unlock.submitButton')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -580,7 +582,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
                           <div className="flex items-center gap-2 shrink-0">
                             <Badge variant="secondary" className="gap-1 bg-primary/20 text-primary">
                               <Vault size={12} />
-                              Caja Fuerte
+                              {t('sections.vault')}
                             </Badge>
                             {note.forTherapy && (
                               <Badge variant="secondary" className="gap-1 bg-mint/20 text-mint">
@@ -688,7 +690,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Edit className="h-5 w-5 text-muted-foreground" />
-                <h2 className="text-lg font-semibold">Notas Regulares</h2>
+                <h2 className="text-lg font-semibold">{t('sections.regular')}</h2>
                 <Badge variant="secondary" className="bg-muted/20">
                   {regularNotes.length}
                 </Badge>

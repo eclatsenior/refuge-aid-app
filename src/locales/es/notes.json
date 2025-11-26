@@ -1,0 +1,170 @@
+{
+  "title": "Diario Caja Fuerte",
+  "subtitle": "Un espacio protegido para lo que pesa y para lo que salva",
+  "search": {
+    "placeholder": "Buscar en tu diario..."
+  },
+  "buttons": {
+    "hide": "Ocultar",
+    "createNote": "Nota",
+    "createVaultNote": "Caja Fuerte",
+    "save": "Guardar",
+    "saveVault": "Guardar en Caja Fuerte",
+    "saveNote": "Guardar nota",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "exportTherapy": "Exportar para terapia"
+  },
+  "empty": {
+    "title": "No hay notas",
+    "description": "Crea tu primera nota para empezar",
+    "button": "Crear nota"
+  },
+  "emptySearch": {
+    "title": "No se encontraron resultados",
+    "description": "Intenta con otros términos de búsqueda"
+  },
+  "editing": {
+    "title": "Editar Nota",
+    "newNote": "Nueva Nota",
+    "newVaultNote": "Nueva Memoria - Caja Fuerte",
+    "titlePlaceholder": "Título de la nota...",
+    "titlePlaceholderVault": "¿Qué memoria quieres guardar?",
+    "contentPlaceholder": "Escribe aquí el contenido de tu nota...",
+    "contentPlaceholderVault": "Este es tu espacio seguro. Escribe sin juicio, sin prisa...",
+    "vaultBadge": "Caja Fuerte",
+    "vaultDescription": "Esta memoria se guardará en tu espacio más seguro. Puedes marcarla para trabajar en terapia.",
+    "encryptionNote": "🔒 Esta nota se guardará de forma segura y encriptada"
+  },
+  "sections": {
+    "vault": "Caja Fuerte",
+    "regular": "Notas Regulares"
+  },
+  "confirmDelete": {
+    "title": "¿Estás segura de que quieres eliminar esta nota?",
+    "description": "Esta acción no se puede deshacer.",
+    "placeholder": "Escribe 'BORRAR' para confirmar",
+    "confirmWord": "BORRAR"
+  },
+  "toast": {
+    "noteCreated": "Nota creada",
+    "noteCreatedDescription": "Tu nota se ha guardado de forma segura",
+    "noteSavedVault": "Nota guardada en Caja Fuerte",
+    "noteSavedVaultDescription": "Tu memoria sensible se ha guardado de forma segura y cifrada",
+    "noteUpdated": "Nota actualizada",
+    "noteUpdatedDescription": "Los cambios se han guardado correctamente",
+    "noteDeleted": "Nota eliminada",
+    "noteDeletedDescription": "La nota ha sido eliminada permanentemente",
+    "exportedTherapy": "Exportado para terapia",
+    "exportedTherapyDescription": "Archivo descargado (en app real sería PDF protegido)",
+    "emergencyHideActivated": "Modo discreto activado",
+    "emergencyHideDescription": "Toca el ícono del corazón para volver",
+    "requestApproved": "✅ Solicitud aprobada",
+    "requestApprovedDescription": "Tu Refugi Lead aprobó tu solicitud. Establece tu nueva contraseña."
+  },
+  "errors": {
+    "titleRequired": "El título es obligatorio",
+    "encryptionFailed": "No se pudo cifrar la nota",
+    "passwordRequired": "Ingresa tu contraseña",
+    "confirmDeleteError": "Escribe 'BORRAR' para confirmar la eliminación"
+  },
+  "vault": {
+    "setup": {
+      "title": "Configura tu Caja Fuerte",
+      "description": "Esta contraseña protegerá tus notas más sensibles.",
+      "warning": "Importante:",
+      "warningDescription": "No olvides esta contraseña. Recuperarla requiere verificación especial y perderás el acceso a tus notas antiguas.",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Mínimo 8 caracteres",
+      "passwordRequirements": "Debe contener mayúsculas, minúsculas y números",
+      "confirmPasswordLabel": "Confirmar Contraseña",
+      "confirmPasswordPlaceholder": "Repite tu contraseña",
+      "submitButton": "Proteger Caja Fuerte",
+      "submittingButton": "Configurando...",
+      "successTitle": "🔒 Caja Fuerte protegida",
+      "successDescription": "Tu contraseña ha sido configurada correctamente",
+      "errorTitle": "Error",
+      "errorDescription": "No se pudo configurar la contraseña",
+      "validationMinLength": "La contraseña debe tener al menos 8 caracteres",
+      "validationUppercase": "Debe contener al menos una mayúscula",
+      "validationLowercase": "Debe contener al menos una minúscula",
+      "validationNumber": "Debe contener al menos un número",
+      "validationMismatch": "Las contraseñas no coinciden"
+    },
+    "unlock": {
+      "title": "Desbloquear Caja Fuerte",
+      "description": "Ingresa tu contraseña para acceder a tus notas protegidas",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "attemptsRemaining": "intentos restantes",
+      "submitButton": "Desbloquear",
+      "submittingButton": "Verificando...",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "locked": "Bloqueado temporalmente",
+      "lockedDescription": "Podrás intentar de nuevo en:",
+      "lockedToast": "Bloqueado temporalmente",
+      "lockedToastDescription": "Espera {time} para intentar de nuevo",
+      "tooManyAttempts": "Bloqueado",
+      "tooManyAttemptsDescription": "Demasiados intentos fallidos. Bloqueado por 15 minutos",
+      "incorrectPassword": "Contraseña incorrecta",
+      "successTitle": "🔓 Caja Fuerte desbloqueada",
+      "successDescription": "Accediendo a tus notas seguras...",
+      "errorTitle": "Error",
+      "errorDescription": "No se pudo verificar la contraseña"
+    },
+    "reset": {
+      "title": "Recuperar acceso a Caja Fuerte",
+      "descriptionManaged": "Tu Refugi Lead recibirá una solicitud para resetear tu contraseña",
+      "descriptionSelfService": "Necesitamos verificar tu identidad para resetear tu contraseña",
+      "warning": "Advertencia:",
+      "warningDescription": "Al resetear tu contraseña, las notas antiguas de tu Caja Fuerte no podrán descifrarse con la nueva contraseña.",
+      "businessPlan": "Plan Empresarial",
+      "businessPlanDescription": "Tu Refugi Lead aprobará tu solicitud",
+      "idUploadLabel": "Foto de tu documento de identidad (DNI/NIE/Pasaporte)",
+      "idUploadButton": "Seleccionar archivo",
+      "idUploadHelp": "Máximo 5MB. Formatos: JPG, PNG, WEBP",
+      "confirmCheckbox": "Confirmo que esta es mi identificación oficial y autorizo su revisión para verificar mi identidad",
+      "reviewTime": "Tu solicitud será revisada en 24-48 horas hábiles",
+      "submitButton": "Enviar solicitud",
+      "submittingButton": "Enviando...",
+      "successTitle": "✅ Solicitud enviada",
+      "errorTitle": "Error",
+      "errorDescription": "No se pudo enviar la solicitud",
+      "errorIdRequired": "Debes adjuntar una foto de tu documento de identidad",
+      "errorConfirmRequired": "Debes confirmar que es tu identificación oficial",
+      "errorFileSize": "Archivo muy grande",
+      "errorFileSizeDescription": "El archivo debe ser menor a 5MB",
+      "errorFileType": "Tipo de archivo inválido",
+      "errorFileTypeDescription": "Solo se permiten imágenes"
+    },
+    "resetComplete": {
+      "title": "Solicitud Aprobada",
+      "description": "Tu Refugi Lead ha aprobado tu solicitud. Establece una nueva contraseña para tu Caja Fuerte.",
+      "warning": "⚠️ Importante:",
+      "warningDescription": "Las notas antiguas no podrán descifrarse con esta nueva contraseña.",
+      "newPasswordLabel": "Nueva contraseña",
+      "newPasswordPlaceholder": "Mínimo 8 caracteres",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Repite la contraseña",
+      "validityNote": "Esta ventana es válida por 30 minutos desde la aprobación.",
+      "submitButton": "Establecer contraseña",
+      "submittingButton": "Actualizando...",
+      "successTitle": "✅ Contraseña actualizada",
+      "successDescription": "Tu Caja Fuerte tiene una nueva contraseña",
+      "errorTitle": "Error",
+      "errorDescription": "No se pudo actualizar la contraseña",
+      "errorPasswordShort": "Contraseña muy corta",
+      "errorPasswordShortDescription": "La contraseña debe tener al menos 8 caracteres",
+      "errorPasswordMismatch": "Las contraseñas no coinciden",
+      "errorPasswordMismatchDescription": "Por favor verifica que ambas contraseñas sean iguales"
+    }
+  },
+  "decoy": {
+    "title": "Mis Notas",
+    "description": "Escribe y organiza tus pensamientos",
+    "empty": "No hay notas",
+    "emptyDescription": "Crea tu primera nota para empezar",
+    "createButton": "Crear nota"
+  }
+}

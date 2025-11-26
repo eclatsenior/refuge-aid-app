@@ -1,0 +1,170 @@
+{
+  "title": "Diari Caixa Forta",
+  "subtitle": "Un espai protegit per allò que pesa i per allò que salva",
+  "search": {
+    "placeholder": "Cercar al teu diari..."
+  },
+  "buttons": {
+    "hide": "Amagar",
+    "createNote": "Nota",
+    "createVaultNote": "Caixa Forta",
+    "save": "Desar",
+    "saveVault": "Desar a Caixa Forta",
+    "saveNote": "Desar nota",
+    "cancel": "Cancel·lar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "exportTherapy": "Exportar per a teràpia"
+  },
+  "empty": {
+    "title": "No hi ha notes",
+    "description": "Crea la teva primera nota per començar",
+    "button": "Crear nota"
+  },
+  "emptySearch": {
+    "title": "No s'han trobat resultats",
+    "description": "Prova amb altres termes de cerca"
+  },
+  "editing": {
+    "title": "Editar Nota",
+    "newNote": "Nova Nota",
+    "newVaultNote": "Nova Memòria - Caixa Forta",
+    "titlePlaceholder": "Títol de la nota...",
+    "titlePlaceholderVault": "Quina memòria vols guardar?",
+    "contentPlaceholder": "Escriu aquí el contingut de la teva nota...",
+    "contentPlaceholderVault": "Aquest és el teu espai segur. Escriu sense judici, sense pressa...",
+    "vaultBadge": "Caixa Forta",
+    "vaultDescription": "Aquesta memòria es desarà al teu espai més segur. Pots marcar-la per treballar-la en teràpia.",
+    "encryptionNote": "🔒 Aquesta nota es desarà de manera segura i xifrada"
+  },
+  "sections": {
+    "vault": "Caixa Forta",
+    "regular": "Notes Regulars"
+  },
+  "confirmDelete": {
+    "title": "Estàs segur que vols eliminar aquesta nota?",
+    "description": "Aquesta acció no es pot desfer.",
+    "placeholder": "Escriu 'ESBORRAR' per confirmar",
+    "confirmWord": "ESBORRAR"
+  },
+  "toast": {
+    "noteCreated": "Nota creada",
+    "noteCreatedDescription": "La teva nota s'ha desat de manera segura",
+    "noteSavedVault": "Nota desada a Caixa Forta",
+    "noteSavedVaultDescription": "La teva memòria sensible s'ha desat de manera segura i xifrada",
+    "noteUpdated": "Nota actualitzada",
+    "noteUpdatedDescription": "Els canvis s'han desat correctament",
+    "noteDeleted": "Nota eliminada",
+    "noteDeletedDescription": "La nota ha estat eliminada permanentment",
+    "exportedTherapy": "Exportat per a teràpia",
+    "exportedTherapyDescription": "Arxiu descarregat (a l'app real seria PDF protegit)",
+    "emergencyHideActivated": "Mode discret activat",
+    "emergencyHideDescription": "Toca la icona del cor per tornar",
+    "requestApproved": "✅ Sol·licitud aprovada",
+    "requestApprovedDescription": "El teu Refugi Lead ha aprovat la teva sol·licitud. Estableix la teva nova contrasenya."
+  },
+  "errors": {
+    "titleRequired": "El títol és obligatori",
+    "encryptionFailed": "No s'ha pogut xifrar la nota",
+    "passwordRequired": "Introdueix la teva contrasenya",
+    "confirmDeleteError": "Escriu 'ESBORRAR' per confirmar l'eliminació"
+  },
+  "vault": {
+    "setup": {
+      "title": "Configura la teva Caixa Forta",
+      "description": "Aquesta contrasenya protegirà les teves notes més sensibles.",
+      "warning": "Important:",
+      "warningDescription": "No oblidis aquesta contrasenya. Recuperar-la requereix verificació especial i perdràs l'accés a les teves notes antigues.",
+      "passwordLabel": "Contrasenya",
+      "passwordPlaceholder": "Mínim 8 caràcters",
+      "passwordRequirements": "Ha de contenir majúscules, minúscules i números",
+      "confirmPasswordLabel": "Confirmar Contrasenya",
+      "confirmPasswordPlaceholder": "Repeteix la teva contrasenya",
+      "submitButton": "Protegir Caixa Forta",
+      "submittingButton": "Configurant...",
+      "successTitle": "🔒 Caixa Forta protegida",
+      "successDescription": "La teva contrasenya s'ha configurat correctament",
+      "errorTitle": "Error",
+      "errorDescription": "No s'ha pogut configurar la contrasenya",
+      "validationMinLength": "La contrasenya ha de tenir almenys 8 caràcters",
+      "validationUppercase": "Ha de contenir almenys una majúscula",
+      "validationLowercase": "Ha de contenir almenys una minúscula",
+      "validationNumber": "Ha de contenir almenys un número",
+      "validationMismatch": "Les contrasenyes no coincideixen"
+    },
+    "unlock": {
+      "title": "Desbloquejar Caixa Forta",
+      "description": "Introdueix la teva contrasenya per accedir a les teves notes protegides",
+      "passwordLabel": "Contrasenya",
+      "passwordPlaceholder": "Introdueix la teva contrasenya",
+      "attemptsRemaining": "intents restants",
+      "submitButton": "Desbloquejar",
+      "submittingButton": "Verificant...",
+      "forgotPassword": "Has oblidat la teva contrasenya?",
+      "locked": "Bloquejat temporalment",
+      "lockedDescription": "Podràs intentar-ho de nou en:",
+      "lockedToast": "Bloquejat temporalment",
+      "lockedToastDescription": "Espera {time} per intentar-ho de nou",
+      "tooManyAttempts": "Bloquejat",
+      "tooManyAttemptsDescription": "Massa intents fallits. Bloquejat durant 15 minuts",
+      "incorrectPassword": "Contrasenya incorrecta",
+      "successTitle": "🔓 Caixa Forta desbloquejada",
+      "successDescription": "Accedint a les teves notes segures...",
+      "errorTitle": "Error",
+      "errorDescription": "No s'ha pogut verificar la contrasenya"
+    },
+    "reset": {
+      "title": "Recuperar accés a Caixa Forta",
+      "descriptionManaged": "El teu Refugi Lead rebrà una sol·licitud per restablir la teva contrasenya",
+      "descriptionSelfService": "Necessitem verificar la teva identitat per restablir la teva contrasenya",
+      "warning": "Advertència:",
+      "warningDescription": "En restablir la teva contrasenya, les notes antigues de la teva Caixa Forta no es podran desxifrar amb la nova contrasenya.",
+      "businessPlan": "Pla Empresarial",
+      "businessPlanDescription": "El teu Refugi Lead aprovarà la teva sol·licitud",
+      "idUploadLabel": "Foto del teu document d'identitat (DNI/NIE/Passaport)",
+      "idUploadButton": "Seleccionar arxiu",
+      "idUploadHelp": "Màxim 5MB. Formats: JPG, PNG, WEBP",
+      "confirmCheckbox": "Confirmo que aquesta és la meva identificació oficial i autoritzo la seva revisió per verificar la meva identitat",
+      "reviewTime": "La teva sol·licitud serà revisada en 24-48 hores hàbils",
+      "submitButton": "Enviar sol·licitud",
+      "submittingButton": "Enviant...",
+      "successTitle": "✅ Sol·licitud enviada",
+      "errorTitle": "Error",
+      "errorDescription": "No s'ha pogut enviar la sol·licitud",
+      "errorIdRequired": "Has d'adjuntar una foto del teu document d'identitat",
+      "errorConfirmRequired": "Has de confirmar que és la teva identificació oficial",
+      "errorFileSize": "Arxiu massa gran",
+      "errorFileSizeDescription": "L'arxiu ha de ser menor de 5MB",
+      "errorFileType": "Tipus d'arxiu invàlid",
+      "errorFileTypeDescription": "Només es permeten imatges"
+    },
+    "resetComplete": {
+      "title": "Sol·licitud Aprovada",
+      "description": "El teu Refugi Lead ha aprovat la teva sol·licitud. Estableix una nova contrasenya per a la teva Caixa Forta.",
+      "warning": "⚠️ Important:",
+      "warningDescription": "Les notes antigues no es podran desxifrar amb aquesta nova contrasenya.",
+      "newPasswordLabel": "Nova contrasenya",
+      "newPasswordPlaceholder": "Mínim 8 caràcters",
+      "confirmPasswordLabel": "Confirmar contrasenya",
+      "confirmPasswordPlaceholder": "Repeteix la contrasenya",
+      "validityNote": "Aquesta finestra és vàlida durant 30 minuts des de l'aprovació.",
+      "submitButton": "Establir contrasenya",
+      "submittingButton": "Actualitzant...",
+      "successTitle": "✅ Contrasenya actualitzada",
+      "successDescription": "La teva Caixa Forta té una nova contrasenya",
+      "errorTitle": "Error",
+      "errorDescription": "No s'ha pogut actualitzar la contrasenya",
+      "errorPasswordShort": "Contrasenya massa curta",
+      "errorPasswordShortDescription": "La contrasenya ha de tenir almenys 8 caràcters",
+      "errorPasswordMismatch": "Les contrasenyes no coincideixen",
+      "errorPasswordMismatchDescription": "Si us plau, verifica que ambdues contrasenyes siguin iguals"
+    }
+  },
+  "decoy": {
+    "title": "Les Meves Notes",
+    "description": "Escriu i organitza els teus pensaments",
+    "empty": "No hi ha notes",
+    "emptyDescription": "Crea la teva primera nota per començar",
+    "createButton": "Crear nota"
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "title": "يومية الخزنة الآمنة",
+  "subtitle": "مساحة محمية لما يثقل وما ينقذ",
+  "search": {
+    "placeholder": "البحث في يومياتك..."
+  },
+  "buttons": {
+    "hide": "إخفاء",
+    "createNote": "ملاحظة",
+    "createVaultNote": "الخزنة الآمنة",
+    "save": "حفظ",
+    "saveVault": "حفظ في الخزنة الآمنة",
+    "saveNote": "حفظ الملاحظة",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تحرير",
+    "exportTherapy": "تصدير للعلاج"
+  },
+  "empty": {
+    "title": "لا توجد ملاحظات",
+    "description": "أنشئ ملاحظتك الأولى للبدء",
+    "button": "إنشاء ملاحظة"
+  },
+  "emptySearch": {
+    "title": "لم يتم العثور على نتائج",
+    "description": "جرب مصطلحات بحث أخرى"
+  },
+  "editing": {
+    "title": "تحرير الملاحظة",
+    "newNote": "ملاحظة جديدة",
+    "newVaultNote": "ذكرى جديدة - الخزنة الآمنة",
+    "titlePlaceholder": "عنوان الملاحظة...",
+    "titlePlaceholderVault": "ما الذكرى التي تريد حفظها؟",
+    "contentPlaceholder": "اكتب محتوى ملاحظتك هنا...",
+    "contentPlaceholderVault": "هذا مساحتك الآمنة. اكتب دون حكم، دون عجلة...",
+    "vaultBadge": "الخزنة الآمنة",
+    "vaultDescription": "سيتم حفظ هذه الذكرى في مساحتك الأكثر أمانًا. يمكنك تمييزها للعمل عليها في العلاج.",
+    "encryptionNote": "🔒 سيتم حفظ هذه الملاحظة بشكل آمن ومشفر"
+  },
+  "sections": {
+    "vault": "الخزنة الآمنة",
+    "regular": "الملاحظات العادية"
+  },
+  "confirmDelete": {
+    "title": "هل أنت متأكد أنك تريد حذف هذه الملاحظة؟",
+    "description": "لا يمكن التراجع عن هذا الإجراء.",
+    "placeholder": "اكتب 'حذف' للتأكيد",
+    "confirmWord": "حذف"
+  },
+  "toast": {
+    "noteCreated": "تم إنشاء الملاحظة",
+    "noteCreatedDescription": "تم حفظ ملاحظتك بشكل آمن",
+    "noteSavedVault": "تم حفظ الملاحظة في الخزنة الآمنة",
+    "noteSavedVaultDescription": "تم حفظ ذكرتك الحساسة بشكل آمن ومشفر",
+    "noteUpdated": "تم تحديث الملاحظة",
+    "noteUpdatedDescription": "تم حفظ التغييرات بنجاح",
+    "noteDeleted": "تم حذف الملاحظة",
+    "noteDeletedDescription": "تم حذف الملاحظة نهائيًا",
+    "exportedTherapy": "تم التصدير للعلاج",
+    "exportedTherapyDescription": "تم تنزيل الملف (في التطبيق الحقيقي سيكون PDF محمي)",
+    "emergencyHideActivated": "تم تفعيل الوضع السري",
+    "emergencyHideDescription": "اضغط على رمز القلب للعودة",
+    "requestApproved": "✅ تمت الموافقة على الطلب",
+    "requestApprovedDescription": "وافق قائد Refugi الخاص بك على طلبك. قم بتعيين كلمة المرور الجديدة."
+  },
+  "errors": {
+    "titleRequired": "العنوان مطلوب",
+    "encryptionFailed": "تعذر تشفير الملاحظة",
+    "passwordRequired": "أدخل كلمة المرور",
+    "confirmDeleteError": "اكتب 'حذف' لتأكيد الحذف"
+  },
+  "vault": {
+    "setup": {
+      "title": "إعداد الخزنة الآمنة",
+      "description": "ستحمي كلمة المرور هذه ملاحظاتك الأكثر حساسية.",
+      "warning": "مهم:",
+      "warningDescription": "لا تنس كلمة المرور هذه. استعادتها تتطلب تحققًا خاصًا وستفقد الوصول إلى ملاحظاتك القديمة.",
+      "passwordLabel": "كلمة المرور",
+      "passwordPlaceholder": "8 أحرف على الأقل",
+      "passwordRequirements": "يجب أن تحتوي على أحرف كبيرة وصغيرة وأرقام",
+      "confirmPasswordLabel": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "كرر كلمة المرور",
+      "submitButton": "حماية الخزنة الآمنة",
+      "submittingButton": "جارٍ الإعداد...",
+      "successTitle": "🔒 تم حماية الخزنة الآمنة",
+      "successDescription": "تم تكوين كلمة المرور بنجاح",
+      "errorTitle": "خطأ",
+      "errorDescription": "تعذر إعداد كلمة المرور",
+      "validationMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+      "validationUppercase": "يجب أن تحتوي على حرف كبير واحد على الأقل",
+      "validationLowercase": "يجب أن تحتوي على حرف صغير واحد على الأقل",
+      "validationNumber": "يجب أن تحتوي على رقم واحد على الأقل",
+      "validationMismatch": "كلمات المرور غير متطابقة"
+    },
+    "unlock": {
+      "title": "فتح الخزنة الآمنة",
+      "description": "أدخل كلمة المرور للوصول إلى ملاحظاتك المحمية",
+      "passwordLabel": "كلمة المرور",
+      "passwordPlaceholder": "أدخل كلمة المرور",
+      "attemptsRemaining": "محاولات متبقية",
+      "submitButton": "فتح",
+      "submittingButton": "جارٍ التحقق...",
+      "forgotPassword": "هل نسيت كلمة المرور؟",
+      "locked": "مقفل مؤقتًا",
+      "lockedDescription": "يمكنك المحاولة مرة أخرى في:",
+      "lockedToast": "مقفل مؤقتًا",
+      "lockedToastDescription": "انتظر {time} للمحاولة مرة أخرى",
+      "tooManyAttempts": "مقفل",
+      "tooManyAttemptsDescription": "محاولات فاشلة كثيرة. مقفل لمدة 15 دقيقة",
+      "incorrectPassword": "كلمة مرور غير صحيحة",
+      "successTitle": "🔓 تم فتح الخزنة الآمنة",
+      "successDescription": "جارٍ الوصول إلى ملاحظاتك الآمنة...",
+      "errorTitle": "خطأ",
+      "errorDescription": "تعذر التحقق من كلمة المرور"
+    },
+    "reset": {
+      "title": "استعادة الوصول إلى الخزنة الآمنة",
+      "descriptionManaged": "سيتلقى قائد Refugi الخاص بك طلبًا لإعادة تعيين كلمة المرور",
+      "descriptionSelfService": "نحتاج إلى التحقق من هويتك لإعادة تعيين كلمة المرور",
+      "warning": "تحذير:",
+      "warningDescription": "بإعادة تعيين كلمة المرور، لن تكون الملاحظات القديمة في خزنتك الآمنة قابلة لفك التشفير بكلمة المرور الجديدة.",
+      "businessPlan": "خطة الأعمال",
+      "businessPlanDescription": "سيوافق قائد Refugi الخاص بك على طلبك",
+      "idUploadLabel": "صورة وثيقة الهوية (الهوية/NIE/جواز السفر)",
+      "idUploadButton": "اختيار ملف",
+      "idUploadHelp": "الحد الأقصى 5 ميجابايت. التنسيقات: JPG، PNG، WEBP",
+      "confirmCheckbox": "أؤكد أن هذه هي هويتي الرسمية وأوافق على مراجعتها للتحقق من هويتي",
+      "reviewTime": "سيتم مراجعة طلبك خلال 24-48 ساعة عمل",
+      "submitButton": "إرسال الطلب",
+      "submittingButton": "جارٍ الإرسال...",
+      "successTitle": "✅ تم إرسال الطلب",
+      "errorTitle": "خطأ",
+      "errorDescription": "تعذر إرسال الطلب",
+      "errorIdRequired": "يجب إرفاق صورة وثيقة الهوية",
+      "errorConfirmRequired": "يجب تأكيد أنها هويتك الرسمية",
+      "errorFileSize": "الملف كبير جدًا",
+      "errorFileSizeDescription": "يجب أن يكون الملف أقل من 5 ميجابايت",
+      "errorFileType": "نوع ملف غير صالح",
+      "errorFileTypeDescription": "الصور فقط مسموح بها"
+    },
+    "resetComplete": {
+      "title": "تمت الموافقة على الطلب",
+      "description": "وافق قائد Refugi الخاص بك على طلبك. قم بتعيين كلمة مرور جديدة لخزنتك الآمنة.",
+      "warning": "⚠️ مهم:",
+      "warningDescription": "لن تكون الملاحظات القديمة قابلة لفك التشفير بكلمة المرور الجديدة.",
+      "newPasswordLabel": "كلمة مرور جديدة",
+      "newPasswordPlaceholder": "8 أحرف على الأقل",
+      "confirmPasswordLabel": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "كرر كلمة المرور",
+      "validityNote": "هذه النافذة صالحة لمدة 30 دقيقة من الموافقة.",
+      "submitButton": "تعيين كلمة المرور",
+      "submittingButton": "جارٍ التحديث...",
+      "successTitle": "✅ تم تحديث كلمة المرور",
+      "successDescription": "خزنتك الآمنة لديها كلمة مرور جديدة",
+      "errorTitle": "خطأ",
+      "errorDescription": "تعذر تحديث كلمة المرور",
+      "errorPasswordShort": "كلمة المرور قصيرة جدًا",
+      "errorPasswordShortDescription": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+      "errorPasswordMismatch": "كلمات المرور غير متطابقة",
+      "errorPasswordMismatchDescription": "يرجى التحقق من أن كلمتي المرور متطابقتان"
+    }
+  },
+  "decoy": {
+    "title": "ملاحظاتي",
+    "description": "اكتب ونظم أفكارك",
+    "empty": "لا توجد ملاحظات",
+    "emptyDescription": "أنشئ ملاحظتك الأولى للبدء",
+    "createButton": "إنشاء ملاحظة"
+  }
+}
