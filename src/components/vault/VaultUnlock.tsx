@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutos
 
 export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockProps) {
+  const { t } = useTranslation('notes');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
@@ -76,8 +78,8 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
     
     if (lockedUntil) {
       toast({
-        title: 'Bloqueado temporalmente',
-        description: `Espera ${formatCountdown(countdown)} para intentar de nuevo`,
+        title: t('vault.unlock.lockedToast'),
+        description: t('vault.unlock.lockedToastDescription').replace('{time}', formatCountdown(countdown)),
         variant: 'destructive',
       });
       return;
@@ -85,8 +87,8 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
     
     if (!password) {
       toast({
-        title: 'Error',
-        description: 'Ingresa tu contraseña',
+        title: t('vault.setup.errorTitle'),
+        description: t('errors.passwordRequired'),
         variant: 'destructive',
       });
       return;
@@ -113,14 +115,14 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
           sessionStorage.setItem('vault_lock', lockTime.toString());
           
           toast({
-            title: 'Bloqueado',
-            description: `Demasiados intentos fallidos. Bloqueado por 15 minutos`,
+            title: t('vault.unlock.tooManyAttempts'),
+            description: t('vault.unlock.tooManyAttemptsDescription'),
             variant: 'destructive',
           });
         } else {
           toast({
-            title: 'Contraseña incorrecta',
-            description: `${MAX_ATTEMPTS - newAttempts} intentos restantes`,
+            title: t('vault.unlock.incorrectPassword'),
+            description: `${MAX_ATTEMPTS - newAttempts} ${t('vault.unlock.attemptsRemaining')}`,
             variant: 'destructive',
           });
         }
@@ -136,16 +138,16 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
       setPassword('');
       
       toast({
-        title: '🔓 Caja Fuerte desbloqueada',
-        description: 'Accediendo a tus notas seguras...',
+        title: t('vault.unlock.successTitle'),
+        description: t('vault.unlock.successDescription'),
       });
       
       onSuccess(data.token);
     } catch (error: any) {
       console.error('Error al verificar contraseña:', error);
       toast({
-        title: 'Error',
-        description: error.message || 'No se pudo verificar la contraseña',
+        title: t('vault.unlock.errorTitle'),
+        description: error.message || t('vault.unlock.errorDescription'),
         variant: 'destructive',
       });
     } finally {
@@ -159,10 +161,10 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
         <DialogHeader>
           <div className="flex items-center gap-2">
             <Lock className="h-6 w-6 text-primary" />
-            <DialogTitle>Desbloquear Caja Fuerte</DialogTitle>
+            <DialogTitle>{t('vault.unlock.title')}</DialogTitle>
           </div>
           <DialogDescription>
-            Ingresa tu contraseña para acceder a tus notas protegidas
+            {t('vault.unlock.description')}
           </DialogDescription>
         </DialogHeader>
         
@@ -170,9 +172,9 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
           <div className="flex flex-col items-center gap-4 py-6">
             <AlertTriangle className="h-16 w-16 text-destructive" />
             <div className="text-center">
-              <p className="font-semibold text-destructive">Bloqueado temporalmente</p>
+              <p className="font-semibold text-destructive">{t('vault.unlock.locked')}</p>
               <p className="text-sm text-muted-foreground mt-2">
-                Podrás intentar de nuevo en:
+                {t('vault.unlock.lockedDescription')}
               </p>
               <p className="text-2xl font-bold text-primary mt-2">
                 {formatCountdown(countdown)}
@@ -182,7 +184,7 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="vault-password">Contraseña</Label>
+              <Label htmlFor="vault-password">{t('vault.unlock.passwordLabel')}</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -191,7 +193,7 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-9"
-                  placeholder="Ingresa tu contraseña"
+                  placeholder={t('vault.unlock.passwordPlaceholder')}
                   disabled={isLoading}
                   autoFocus
                 />
@@ -199,14 +201,14 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
               {attempts > 0 && (
                 <p className="text-sm text-warning flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4" />
-                  {MAX_ATTEMPTS - attempts} intentos restantes
+                  {MAX_ATTEMPTS - attempts} {t('vault.unlock.attemptsRemaining')}
                 </p>
               )}
             </div>
             
             <DialogFooter className="flex-col gap-2">
               <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading ? 'Verificando...' : 'Desbloquear'}
+                {isLoading ? t('vault.unlock.submittingButton') : t('vault.unlock.submitButton')}
               </Button>
               <Button 
                 type="button" 
@@ -214,7 +216,7 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
                 onClick={onForgotPassword}
                 className="w-full"
               >
-                ¿Olvidaste tu contraseña?
+                {t('vault.unlock.forgotPassword')}
               </Button>
             </DialogFooter>
           </form>

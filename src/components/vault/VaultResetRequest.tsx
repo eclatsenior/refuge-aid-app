@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -14,6 +15,7 @@ interface VaultResetRequestProps {
 }
 
 export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultResetRequestProps) {
+  const { t } = useTranslation('notes');
   const [isLoading, setIsLoading] = useState(false);
   const [idFile, setIdFile] = useState<File | null>(null);
   const [confirmed, setConfirmed] = useState(false);

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ interface VaultPasswordSetupProps {
 }
 
 export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSetupProps) {
+  const { t } = useTranslation('notes');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -21,16 +23,16 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
 
   const validatePassword = (pwd: string) => {
     if (pwd.length < 8) {
-      return 'La contraseña debe tener al menos 8 caracteres';
+      return t('vault.setup.validationMinLength');
     }
     if (!/[A-Z]/.test(pwd)) {
-      return 'Debe contener al menos una mayúscula';
+      return t('vault.setup.validationUppercase');
     }
     if (!/[a-z]/.test(pwd)) {
-      return 'Debe contener al menos una minúscula';
+      return t('vault.setup.validationLowercase');
     }
     if (!/[0-9]/.test(pwd)) {
-      return 'Debe contener al menos un número';
+      return t('vault.setup.validationNumber');
     }
     return null;
   };
@@ -46,7 +48,7 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
     }
     
     if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+      newErrors.confirmPassword = t('vault.setup.validationMismatch');
     }
     
     if (Object.keys(newErrors).length > 0) {
@@ -69,8 +71,8 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
       }
       
       toast({
-        title: '🔒 Caja Fuerte protegida',
-        description: 'Tu contraseña ha sido configurada correctamente',
+        title: t('vault.setup.successTitle'),
+        description: t('vault.setup.successDescription'),
       });
       
       setPassword('');
@@ -79,8 +81,8 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
     } catch (error: any) {
       console.error('Error al configurar contraseña:', error);
       toast({
-        title: 'Error',
-        description: error.message || 'No se pudo configurar la contraseña',
+        title: t('vault.setup.errorTitle'),
+        description: error.message || t('vault.setup.errorDescription'),
         variant: 'destructive',
       });
     } finally {
@@ -94,23 +96,22 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
         <DialogHeader>
           <div className="flex items-center gap-2">
             <Shield className="h-6 w-6 text-primary" />
-            <DialogTitle>Configura tu Caja Fuerte</DialogTitle>
+            <DialogTitle>{t('vault.setup.title')}</DialogTitle>
           </div>
           <DialogDescription className="pt-2">
-            Esta contraseña protegerá tus notas más sensibles.
+            {t('vault.setup.description')}
           </DialogDescription>
           <div className="flex items-start gap-2 p-3 bg-warning/10 rounded-lg border border-warning/20 mt-2">
             <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
             <div className="text-sm text-warning">
-              <strong>Importante:</strong> No olvides esta contraseña. Recuperarla requiere 
-              {' '}verificación especial y perderás el acceso a tus notas antiguas.
+              <strong>{t('vault.setup.warning')}</strong> {t('vault.setup.warningDescription')}
             </div>
           </div>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
+            <Label htmlFor="password">{t('vault.setup.passwordLabel')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -122,7 +123,7 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
                   setErrors({ ...errors, password: undefined });
                 }}
                 className="pl-9"
-                placeholder="Mínimo 8 caracteres"
+                placeholder={t('vault.setup.passwordPlaceholder')}
                 disabled={isLoading}
               />
             </div>
@@ -130,12 +131,12 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
               <p className="text-sm text-destructive">{errors.password}</p>
             )}
             <p className="text-xs text-muted-foreground">
-              Debe contener mayúsculas, minúsculas y números
+              {t('vault.setup.passwordRequirements')}
             </p>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
+            <Label htmlFor="confirmPassword">{t('vault.setup.confirmPasswordLabel')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -147,7 +148,7 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
                   setErrors({ ...errors, confirmPassword: undefined });
                 }}
                 className="pl-9"
-                placeholder="Repite tu contraseña"
+                placeholder={t('vault.setup.confirmPasswordPlaceholder')}
                 disabled={isLoading}
               />
             </div>
@@ -158,7 +159,7 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
           
           <DialogFooter>
             <Button type="submit" disabled={isLoading} className="w-full">
-              {isLoading ? 'Configurando...' : 'Proteger Caja Fuerte'}
+              {isLoading ? t('vault.setup.submittingButton') : t('vault.setup.submitButton')}
             </Button>
           </DialogFooter>
         </form>

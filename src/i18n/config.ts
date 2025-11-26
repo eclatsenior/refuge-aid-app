@@ -66,6 +66,16 @@ import caSubscription from '@/locales/ca/subscription.json';
 import enSubscription from '@/locales/en/subscription.json';
 import arSubscription from '@/locales/ar/subscription.json';
 
+import esInstall from '@/locales/es/install.json';
+import caInstall from '@/locales/ca/install.json';
+import enInstall from '@/locales/en/install.json';
+import arInstall from '@/locales/ar/install.json';
+
+import esNotes from '@/locales/es/notes.json';
+import caNotes from '@/locales/ca/notes.json';
+import enNotes from '@/locales/en/notes.json';
+import arNotes from '@/locales/ar/notes.json';
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -84,7 +94,9 @@ i18n
         admin: esAdmin,
         employees: esEmployees,
         alerts: esAlerts,
-        subscription: esSubscription
+        subscription: esSubscription,
+        install: esInstall,
+        notes: esNotes
       },
       ca: {
         common: caCommon,
@@ -99,7 +111,9 @@ i18n
         admin: caAdmin,
         employees: caEmployees,
         alerts: caAlerts,
-        subscription: caSubscription
+        subscription: caSubscription,
+        install: caInstall,
+        notes: caNotes
       },
       en: {
         common: enCommon,
@@ -114,7 +128,9 @@ i18n
         admin: enAdmin,
         employees: enEmployees,
         alerts: enAlerts,
-        subscription: enSubscription
+        subscription: enSubscription,
+        install: enInstall,
+        notes: enNotes
       },
       ar: {
         common: arCommon,
@@ -129,7 +145,9 @@ i18n
         admin: arAdmin,
         employees: arEmployees,
         alerts: arAlerts,
-        subscription: arSubscription
+        subscription: arSubscription,
+        install: arInstall,
+        notes: arNotes
       }
     },
     fallbackLng: 'es',
