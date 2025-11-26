@@ -27,8 +27,8 @@ export function VaultResetComplete({ open, onClose, resetToken, onSuccess }: Vau
     // Validaciones
     if (newPassword.length < 8) {
       toast({
-        title: 'Contraseña muy corta',
-        description: 'La contraseña debe tener al menos 8 caracteres',
+        title: t('vault.resetComplete.errorPasswordShort'),
+        description: t('vault.resetComplete.errorPasswordShortDescription'),
         variant: 'destructive',
       });
       return;
@@ -36,8 +36,8 @@ export function VaultResetComplete({ open, onClose, resetToken, onSuccess }: Vau
 
     if (newPassword !== confirmPassword) {
       toast({
-        title: 'Las contraseñas no coinciden',
-        description: 'Por favor verifica que ambas contraseñas sean iguales',
+        title: t('vault.resetComplete.errorPasswordMismatch'),
+        description: t('vault.resetComplete.errorPasswordMismatchDescription'),
         variant: 'destructive',
       });
       return;
@@ -58,8 +58,8 @@ export function VaultResetComplete({ open, onClose, resetToken, onSuccess }: Vau
       }
       
       toast({
-        title: '✅ Contraseña actualizada',
-        description: 'Tu Caja Fuerte tiene una nueva contraseña',
+        title: t('vault.resetComplete.successTitle'),
+        description: t('vault.resetComplete.successDescription'),
       });
       
       // Limpiar sessionStorage y resetear estados
@@ -70,8 +70,8 @@ export function VaultResetComplete({ open, onClose, resetToken, onSuccess }: Vau
     } catch (error: any) {
       console.error('Error al resetear contraseña:', error);
       toast({
-        title: 'Error',
-        description: error.message || 'No se pudo actualizar la contraseña',
+        title: t('vault.resetComplete.errorTitle'),
+        description: error.message || t('vault.resetComplete.errorDescription'),
         variant: 'destructive',
       });
     } finally {
@@ -85,27 +85,27 @@ export function VaultResetComplete({ open, onClose, resetToken, onSuccess }: Vau
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-success" />
-            Solicitud Aprobada
+            {t('vault.resetComplete.title')}
           </DialogTitle>
           <DialogDescription>
-            Tu Refugi Lead ha aprobado tu solicitud. Establece una nueva contraseña para tu Caja Fuerte.
+            {t('vault.resetComplete.description')}
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
           <div className="bg-warning/10 p-3 rounded-lg border border-warning/20 text-sm text-warning">
-            <strong>⚠️ Importante:</strong> Las notas antiguas no podrán descifrarse con esta nueva contraseña.
+            <strong>{t('vault.resetComplete.warning')}</strong> {t('vault.resetComplete.warningDescription')}
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="new-password">Nueva contraseña</Label>
+            <Label htmlFor="new-password">{t('vault.resetComplete.newPasswordLabel')}</Label>
             <div className="relative">
               <Input
                 id="new-password"
                 type={showPassword ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Mínimo 8 caracteres"
+                placeholder={t('vault.resetComplete.newPasswordPlaceholder')}
                 className="pr-10"
               />
               <Button
@@ -121,14 +121,14 @@ export function VaultResetComplete({ open, onClose, resetToken, onSuccess }: Vau
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirmar contraseña</Label>
+            <Label htmlFor="confirm-password">{t('vault.resetComplete.confirmPasswordLabel')}</Label>
             <div className="relative">
               <Input
                 id="confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Repite la contraseña"
+                placeholder={t('vault.resetComplete.confirmPasswordPlaceholder')}
                 className="pr-10"
               />
               <Button
@@ -144,19 +144,19 @@ export function VaultResetComplete({ open, onClose, resetToken, onSuccess }: Vau
           </div>
           
           <p className="text-xs text-muted-foreground">
-            Esta ventana es válida por 30 minutos desde la aprobación.
+            {t('vault.resetComplete.validityNote')}
           </p>
         </div>
         
         <DialogFooter className="flex gap-2">
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            Cancelar
+            {t('buttons.cancel')}
           </Button>
           <Button 
             onClick={handleResetPassword} 
             disabled={isLoading || !newPassword || !confirmPassword}
           >
-            {isLoading ? 'Actualizando...' : 'Establecer contraseña'}
+            {isLoading ? t('vault.resetComplete.submittingButton') : t('vault.resetComplete.submitButton')}
           </Button>
         </DialogFooter>
       </DialogContent>

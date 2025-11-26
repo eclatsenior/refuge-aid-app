@@ -27,8 +27,8 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
       // Validar tamaño (máximo 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast({
-          title: 'Archivo muy grande',
-          description: 'El archivo debe ser menor a 5MB',
+          title: t('vault.reset.errorFileSize'),
+          description: t('vault.reset.errorFileSizeDescription'),
           variant: 'destructive',
         });
         return;
@@ -37,8 +37,8 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
       // Validar tipo
       if (!file.type.startsWith('image/')) {
         toast({
-          title: 'Tipo de archivo inválido',
-          description: 'Solo se permiten imágenes',
+          title: t('vault.reset.errorFileType'),
+          description: t('vault.reset.errorFileTypeDescription'),
           variant: 'destructive',
         });
         return;
@@ -60,8 +60,8 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
   const handleRequestReset = async () => {
     if (!isManagedByLead && !idFile) {
       toast({
-        title: 'Error',
-        description: 'Debes adjuntar una foto de tu documento de identidad',
+        title: t('vault.reset.errorTitle'),
+        description: t('vault.reset.errorIncompleteDescription'),
         variant: 'destructive',
       });
       return;
@@ -69,8 +69,8 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
     
     if (!isManagedByLead && !confirmed) {
       toast({
-        title: 'Error',
-        description: 'Debes confirmar que es tu identificación oficial',
+        title: t('vault.reset.errorTitle'),
+        description: t('vault.reset.errorIncompleteDescription'),
         variant: 'destructive',
       });
       return;
@@ -82,7 +82,7 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        throw new Error('No hay sesión activa');
+        throw new Error(t('vault.reset.errorNoSession'));
       }
       
       // Convertir archivo a base64 si existe
@@ -108,16 +108,18 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
       }
       
       toast({
-        title: '✅ Solicitud enviada',
-        description: data.message,
+        title: t('vault.reset.successTitle'),
+        description: data.message || (isManagedByLead 
+          ? t('vault.reset.successDescriptionManaged')
+          : t('vault.reset.successDescriptionSelfService')),
       });
       
       onClose();
     } catch (error: any) {
       console.error('Error al solicitar reset:', error);
       toast({
-        title: 'Error',
-        description: error.message || 'No se pudo enviar la solicitud',
+        title: t('vault.reset.errorTitle'),
+        description: error.message || t('vault.reset.errorDescription'),
         variant: 'destructive',
       });
     } finally {
@@ -129,11 +131,11 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Recuperar acceso a Caja Fuerte</DialogTitle>
+          <DialogTitle>{t('vault.reset.title')}</DialogTitle>
           <DialogDescription>
             {isManagedByLead 
-              ? 'Tu Refugi Lead recibirá una solicitud para resetear tu contraseña'
-              : 'Necesitamos verificar tu identidad para resetear tu contraseña'
+              ? t('vault.reset.descriptionManaged')
+              : t('vault.reset.descriptionSelfService')
             }
           </DialogDescription>
         </DialogHeader>
@@ -142,8 +144,7 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
           <div className="flex items-start gap-2 p-3 bg-warning/10 rounded-lg border border-warning/20">
             <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
             <div className="text-sm text-warning">
-              <strong>Advertencia:</strong> Al resetear tu contraseña, las notas antiguas 
-              de tu Caja Fuerte no podrán descifrarse con la nueva contraseña.
+              <strong>{t('vault.reset.warning')}</strong> {t('vault.reset.warningDescription')}
             </div>
           </div>
           
@@ -151,9 +152,9 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
             <div className="flex items-center gap-3 p-4 bg-muted rounded-lg">
               <UserCheck className="h-8 w-8 text-primary" />
               <div>
-                <p className="font-medium">Plan Empresarial</p>
+                <p className="font-medium">{t('vault.reset.businessPlan')}</p>
                 <p className="text-sm text-muted-foreground">
-                  Tu Refugi Lead aprobará tu solicitud
+                  {t('vault.reset.businessPlanDescription')}
                 </p>
               </div>
             </div>
@@ -161,7 +162,7 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
             <>
               <div className="space-y-2">
                 <Label htmlFor="id-upload">
-                  Foto de tu documento de identidad (DNI/NIE/Pasaporte)
+                  {t('vault.reset.idUploadLabel')}
                 </Label>
                 <div className="flex items-center gap-2">
                   <Button
@@ -171,7 +172,7 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
                     className="w-full"
                   >
                     <Upload className="h-4 w-4 mr-2" />
-                    {idFile ? idFile.name : 'Seleccionar archivo'}
+                    {idFile ? idFile.name : t('vault.reset.idUploadButton')}
                   </Button>
                   <input
                     id="id-upload"
@@ -182,7 +183,7 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Máximo 5MB. Formatos: JPG, PNG, WEBP
+                  {t('vault.reset.idUploadHelp')}
                 </p>
               </div>
               
@@ -196,13 +197,12 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
                   htmlFor="confirm"
                   className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  Confirmo que esta es mi identificación oficial y autorizo su revisión 
-                  para verificar mi identidad
+                  {t('vault.reset.confirmCheckbox')}
                 </label>
               </div>
               
               <p className="text-xs text-muted-foreground">
-                Tu solicitud será revisada en 24-48 horas hábiles
+                {t('vault.reset.reviewTime')}
               </p>
             </>
           )}
@@ -210,10 +210,10 @@ export function VaultResetRequest({ open, onClose, isManagedByLead }: VaultReset
         
         <DialogFooter className="flex gap-2">
           <Button variant="outline" onClick={onClose}>
-            Cancelar
+            {t('buttons.cancel')}
           </Button>
           <Button onClick={handleRequestReset} disabled={isLoading}>
-            {isLoading ? 'Enviando...' : 'Enviar solicitud'}
+            {isLoading ? t('vault.reset.submittingButton') : t('vault.reset.submitButton')}
           </Button>
         </DialogFooter>
       </DialogContent>
