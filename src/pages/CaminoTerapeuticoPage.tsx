@@ -141,10 +141,18 @@ const routes: Route[] = [
     id: 'aromaterapia',
     title: 'Aromaterapia',
     description: 'Calma a través del sentido del olfato.',
-    duration: '5-10 min',
+    duration: '8-15 min',
     icon: <Flower className="h-6 w-6" />,
     color: 'green',
     modules: [
+      {
+        id: 'info',
+        title: 'Aromaterapia - Información',
+        description: 'Conoce los aceites esenciales y sus beneficios',
+        duration: 3,
+        type: 'education',
+        content: '**Lavanda:** Relajante, reduce el estrés y promueve el sueño.\n\n**Eucalipto:** Revitalizante, energético, control mental.\n\n**Limón:** Purificador refrescante y eleva el estado de ánimo.\n\n**Melissa:** Calmante, antidepresivo y para el insomnio.\n\n*Elige el aceite que resuene contigo y acompáñalo de respiración con cada módulo.*'
+      },
       {
         id: 'library',
         title: 'Biblioteca de aromas',
