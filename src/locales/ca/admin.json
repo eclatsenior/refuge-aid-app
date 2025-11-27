@@ -57,7 +57,6 @@
       "estabilizacion": "Estabilització emocional",
       "ansiedad": "Ansietat / Pànic",
       "trauma": "Trauma i dissociació",
-      "violencia": "Violència de gènere",
       "aromaterapia": "Aromateràpia"
     },
     "modules": {
@@ -70,9 +69,6 @@
       "grounding-intensive": "Tornar al present",
       "anchor-plan": "Pla personal d'ancoratge",
       "mantra": "Mantres de seguretat",
-      "safety-plan": "Pla de seguretat",
-      "evidence": "Desar proves de forma segura",
-      "resources-24h": "Recursos 24/7",
       "library": "Biblioteca d'aromes",
       "routine": "Rutina guiada de 3 minuts",
       "alternatives": "Alternatives sensorials"

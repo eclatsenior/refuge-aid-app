@@ -17,7 +17,6 @@ const ROUTES = [
   { id: 'estabilizacion', name: 'Estabilización emocional' },
   { id: 'ansiedad', name: 'Ansiedad / Pánico' },
   { id: 'trauma', name: 'Trauma y disociación' },
-  { id: 'violencia', name: 'Violencia de género' },
   { id: 'aromaterapia', name: 'Aromaterapia' }
 ];
 
@@ -36,11 +35,6 @@ const MODULES: Record<string, Array<{ id: string; name: string }>> = {
     { id: 'grounding-intensive', name: 'Volver al presente' },
     { id: 'anchor-plan', name: 'Plan personal de anclaje' },
     { id: 'mantra', name: 'Mantras de seguridad' }
-  ],
-  violencia: [
-    { id: 'safety-plan', name: 'Plan de seguridad' },
-    { id: 'evidence', name: 'Guardar pruebas de forma segura' },
-    { id: 'resources-24h', name: 'Recursos 24/7' }
   ],
   aromaterapia: [
     { id: 'library', name: 'Biblioteca de aromas' },

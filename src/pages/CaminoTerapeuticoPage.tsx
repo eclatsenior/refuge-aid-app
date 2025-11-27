@@ -138,40 +138,6 @@ const routes: Route[] = [
     ]
   },
   {
-    id: 'violencia',
-    title: 'Violencia de género o abuso sexual',
-    description: 'Plan de seguridad y apoyo.',
-    duration: '20-30 min',
-    icon: <Shield className="h-6 w-6" />,
-    color: 'purple',
-    modules: [
-      {
-        id: 'safety-plan',
-        title: 'Plan de seguridad',
-        description: 'Estrategia personalizada para situaciones de riesgo',
-        duration: 15,
-        type: 'tool',
-        content: 'Crea tu plan de seguridad: contactos, rutas de escape, palabras clave y recursos de emergencia.'
-      },
-      {
-        id: 'evidence',
-        title: 'Guardar pruebas de forma segura',
-        description: 'Checklist para documentar situaciones',
-        duration: 10,
-        type: 'education',
-        content: 'Guía sobre cómo documentar y guardar pruebas de forma segura y privada.'
-      },
-      {
-        id: 'resources-24h',
-        title: 'Recursos 24/7',
-        description: 'Acceso directo a ayuda especializada',
-        duration: 5,
-        type: 'tool',
-        content: 'Recursos especializados disponibles las 24 horas para situaciones de violencia de género.'
-      }
-    ]
-  },
-  {
     id: 'aromaterapia',
     title: 'Aromaterapia',
     description: 'Calma a través del sentido del olfato.',
