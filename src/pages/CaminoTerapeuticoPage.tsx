@@ -522,9 +522,53 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                 </div>
               )}
               
-              <div className="prose prose-sm">
-                <p className="text-base leading-relaxed">{module.content}</p>
-              </div>
+              {selectedRoute.id === 'aromaterapia' && module.id === 'info' ? (
+                <div className="space-y-4">
+                  <div className="grid gap-3">
+                    <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-2xl">🪻</span>
+                        <h4 className="font-semibold text-purple-700 dark:text-purple-300">Lavanda</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Relajante, reduce el estrés y promueve el sueño.</p>
+                    </div>
+                    
+                    <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-2xl">🌿</span>
+                        <h4 className="font-semibold text-green-700 dark:text-green-300">Eucalipto</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Revitalizante, energético, control mental.</p>
+                    </div>
+                    
+                    <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-2xl">🍋</span>
+                        <h4 className="font-semibold text-yellow-700 dark:text-yellow-300">Limón</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Purificador refrescante y eleva el estado de ánimo.</p>
+                    </div>
+                    
+                    <div className="p-4 rounded-xl bg-pink-500/10 border border-pink-500/20">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-2xl">🌸</span>
+                        <h4 className="font-semibold text-pink-700 dark:text-pink-300">Melissa</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Calmante, antidepresivo y para el insomnio.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 text-center">
+                    <p className="text-sm italic text-foreground/80">
+                      ✨ Elige el aceite que resuene contigo y acompáñalo de respiración con cada módulo.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="prose prose-sm">
+                  <p className="text-base leading-relaxed">{module.content}</p>
+                </div>
+              )}
               
               {module.type === 'breathing' && (
                 <div className="text-center p-6 bg-mint/5 rounded-xl">
