@@ -57,7 +57,6 @@
       "estabilizacion": "Emotional stabilization",
       "ansiedad": "Anxiety / Panic",
       "trauma": "Trauma and dissociation",
-      "violencia": "Gender violence",
       "aromaterapia": "Aromatherapy"
     },
     "modules": {
@@ -70,9 +69,6 @@
       "grounding-intensive": "Return to present",
       "anchor-plan": "Personal anchoring plan",
       "mantra": "Safety mantras",
-      "safety-plan": "Safety plan",
-      "evidence": "Save evidence safely",
-      "resources-24h": "24/7 Resources",
       "library": "Scent library",
       "routine": "3-minute guided routine",
       "alternatives": "Sensory alternatives"

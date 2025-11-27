@@ -57,7 +57,6 @@
       "estabilizacion": "الاستقرار العاطفي",
       "ansiedad": "القلق / الذعر",
       "trauma": "الصدمة والانفصال",
-      "violencia": "العنف القائم على النوع الاجتماعي",
       "aromaterapia": "العلاج بالروائح"
     },
     "modules": {
@@ -70,9 +69,6 @@
       "grounding-intensive": "العودة إلى الحاضر",
       "anchor-plan": "خطة التثبيت الشخصية",
       "mantra": "شعارات الأمان",
-      "safety-plan": "خطة الأمان",
-      "evidence": "حفظ الأدلة بشكل آمن",
-      "resources-24h": "موارد 24/7",
       "library": "مكتبة الروائح",
       "routine": "روتين موجه لمدة 3 دقائق",
       "alternatives": "بدائل حسية"
