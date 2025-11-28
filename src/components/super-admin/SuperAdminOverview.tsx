@@ -110,6 +110,7 @@ export function SuperAdminOverview() {
       icon: Activity,
       color: 'text-cyan-500',
       bgColor: 'bg-cyan-500/10',
+      subtitle: t('stats.last24h'),
     },
     {
       title: t('stats.recentSignups'),
