@@ -14,25 +14,41 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-
-    // Client with user auth to check permissions
-    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: req.headers.get('Authorization')! } }
-    });
 
     // Service client for admin operations
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
-    if (authError || !user) {
-      console.error('Auth error:', authError);
+    // Decode JWT to get user info (Supabase validates JWT via verify_jwt=true in config)
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const token = authHeader.replace('Bearer ', '');
+    const tokenParts = token.split('.');
+    if (tokenParts.length !== 3) {
+      return new Response(JSON.stringify({ error: 'Invalid token format' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const payload = JSON.parse(atob(tokenParts[1]));
+    const userId = payload.sub;
+    const userEmail = payload.email;
+
+    if (!userId) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Create user object for compatibility
+    const user = { id: userId, email: userEmail };
 
     // CRITICAL: Verify user is super admin
     const { data: isSuperAdmin } = await supabaseAdmin
