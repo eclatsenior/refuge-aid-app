@@ -73,7 +73,7 @@ const routes: Route[] = [
     id: 'ansiedad',
     title: 'Ansiedad / Pánico',
     description: 'Guía breve para atravesar el pico.',
-    duration: '8-12 min',
+    duration: '5-8 min',
     icon: <Wind className="h-6 w-6" />,
     color: 'coral',
     modules: [
@@ -92,14 +92,6 @@ const routes: Route[] = [
         duration: 3,
         type: 'tool',
         content: 'Un temporizador que te guía minuto a minuto durante una crisis de ansiedad.'
-      },
-      {
-        id: 'tracking',
-        title: 'Registro rápido',
-        description: 'Anota desencadenante y niveles antes/después',
-        duration: 2,
-        type: 'reflection',
-        content: 'Identificar patrones te ayuda a prepararte mejor para futuras situaciones.'
       }
     ]
   },
