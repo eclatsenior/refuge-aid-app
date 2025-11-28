@@ -4,6 +4,8 @@
   "accessDenied": "Acceso Denegado",
   "noPermission": "No tienes permisos para acceder a este panel.",
   "goBack": "Volver",
+  "downloadReport": "Descargar Reporte PDF",
+  "generatingReport": "Generando...",
   "controlMaster": "Control Maestro",
   "errorLoading": "Error al cargar datos",
   "tabs": {

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Shield } from 'lucide-react';
+import { ArrowLeft, Shield, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +12,7 @@ import { SuperAdminSubscriptionsTab } from '@/components/super-admin/SuperAdminS
 import { SuperAdminAlertsTab } from '@/components/super-admin/SuperAdminAlertsTab';
 import { SuperAdminMetricsTab } from '@/components/super-admin/SuperAdminMetricsTab';
 import { SuperAdminSettingsTab } from '@/components/super-admin/SuperAdminSettingsTab';
+import { useSuperAdminReportGeneration } from '@/hooks/useSuperAdminReportGeneration';
 
 export default function SuperAdminDashboard() {
   const { t } = useTranslation('superAdmin');
@@ -56,6 +56,8 @@ export default function SuperAdminDashboard() {
     );
   }
 
+  const { generatePDF, isGenerating } = useSuperAdminReportGeneration();
+
   if (!isSuperAdmin) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -89,6 +91,14 @@ export default function SuperAdminDashboard() {
               <p className="text-muted-foreground">{t('subtitle')}</p>
             </div>
           </div>
+          <Button onClick={generatePDF} disabled={isGenerating} className="gap-2">
+            {isGenerating ? (
+              <LoadingSpinner size="sm" className="text-primary-foreground" />
+            ) : (
+              <FileDown className="w-4 h-4" />
+            )}
+            {isGenerating ? t('generatingReport') : t('downloadReport')}
+          </Button>
         </div>
 
         {/* Tabs */}

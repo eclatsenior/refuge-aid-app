@@ -296,6 +296,91 @@ serve(async (req) => {
         break;
       }
 
+      case 'get_full_report_data': {
+        // Get all data needed for the complete PDF report
+        const [
+          { count: totalUsers },
+          { count: totalEmployees },
+          { count: totalLeads },
+          { count: activeSubscriptions },
+          { count: totalAlerts },
+          { count: unresolvedAlerts },
+          { count: activeSessionsToday },
+        ] = await Promise.all([
+          supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }),
+          supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'employee'),
+          supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'refugi_lead'),
+          supabaseAdmin.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+          supabaseAdmin.from('emergency_alerts').select('*', { count: 'exact', head: true }),
+          supabaseAdmin.from('emergency_alerts').select('*', { count: 'exact', head: true }).eq('is_resolved', false),
+          supabaseAdmin.from('app_sessions').select('*', { count: 'exact', head: true })
+            .gte('started_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
+        ]);
+
+        // Get recent signups
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+        const { count: recentSignups } = await supabaseAdmin
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', thirtyDaysAgo);
+
+        // Get mood average
+        const { data: moodData } = await supabaseAdmin
+          .from('mood_check_ins')
+          .select('mood_level')
+          .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+        
+        const avgMood = moodData && moodData.length > 0 
+          ? moodData.reduce((sum, m) => sum + m.mood_level, 0) / moodData.length 
+          : null;
+
+        // Get all users
+        const { data: users } = await supabaseAdmin
+          .from('profiles')
+          .select('full_name, email, role, created_at')
+          .order('created_at', { ascending: false });
+
+        // Get all subscriptions
+        const { data: subscriptions } = await supabaseAdmin
+          .from('subscriptions')
+          .select(`
+            id, status, employee_limit, current_period_end,
+            profiles!subscriptions_refugi_lead_id_fkey(full_name, email)
+          `)
+          .order('created_at', { ascending: false });
+
+        // Get all alerts
+        const { data: alerts } = await supabaseAdmin
+          .from('emergency_alerts')
+          .select(`
+            id, alert_type, is_resolved, created_at,
+            profiles!emergency_alerts_employee_id_fkey(full_name, email)
+          `)
+          .order('created_at', { ascending: false });
+
+        result = {
+          metadata: {
+            generated_at: new Date().toISOString(),
+            generated_by: user.email,
+          },
+          overview: {
+            totalUsers,
+            totalEmployees,
+            totalLeads,
+            activeSubscriptions,
+            totalAlerts,
+            unresolvedAlerts,
+            activeSessionsToday,
+            recentSignups,
+            avgMood: avgMood ? Number(avgMood.toFixed(1)) : null,
+          },
+          users: users || [],
+          subscriptions: subscriptions || [],
+          alerts: alerts || [],
+        };
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: 'Invalid action' }), {
           status: 400,
