@@ -306,7 +306,9 @@ export function SuperAdminSubscriptionsTab() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {format(new Date(sub.currentPeriodEnd * 1000), 'dd/MM/yyyy')}
+                        {sub.currentPeriodEnd 
+                          ? format(new Date(sub.currentPeriodEnd * 1000), 'dd/MM/yyyy')
+                          : '-'}
                       </TableCell>
                     </TableRow>
                   ))}
