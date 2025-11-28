@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Shield } from "lucide-react";
 import { AccountSettingsSection } from "@/components/dashboard/settings/AccountSettingsSection";
 import { NotificationsSettingsSection } from "@/components/dashboard/settings/NotificationsSettingsSection";
 import { SubscriptionSettingsSection } from "@/components/dashboard/settings/SubscriptionSettingsSection";
@@ -11,6 +11,7 @@ import { TeamSettingsSection } from "@/components/dashboard/settings/TeamSetting
 import { InstallationSettingsSection } from "@/components/dashboard/settings/InstallationSettingsSection";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SettingsLeadPageProps {
   onNavigate?: (path: string) => void;
@@ -18,22 +19,36 @@ interface SettingsLeadPageProps {
 
 export default function SettingsLeadPage({ onNavigate }: SettingsLeadPageProps = {}) {
   const { t } = useTranslation();
-  const { leadSettings, loadLeadSettings } = useAppStore();
+  const { leadSettings, loadLeadSettings, user } = useAppStore();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
       await loadLeadSettings();
+      
+      // Check super admin status
+      if (user?.id) {
+        const { data } = await supabase.rpc('is_super_admin', { check_user_id: user.id });
+        setIsSuperAdmin(data === true);
+      }
+      
       setIsLoading(false);
     };
     
     if (!leadSettings) {
       loadData();
     } else {
+      // Still check super admin even if settings are loaded
+      if (user?.id) {
+        supabase.rpc('is_super_admin', { check_user_id: user.id }).then(({ data }) => {
+          setIsSuperAdmin(data === true);
+        });
+      }
       setIsLoading(false);
     }
-  }, [leadSettings, loadLeadSettings]);
+  }, [leadSettings, loadLeadSettings, user?.id]);
 
   const handleBack = () => {
     if (onNavigate) {
@@ -56,17 +71,31 @@ export default function SettingsLeadPage({ onNavigate }: SettingsLeadPageProps =
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleBack}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              {t('settings-lead:backToDashboard')}
-            </Button>
-            <h1 className="text-2xl font-bold">{t('settings-lead:title')}</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBack}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                {t('settings-lead:backToDashboard')}
+              </Button>
+              <h1 className="text-2xl font-bold">{t('settings-lead:title')}</h1>
+            </div>
+            {isSuperAdmin && (
+              <Button
+                onClick={() => {
+                  window.history.pushState({}, '', '/super-admin');
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Control Maestro
+              </Button>
+            )}
           </div>
         </div>
       </header>
