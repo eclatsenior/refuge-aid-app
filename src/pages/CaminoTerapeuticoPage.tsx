@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Heart, Shield, Clock, Wind, Flower, RotateCcw, Book, MessageSquare, Wrench, Eye } from "lucide-react";
+import { ArrowLeft, ArrowRight, Heart, Shield, Clock, Wind, Flower, RotateCcw, Book, MessageSquare, Wrench, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -400,36 +400,67 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
             ))}
           </div>
 
-          <div className="flex gap-3 justify-center">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              className="flex-1 max-w-xs"
-            >
-              Volver al inicio
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline" className="flex-1 max-w-xs gap-2">
-                  <RotateCcw size={16} />
-                  Reiniciar ruta
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>¿Reiniciar esta ruta?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Esto borrará tu progreso en "{selectedRoute.title}" y podrás volver a hacer todos los módulos desde el inicio.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.id)}>
+          <div className="flex flex-col gap-3">
+            {(() => {
+              const currentIndex = routes.findIndex(r => r.id === selectedRoute.id);
+              const nextRoute = currentIndex !== -1 && currentIndex < routes.length - 1 
+                ? routes[currentIndex + 1] 
+                : null;
+              
+              if (nextRoute) {
+                return (
+                  <Button
+                    onClick={() => {
+                      setSelectedRoute(nextRoute);
+                      setCurrentModule(0);
+                      setShowSummary(false);
+                      setVideoWatchedPercentage(0);
+                      toast({
+                        title: `Iniciando: ${nextRoute.title}`,
+                        description: "¡Continúa tu camino terapéutico!",
+                      });
+                    }}
+                    className="w-full max-w-md mx-auto gap-2"
+                  >
+                    <ArrowRight size={16} />
+                    Continuar a: {nextRoute.title}
+                  </Button>
+                );
+              }
+              return null;
+            })()}
+            
+            <div className="flex gap-3 justify-center">
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                className="flex-1 max-w-xs"
+              >
+                Volver al inicio
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" className="flex-1 max-w-xs gap-2">
+                    <RotateCcw size={16} />
                     Reiniciar ruta
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>¿Reiniciar esta ruta?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esto borrará tu progreso en "{selectedRoute.title}" y podrás volver a hacer todos los módulos desde el inicio.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.id)}>
+                      Reiniciar ruta
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
 
           <div className="text-center text-sm text-muted-foreground mt-8">
