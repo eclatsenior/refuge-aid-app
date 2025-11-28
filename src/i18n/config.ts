@@ -76,6 +76,11 @@ import caNotes from '@/locales/ca/notes.json';
 import enNotes from '@/locales/en/notes.json';
 import arNotes from '@/locales/ar/notes.json';
 
+import esSuperAdmin from '@/locales/es/superAdmin.json';
+import caSuperAdmin from '@/locales/ca/superAdmin.json';
+import enSuperAdmin from '@/locales/en/superAdmin.json';
+import arSuperAdmin from '@/locales/ar/superAdmin.json';
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -96,7 +101,8 @@ i18n
         alerts: esAlerts,
         subscription: esSubscription,
         install: esInstall,
-        notes: esNotes
+        notes: esNotes,
+        superAdmin: esSuperAdmin
       },
       ca: {
         common: caCommon,
@@ -113,7 +119,8 @@ i18n
         alerts: caAlerts,
         subscription: caSubscription,
         install: caInstall,
-        notes: caNotes
+        notes: caNotes,
+        superAdmin: caSuperAdmin
       },
       en: {
         common: enCommon,
@@ -130,7 +137,8 @@ i18n
         alerts: enAlerts,
         subscription: enSubscription,
         install: enInstall,
-        notes: enNotes
+        notes: enNotes,
+        superAdmin: enSuperAdmin
       },
       ar: {
         common: arCommon,
@@ -147,7 +155,8 @@ i18n
         alerts: arAlerts,
         subscription: arSubscription,
         install: arInstall,
-        notes: arNotes
+        notes: arNotes,
+        superAdmin: arSuperAdmin
       }
     },
     fallbackLng: 'es',

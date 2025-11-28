@@ -803,6 +803,27 @@ export type Database = {
           },
         ]
       }
+      super_admins: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       therapy_videos: {
         Row: {
           created_at: string | null
@@ -1051,6 +1072,7 @@ export type Database = {
         Args: { user_id_param: string }
         Returns: boolean
       }
+      is_super_admin: { Args: { check_user_id?: string }; Returns: boolean }
     }
     Enums: {
       app_role: "employee" | "refugi_lead"
