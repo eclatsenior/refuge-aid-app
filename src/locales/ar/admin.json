@@ -62,12 +62,10 @@
     "modules": {
       "breathing": "تنفس 4-7-8",
       "grounding": "التأريض 5-4-3-2-1",
-      "toolbox": "صندوق أدوات سريع",
       "wave": "اجتياز الموجة",
       "timer": "مؤقت الأزمة",
       "grounding-intensive": "العودة إلى الحاضر",
       "anchor-plan": "خطة التثبيت الشخصية",
-      "mantra": "شعارات الأمان",
       "library": "مكتبة الروائح",
       "routine": "روتين موجه لمدة 3 دقائق",
       "alternatives": "بدائل حسية"

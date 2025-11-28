@@ -23,8 +23,7 @@ const ROUTES = [
 const MODULES: Record<string, Array<{ id: string; name: string }>> = {
   estabilizacion: [
     { id: 'breathing', name: 'Respiración 4-7-8' },
-    { id: 'grounding', name: 'Grounding 5-4-3-2-1' },
-    { id: 'toolbox', name: 'Caja de herramientas rápidas' }
+    { id: 'grounding', name: 'Grounding 5-4-3-2-1' }
   ],
   ansiedad: [
     { id: 'wave', name: 'Atraviesa la ola' },
@@ -32,8 +31,7 @@ const MODULES: Record<string, Array<{ id: string; name: string }>> = {
   ],
   trauma: [
     { id: 'grounding-intensive', name: 'Volver al presente' },
-    { id: 'anchor-plan', name: 'Plan personal de anclaje' },
-    { id: 'mantra', name: 'Mantras de seguridad' }
+    { id: 'anchor-plan', name: 'Plan personal de anclaje' }
   ],
   aromaterapia: [
     { id: 'library', name: 'Biblioteca de aromas' },
