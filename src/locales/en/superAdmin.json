@@ -93,7 +93,10 @@
     "nextPayment": "Next Payment",
     "noStripeSubscriptions": "No active subscriptions in Stripe",
     "localSubscriptions": "Local Subscriptions (Database)",
-    "errorLoadingStripeData": "Error loading Stripe data"
+    "errorLoadingStripeData": "Error loading Stripe data",
+    "origin": "Origin",
+    "paidStripe": "Stripe",
+    "manualAssignment": "Manual"
   },
   "alerts": {
     "title": "Alerts History",
