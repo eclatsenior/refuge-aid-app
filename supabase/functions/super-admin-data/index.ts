@@ -378,14 +378,19 @@ serve(async (req) => {
         const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
         console.log('Fetching Stripe data...');
 
-        // 1. Get all active subscriptions with expanded data
+        // 1. Get all active subscriptions (limit expansion to 4 levels max)
         const stripeSubscriptions = await stripe.subscriptions.list({
           status: 'active',
           limit: 100,
-          expand: ['data.customer', 'data.items.data.price.product']
+          expand: ['data.customer', 'data.items.data.price']
         });
 
-        // 2. Calculate MRR
+        // 2. Fetch all products separately to get names (avoids deep expansion)
+        const products = await stripe.products.list({ limit: 100, active: true });
+        const productMap = new Map(products.data.map(p => [p.id, p.name]));
+        console.log('Products fetched:', productMap.size);
+
+        // 3. Calculate MRR
         let mrr = 0;
         stripeSubscriptions.data.forEach(sub => {
           sub.items.data.forEach(item => {
@@ -398,7 +403,7 @@ serve(async (req) => {
           });
         });
 
-        // 3. Get payments from last 30 days
+        // 4. Get payments from last 30 days
         const thirtyDaysAgoStripe = Math.floor(Date.now() / 1000) - (30 * 24 * 60 * 60);
         const payments = await stripe.paymentIntents.list({
           created: { gte: thirtyDaysAgoStripe },
@@ -409,16 +414,18 @@ serve(async (req) => {
           .filter(p => p.status === 'succeeded')
           .reduce((sum, p) => sum + p.amount, 0);
 
-        // 4. Get balance
+        // 5. Get balance
         const balance = await stripe.balance.retrieve();
         const availableBalance = balance.available.reduce((sum, b) => sum + b.amount, 0);
         const pendingBalance = balance.pending.reduce((sum, b) => sum + b.amount, 0);
 
-        // 5. Format subscriptions list
+        // 6. Format subscriptions list (use productMap for names)
         const subscriptionsList = stripeSubscriptions.data.map(sub => {
           const customer = sub.customer as Stripe.Customer;
           const firstItem = sub.items.data[0];
-          const product = firstItem?.price?.product as Stripe.Product;
+          const productId = typeof firstItem?.price?.product === 'string' 
+            ? firstItem.price.product 
+            : (firstItem?.price?.product as Stripe.Product)?.id;
           
           return {
             id: sub.id,
@@ -427,7 +434,7 @@ serve(async (req) => {
             customerName: customer?.name || 'N/A',
             currentPeriodEnd: sub.current_period_end,
             cancelAtPeriodEnd: sub.cancel_at_period_end,
-            productName: product?.name || 'Unknown',
+            productName: productId ? productMap.get(productId) || 'Unknown' : 'Unknown',
             amount: (firstItem?.price?.unit_amount || 0) / 100,
             currency: firstItem?.price?.currency || 'eur',
             interval: firstItem?.price?.recurring?.interval || 'month'
