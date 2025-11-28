@@ -141,25 +141,17 @@ const routes: Route[] = [
     id: 'aromaterapia',
     title: 'Aromaterapia',
     description: 'Calma a través del sentido del olfato.',
-    duration: '8-15 min',
+    duration: '6-12 min',
     icon: <Flower className="h-6 w-6" />,
     color: 'green',
     modules: [
       {
-        id: 'info',
-        title: 'Aromaterapia - Información',
-        description: 'Conoce los aceites esenciales y sus beneficios',
-        duration: 3,
-        type: 'education',
-        content: '**Lavanda:** Relajante, reduce el estrés y promueve el sueño.\n\n**Eucalipto:** Revitalizante, energético, control mental.\n\n**Limón:** Purificador refrescante y eleva el estado de ánimo.\n\n**Melissa:** Calmante, antidepresivo y para el insomnio.\n\n*Elige el aceite que resuene contigo y acompáñalo de respiración con cada módulo.*'
-      },
-      {
         id: 'library',
         title: 'Biblioteca de aromas',
-        description: 'Beneficios y contraindicaciones',
+        description: 'Conoce los aceites esenciales, sus beneficios y contraindicaciones',
         duration: 5,
         type: 'education',
-        content: 'Conoce los diferentes aceites esenciales y sus efectos calmantes.'
+        content: 'Conoce los diferentes aceites esenciales y sus efectos calmantes. Elige el aceite que resuene contigo y acompáñalo de respiración con cada módulo.'
       },
       {
         id: 'routine',
@@ -553,7 +545,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                 </div>
               )}
               
-              {selectedRoute.id === 'aromaterapia' && module.id === 'info' ? (
+              {selectedRoute.id === 'aromaterapia' && module.id === 'library' ? (
                 <div className="space-y-4">
                   <div className="grid gap-3">
                     <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
