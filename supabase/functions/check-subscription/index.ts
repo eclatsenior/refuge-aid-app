@@ -41,19 +41,23 @@ serve(async (req) => {
     logStep("Authorization header found");
 
     const token = authHeader.replace("Bearer ", "");
-    logStep("Authenticating user with token");
     
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    // Decode the JWT to extract user info (Supabase already validates JWT via verify_jwt=true)
+    const tokenParts = token.split('.');
+    if (tokenParts.length !== 3) throw new Error("Invalid JWT format");
+    
+    const payload = JSON.parse(atob(tokenParts[1]));
+    const userId = payload.sub;
+    const userEmail = payload.email;
+    
+    if (!userId || !userEmail) throw new Error("User not authenticated or email not available");
+    logStep("User authenticated from JWT", { userId, email: userEmail });
 
     // Obtener perfil del usuario
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
       .select('role, managed_by_lead, user_id, email, full_name')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (profileError || !profile) {
@@ -80,7 +84,7 @@ serve(async (req) => {
       const { data: assignment, error: assignmentError } = await supabaseClient
         .from('employee_assignments')
         .select('refugi_lead_id')
-        .eq('employee_id', user.id)
+        .eq('employee_id', userId)
         .single();
       
       if (assignment && !assignmentError) {
@@ -125,7 +129,7 @@ serve(async (req) => {
       const { data: individualSub, error: individualSubError } = await supabaseClient
         .from('subscriptions')
         .select('*')
-        .eq('refugi_lead_id', user.id) // Empleado individual usa su propio user_id
+        .eq('refugi_lead_id', userId) // Empleado individual usa su propio user_id
         .eq('product_id', 'prod_TD9UdEM6XDdBZT') // Plan individual
         .eq('status', 'active')
         .single();
@@ -163,7 +167,7 @@ serve(async (req) => {
 
     // Para Refugi Leads, continuar con la lógica existente de Stripe
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customers = await stripe.customers.list({ email: userEmail, limit: 1 });
     
     // If no Stripe customer found, check local subscriptions table
     if (customers.data.length === 0) {
@@ -172,7 +176,7 @@ serve(async (req) => {
       const { data: localSub, error: subError } = await supabaseClient
         .from('subscriptions')
         .select('*')
-        .eq('refugi_lead_id', user.id)
+        .eq('refugi_lead_id', userId)
         .eq('status', 'active')
         .single();
       
