@@ -77,7 +77,23 @@
     "periodEnd": "Fin del Período",
     "createdAt": "Fecha de Creación",
     "actions": "Acciones",
-    "editSubscription": "Editar Suscripción"
+    "editSubscription": "Editar Suscripción",
+    "mrr": "MRR",
+    "mrrDescription": "Ingresos Mensuales Recurrentes",
+    "revenue30d": "Ingresos 30d",
+    "revenue30dDescription": "Últimos 30 días",
+    "stripeSubscriptions": "Suscripciones Stripe",
+    "stripeSubscriptionsTitle": "Suscripciones en Stripe",
+    "activeInStripe": "Activas en Stripe",
+    "availableBalance": "Balance Disponible",
+    "pendingBalance": "Pendiente",
+    "customer": "Cliente",
+    "plan": "Plan",
+    "amount": "Monto",
+    "nextPayment": "Próximo Cobro",
+    "noStripeSubscriptions": "No hay suscripciones activas en Stripe",
+    "localSubscriptions": "Suscripciones Locales (Base de datos)",
+    "errorLoadingStripeData": "Error al cargar datos de Stripe"
   },
   "alerts": {
     "title": "Historial de Alertas",
@@ -113,7 +129,8 @@
   "common": {
     "cancel": "Cancelar",
     "save": "Guardar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "refresh": "Actualizar"
   },
   "errorLoadingUsers": "Error al cargar usuarios",
   "errorDeletingUser": "Error al eliminar usuario",
