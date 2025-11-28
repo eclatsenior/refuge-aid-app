@@ -28,8 +28,7 @@ const MODULES: Record<string, Array<{ id: string; name: string }>> = {
   ],
   ansiedad: [
     { id: 'wave', name: 'Atraviesa la ola' },
-    { id: 'timer', name: 'Temporizador de crisis' },
-    { id: 'tracking', name: 'Registro rápido' }
+    { id: 'timer', name: 'Temporizador de crisis' }
   ],
   trauma: [
     { id: 'grounding-intensive', name: 'Volver al presente' },
