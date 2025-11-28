@@ -39,7 +39,7 @@ const routes: Route[] = [
     id: 'estabilizacion',
     title: 'Estabilización emocional',
     description: 'Baja la intensidad y regresa al ahora.',
-    duration: '15-20 min',
+    duration: '5-8 min',
     icon: <Heart className="h-6 w-6" />,
     color: 'blue',
     modules: [
@@ -58,14 +58,6 @@ const routes: Route[] = [
         duration: 3,
         type: 'grounding',
         content: 'Este ejercicio te ayuda a reconectar con el momento presente usando tus cinco sentidos.'
-      },
-      {
-        id: 'toolbox',
-        title: 'Caja de herramientas rápidas',
-        description: 'Personaliza tu kit de emergencia emocional',
-        duration: 10,
-        type: 'tool',
-        content: 'Crea tu colección personal de frases, imágenes, canciones y recursos que te brindan calma y seguridad.'
       }
     ]
   },
@@ -99,7 +91,7 @@ const routes: Route[] = [
     id: 'trauma',
     title: 'Trauma y disociación',
     description: 'Anclajes cuando te desconectas.',
-    duration: '10-15 min',
+    duration: '8-12 min',
     icon: <Shield className="h-6 w-6" />,
     color: 'gray-gradient',
     modules: [
@@ -118,14 +110,6 @@ const routes: Route[] = [
         duration: 8,
         type: 'tool',
         content: 'Desarrolla tu plan personalizado de técnicas que te ayuden a volver al presente.'
-      },
-      {
-        id: 'mantra',
-        title: 'Mantras de seguridad',
-        description: 'Frases poderosas para momentos difíciles',
-        duration: 3,
-        type: 'education',
-        content: 'Mantras: "Estoy aquí · Estoy a salvo · Esto pasará"'
       }
     ]
   },
