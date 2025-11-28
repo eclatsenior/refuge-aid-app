@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.0";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -365,6 +366,88 @@ serve(async (req) => {
         
         console.log('Password reset email sent to:', email, 'by super admin:', user.email);
         result = { success: true, message: 'Password reset email sent' };
+        break;
+      }
+
+      case 'get_stripe_data': {
+        const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
+        if (!stripeKey) {
+          throw new Error('STRIPE_SECRET_KEY is not configured');
+        }
+
+        const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+        console.log('Fetching Stripe data...');
+
+        // 1. Get all active subscriptions with expanded data
+        const stripeSubscriptions = await stripe.subscriptions.list({
+          status: 'active',
+          limit: 100,
+          expand: ['data.customer', 'data.items.data.price.product']
+        });
+
+        // 2. Calculate MRR
+        let mrr = 0;
+        stripeSubscriptions.data.forEach(sub => {
+          sub.items.data.forEach(item => {
+            const price = item.price;
+            if (price.recurring?.interval === 'month') {
+              mrr += (price.unit_amount || 0) * (item.quantity || 1);
+            } else if (price.recurring?.interval === 'year') {
+              mrr += ((price.unit_amount || 0) * (item.quantity || 1)) / 12;
+            }
+          });
+        });
+
+        // 3. Get payments from last 30 days
+        const thirtyDaysAgoStripe = Math.floor(Date.now() / 1000) - (30 * 24 * 60 * 60);
+        const payments = await stripe.paymentIntents.list({
+          created: { gte: thirtyDaysAgoStripe },
+          limit: 100
+        });
+
+        const totalRevenue30d = payments.data
+          .filter(p => p.status === 'succeeded')
+          .reduce((sum, p) => sum + p.amount, 0);
+
+        // 4. Get balance
+        const balance = await stripe.balance.retrieve();
+        const availableBalance = balance.available.reduce((sum, b) => sum + b.amount, 0);
+        const pendingBalance = balance.pending.reduce((sum, b) => sum + b.amount, 0);
+
+        // 5. Format subscriptions list
+        const subscriptionsList = stripeSubscriptions.data.map(sub => {
+          const customer = sub.customer as Stripe.Customer;
+          const firstItem = sub.items.data[0];
+          const product = firstItem?.price?.product as Stripe.Product;
+          
+          return {
+            id: sub.id,
+            status: sub.status,
+            customerEmail: customer?.email || 'N/A',
+            customerName: customer?.name || 'N/A',
+            currentPeriodEnd: sub.current_period_end,
+            cancelAtPeriodEnd: sub.cancel_at_period_end,
+            productName: product?.name || 'Unknown',
+            amount: (firstItem?.price?.unit_amount || 0) / 100,
+            currency: firstItem?.price?.currency || 'eur',
+            interval: firstItem?.price?.recurring?.interval || 'month'
+          };
+        });
+
+        console.log('Stripe data fetched:', {
+          mrr: mrr / 100,
+          totalRevenue30d: totalRevenue30d / 100,
+          activeSubscriptions: stripeSubscriptions.data.length
+        });
+
+        result = {
+          mrr: mrr / 100,
+          totalRevenue30d: totalRevenue30d / 100,
+          activeSubscriptions: stripeSubscriptions.data.length,
+          subscriptionsList,
+          availableBalance: availableBalance / 100,
+          pendingBalance: pendingBalance / 100,
+        };
         break;
       }
 

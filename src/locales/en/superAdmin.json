@@ -6,6 +6,8 @@
   "goBack": "Go Back",
   "controlMaster": "Master Control",
   "errorLoading": "Error loading data",
+  "downloadReport": "Download PDF Report",
+  "generatingReport": "Generating...",
   "tabs": {
     "overview": "Overview",
     "users": "Users",
@@ -75,7 +77,23 @@
     "periodEnd": "Period End",
     "createdAt": "Created At",
     "actions": "Actions",
-    "editSubscription": "Edit Subscription"
+    "editSubscription": "Edit Subscription",
+    "mrr": "MRR",
+    "mrrDescription": "Monthly Recurring Revenue",
+    "revenue30d": "Revenue 30d",
+    "revenue30dDescription": "Last 30 days",
+    "stripeSubscriptions": "Stripe Subscriptions",
+    "stripeSubscriptionsTitle": "Stripe Subscriptions",
+    "activeInStripe": "Active in Stripe",
+    "availableBalance": "Available Balance",
+    "pendingBalance": "Pending",
+    "customer": "Customer",
+    "plan": "Plan",
+    "amount": "Amount",
+    "nextPayment": "Next Payment",
+    "noStripeSubscriptions": "No active subscriptions in Stripe",
+    "localSubscriptions": "Local Subscriptions (Database)",
+    "errorLoadingStripeData": "Error loading Stripe data"
   },
   "alerts": {
     "title": "Alerts History",
@@ -111,7 +129,8 @@
   "common": {
     "cancel": "Cancel",
     "save": "Save",
-    "delete": "Delete"
+    "delete": "Delete",
+    "refresh": "Refresh"
   },
   "errorLoadingUsers": "Error loading users",
   "errorDeletingUser": "Error deleting user",
