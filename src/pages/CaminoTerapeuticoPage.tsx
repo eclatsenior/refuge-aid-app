@@ -526,7 +526,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {videoData ? (
+              {videoData && (
                 <VideoPlayer
                   videoUrl={videoData.video_url}
                   videoName={videoData.video_name || undefined}
@@ -537,12 +537,6 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                   onVideoWatched={setVideoWatchedPercentage}
                   onVideoCompleted={handleVideoCompleted}
                 />
-              ) : (
-                <div className="p-4 bg-muted/30 border border-muted rounded-lg text-center">
-                  <p className="text-sm text-muted-foreground">
-                    Sin video asignado todavía
-                  </p>
-                </div>
               )}
               
               {selectedRoute.id === 'aromaterapia' && module.id === 'library' ? (
