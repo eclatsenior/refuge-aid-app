@@ -245,6 +245,10 @@ const App = () => {
       if (currentPath === '/dashboard/settings') {
         return <SettingsLeadPage onNavigate={handleNavigate} />;
       }
+      // Allow super admin access (security is handled inside the component)
+      if (currentPath === '/super-admin') {
+        return <SuperAdminDashboard />;
+      }
       // Default to dashboard for any other route
       if (currentPath !== '/dashboard') {
         handleNavigate('/dashboard');
