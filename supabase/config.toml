@@ -69,3 +69,5 @@ verify_jwt = false
 [functions.auth-signup]
 verify_jwt = false
 
+[functions.super-admin-data]
+verify_jwt = true

@@ -29,6 +29,7 @@ import AdminAssignSubscription from "@/pages/AdminAssignSubscription";
 import AdminCreateRefugiLeadTest from "@/pages/AdminCreateRefugiLeadTest";
 import { EmailVerifiedPage } from "@/pages/EmailVerifiedPage";
 import { AdminUploadVideosPage } from "@/pages/AdminUploadVideosPage";
+import SuperAdminDashboard from "@/pages/SuperAdminDashboard";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 import { PWAUpdater } from "@/components/pwa/PWAUpdater";
@@ -165,6 +166,8 @@ const App = () => {
         return <EmailVerifiedPage />;
       case "/admin/upload-videos":
         return <AdminUploadVideosPage />;
+      case "/super-admin":
+        return <SuperAdminDashboard />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }

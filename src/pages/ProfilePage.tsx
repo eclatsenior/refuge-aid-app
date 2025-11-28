@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Mail, Phone, Calendar, MapPin, Edit, MessageCircle } from 'lucide-react';
+import { User, Mail, Phone, Calendar, MapPin, Edit, MessageCircle, Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -22,6 +22,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   const loadProfile = async () => {
     if (!user?.id) return;
@@ -46,6 +47,10 @@ export default function ProfilePage() {
       if (leadData) {
         setRefugiLead(leadData);
       }
+
+      // Check super admin status
+      const { data: superAdminData } = await supabase.rpc('is_super_admin', { check_user_id: user.id });
+      setIsSuperAdmin(superAdminData === true);
     } catch (error) {
       console.error('Error loading profile:', error);
     } finally {
@@ -87,12 +92,27 @@ export default function ProfilePage() {
 
   return (
     <div className="container max-w-4xl mx-auto p-6 space-y-6 pb-20">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <Button onClick={() => setEditDialogOpen(true)} variant="outline">
-          <Edit className="w-4 h-4 mr-2" />
-          {t('editProfile')}
-        </Button>
+        <div className="flex gap-2">
+          {isSuperAdmin && (
+            <Button 
+              onClick={() => {
+                window.history.pushState({}, '', '/super-admin');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }} 
+              variant="default"
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+            >
+              <Shield className="w-4 h-4 mr-2" />
+              Control Maestro
+            </Button>
+          )}
+          <Button onClick={() => setEditDialogOpen(true)} variant="outline">
+            <Edit className="w-4 h-4 mr-2" />
+            {t('editProfile')}
+          </Button>
+        </div>
       </div>
 
       {/* Información Personal */}
