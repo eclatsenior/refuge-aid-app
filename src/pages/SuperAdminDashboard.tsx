@@ -19,6 +19,7 @@ export default function SuperAdminDashboard() {
   const user = useAppStore((state) => state.user);
   const [isSuperAdmin, setIsSuperAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
+  const { generatePDF, isGenerating } = useSuperAdminReportGeneration();
 
   useEffect(() => {
     checkSuperAdminStatus();
@@ -55,8 +56,6 @@ export default function SuperAdminDashboard() {
       </div>
     );
   }
-
-  const { generatePDF, isGenerating } = useSuperAdminReportGeneration();
 
   if (!isSuperAdmin) {
     return (
