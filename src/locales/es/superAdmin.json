@@ -93,7 +93,10 @@
     "nextPayment": "Próximo Cobro",
     "noStripeSubscriptions": "No hay suscripciones activas en Stripe",
     "localSubscriptions": "Suscripciones Locales (Base de datos)",
-    "errorLoadingStripeData": "Error al cargar datos de Stripe"
+    "errorLoadingStripeData": "Error al cargar datos de Stripe",
+    "origin": "Origen",
+    "paidStripe": "Stripe",
+    "manualAssignment": "Manual"
   },
   "alerts": {
     "title": "Historial de Alertas",

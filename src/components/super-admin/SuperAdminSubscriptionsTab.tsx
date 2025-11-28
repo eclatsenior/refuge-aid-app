@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Edit, CreditCard, RefreshCw, TrendingUp, DollarSign, Users, Wallet } from 'lucide-react';
+import { Edit, CreditCard, RefreshCw, TrendingUp, DollarSign, Users, Wallet, UserCog } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -337,6 +337,7 @@ export function SuperAdminSubscriptionsTab() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t('subscriptions.user')}</TableHead>
+                    <TableHead>{t('subscriptions.origin')}</TableHead>
                     <TableHead>{t('subscriptions.status')}</TableHead>
                     <TableHead>{t('subscriptions.employeeLimit')}</TableHead>
                     <TableHead>{t('subscriptions.periodEnd')}</TableHead>
@@ -352,6 +353,19 @@ export function SuperAdminSubscriptionsTab() {
                           <p className="font-medium">{sub.profiles?.full_name}</p>
                           <p className="text-sm text-muted-foreground">{sub.profiles?.email}</p>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        {sub.stripe_subscription_id ? (
+                          <Badge className="bg-green-100 text-green-800 border-green-300 hover:bg-green-100">
+                            <CreditCard className="w-3 h-3 mr-1" />
+                            {t('subscriptions.paidStripe')}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300">
+                            <UserCog className="w-3 h-3 mr-1" />
+                            {t('subscriptions.manualAssignment')}
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Badge variant={getStatusColor(sub.status)}>
