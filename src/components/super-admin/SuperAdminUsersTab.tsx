@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Trash2, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Trash2, Eye, ChevronLeft, ChevronRight, Key, Mail } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { ChangePasswordDialog } from './ChangePasswordDialog';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -35,6 +36,7 @@ export function SuperAdminUsersTab() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [userDetailsOpen, setUserDetailsOpen] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [passwordDialogUser, setPasswordDialogUser] = useState<User | null>(null);
   const limit = 20;
 
   useEffect(() => {
@@ -95,6 +97,20 @@ export function SuperAdminUsersTab() {
       toast.error(t('errorLoadingUserDetails'));
     } finally {
       setLoadingDetails(false);
+    }
+  };
+
+  const handleSendPasswordReset = async (email: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('super-admin-data', {
+        body: { action: 'send_password_reset', email }
+      });
+
+      if (error) throw error;
+      toast.success(t('users.passwordResetSent'));
+    } catch (err: any) {
+      console.error('Error sending password reset:', err);
+      toast.error(t('users.errorSendingReset'));
     }
   };
 
@@ -162,13 +178,30 @@ export function SuperAdminUsersTab() {
                       </TableCell>
                       <TableCell>{format(new Date(user.created_at), 'dd/MM/yyyy')}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
+                        <div className="flex justify-end gap-1">
                           <Button 
                             variant="ghost" 
                             size="icon"
                             onClick={() => handleViewUser(user.user_id)}
+                            title={t('users.viewDetails')}
                           >
                             <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => setPasswordDialogUser(user)}
+                            title={t('users.changePassword')}
+                          >
+                            <Key className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleSendPasswordReset(user.email)}
+                            title={t('users.sendPasswordReset')}
+                          >
+                            <Mail className="w-4 h-4" />
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -295,6 +328,14 @@ export function SuperAdminUsersTab() {
             ) : null}
           </DialogContent>
         </Dialog>
+
+        {/* Change Password Dialog */}
+        <ChangePasswordDialog
+          open={!!passwordDialogUser}
+          onClose={() => setPasswordDialogUser(null)}
+          user={passwordDialogUser}
+          onSuccess={() => setPasswordDialogUser(null)}
+        />
       </CardContent>
     </Card>
   );

@@ -312,6 +312,62 @@ serve(async (req) => {
         break;
       }
 
+      case 'set_user_password': {
+        const { userId, newPassword } = params;
+        
+        if (!userId || !newPassword) {
+          throw new Error('userId and newPassword are required');
+        }
+        
+        if (newPassword.length < 8) {
+          throw new Error('Password must be at least 8 characters');
+        }
+        
+        // Change password using Admin API
+        const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+          userId,
+          { password: newPassword }
+        );
+        
+        if (updateError) throw updateError;
+        
+        // Log to audit
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'password_reset_by_admin',
+          resource_type: 'user',
+          resource_id: userId,
+          metadata: { target_user_id: userId, performed_by: user.email }
+        });
+        
+        console.log('Password changed for user:', userId, 'by super admin:', user.email);
+        result = { success: true, message: 'Password updated successfully' };
+        break;
+      }
+
+      case 'send_password_reset': {
+        const { email } = params;
+        
+        if (!email) {
+          throw new Error('email is required');
+        }
+        
+        const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email);
+        if (error) throw error;
+        
+        // Log to audit
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'password_reset_email_sent',
+          resource_type: 'user',
+          metadata: { target_email: email, performed_by: user.email }
+        });
+        
+        console.log('Password reset email sent to:', email, 'by super admin:', user.email);
+        result = { success: true, message: 'Password reset email sent' };
+        break;
+      }
+
       case 'get_full_report_data': {
         // Get all data needed for the complete PDF report
         const [
