@@ -269,7 +269,7 @@ interface AppState {
 
   // Security actions
   toggleVaultLock: () => void;
-  unlockVault: (password: string) => boolean;
+  unlockVault: () => boolean;
   toggleDecoyScreen: () => void;
   activateDecoyScreen: () => void;
   deactivateDecoyScreen: () => void;
@@ -1593,12 +1593,9 @@ export const useAppStore = create<AppState>()(
           isVaultLocked: !state.isVaultLocked 
         })),
       
-      unlockVault: (password) => {
-        if (password.length > 0) {
-          set({ vaultLocked: false, isVaultLocked: false });
-          return true;
-        }
-        return false;
+      unlockVault: () => {
+        set({ vaultLocked: false, isVaultLocked: false });
+        return true;
       },
       
       toggleDecoyScreen: () =>
