@@ -111,7 +111,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
       const storedToken = sessionStorage.getItem('vault_token');
       if (storedToken) {
         setVaultToken(storedToken);
-        unlockVault(''); // Unlock with token
+        unlockVault(); // Unlock with token
       }
     } catch (error) {
       console.error('Error checking vault password:', error);
@@ -172,7 +172,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     setShowVaultUnlock(false);
     setVaultToken(token);
     sessionStorage.setItem('vault_token', token);
-    unlockVault(''); // Unlock in store
+    unlockVault(); // Unlock in store
   };
 
   const handleForgotPassword = () => {
