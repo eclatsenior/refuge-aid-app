@@ -108,10 +108,13 @@ serve(async (req) => {
     if (!isValid) {
       console.log('Intento de contraseña incorrecta para usuario:', user.id);
       return new Response(
-        JSON.stringify({ error: 'Contraseña incorrecta' }),
+        JSON.stringify({ 
+          success: false, 
+          error: 'Contraseña incorrecta' 
+        }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401,
+          status: 200,
         }
       );
     }

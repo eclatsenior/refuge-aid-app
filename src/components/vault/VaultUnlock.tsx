@@ -101,10 +101,11 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
         body: { password }
       });
       
+      // Error de red o función no disponible
       if (error) throw error;
       
-      if (data.error) {
-        // Contraseña incorrecta
+      // Contraseña incorrecta (ahora viene como success: false)
+      if (!data?.success || data?.error) {
         const newAttempts = attempts + 1;
         setAttempts(newAttempts);
         sessionStorage.setItem('vault_attempts', newAttempts.toString());
