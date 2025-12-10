@@ -12,12 +12,13 @@ interface VaultUnlockProps {
   open: boolean;
   onSuccess: (token: string) => void;
   onForgotPassword: () => void;
+  onClose?: () => void;
 }
 
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutos
 
-export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockProps) {
+export function VaultUnlock({ open, onSuccess, onForgotPassword, onClose }: VaultUnlockProps) {
   const { t } = useTranslation('notes');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -157,7 +158,7 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword }: VaultUnlockPr
   };
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose?.()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2">
