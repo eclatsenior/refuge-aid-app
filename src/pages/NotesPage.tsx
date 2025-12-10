@@ -780,6 +780,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
           open={showVaultUnlock}
           onSuccess={handleVaultUnlockSuccess}
           onForgotPassword={handleForgotPassword}
+          onClose={() => setShowVaultUnlock(false)}
         />
       )}
 
