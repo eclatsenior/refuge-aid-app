@@ -144,6 +144,7 @@ let realtimeInitialized = false;
 let employeeChannel: any = null;
 let alertsChannel: any = null;
 let messagesChannel: any = null;
+let vaultResetChannel: any = null;
 
 const defaultSettings: Settings = {
   emergencyContacts: [],
@@ -1254,6 +1255,7 @@ export const useAppStore = create<AppState>()(
           return () => {
             if (employeeChannel) employeeChannel.unsubscribe();
             if (alertsChannel) alertsChannel.unsubscribe();
+            if (vaultResetChannel) vaultResetChannel.unsubscribe();
           };
         }
 
@@ -1432,6 +1434,59 @@ export const useAppStore = create<AppState>()(
           })
           .subscribe();
 
+        // Subscribe to vault reset requests (for Refugi Leads)
+        const { loadVaultResetRequests } = get();
+        vaultResetChannel = supabase
+          .channel('vault-reset-requests-changes')
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'vault_reset_requests'
+          }, async (payload) => {
+            console.log('🔐 New vault reset request:', payload);
+            
+            // Reload vault reset requests
+            await loadVaultResetRequests();
+            
+            // Get employee name
+            const employeeId = payload.new?.user_id as string;
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('user_id', employeeId)
+              .maybeSingle();
+            
+            // Show toast notification
+            toast({
+              title: "🔐 Nueva solicitud de reset",
+              description: profile?.full_name 
+                ? `${profile.full_name} solicita reiniciar su Caja Fuerte`
+                : 'Solicitud de reinicio de Caja Fuerte pendiente',
+              duration: 8000,
+            });
+            
+            // Play notification sound
+            const audioEnabled = localStorage.getItem('audio-alerts-enabled') === 'true';
+            if (audioEnabled) {
+              try {
+                const audio = new Audio('/message-notification.mp3');
+                audio.volume = 0.5;
+                await audio.play();
+              } catch (error) {
+                console.log('Audio notification not available');
+              }
+            }
+          })
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'vault_reset_requests'
+          }, () => {
+            console.log('🔐 Vault reset request updated');
+            loadVaultResetRequests();
+          })
+          .subscribe();
+
         // Polling fallback for first 60 seconds (every 5 seconds)
         let pollCount = 0;
         const maxPolls = 12; // 12 * 5 seconds = 60 seconds
@@ -1453,6 +1508,7 @@ export const useAppStore = create<AppState>()(
           if (employeeChannel) employeeChannel.unsubscribe();
           if (alertsChannel) alertsChannel.unsubscribe();
           if (messagesChannel) messagesChannel.unsubscribe();
+          if (vaultResetChannel) vaultResetChannel.unsubscribe();
           realtimeInitialized = false;
         };
       },

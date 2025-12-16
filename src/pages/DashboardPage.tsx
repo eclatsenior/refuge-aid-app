@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { 
   Users, 
   AlertTriangle, 
@@ -34,6 +34,7 @@ import { AlertPermissionDialog } from "@/components/dashboard/AlertPermissionDia
 import { audioManager, requestNotificationPermission } from "@/lib/audioManager";
 import { InstallAppBanner } from "@/components/dashboard/InstallAppBanner";
 import { VaultResetRequestsSection } from "@/components/dashboard/VaultResetRequestsSection";
+import { NotificationBell } from "@/components/dashboard/NotificationBell";
 import { useTranslation } from 'react-i18next';
 
 interface DashboardPageProps {
@@ -48,6 +49,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
   const [showPlans, setShowPlans] = useState(false);
   const [showPermissionDialog, setShowPermissionDialog] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(audioManager.isAudioEnabled());
+  const vaultResetSectionRef = useRef<HTMLDivElement>(null);
   
   const {
     profile, 
@@ -314,6 +316,12 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
             </div>
             
             <div className="flex items-center space-x-2">
+              <NotificationBell 
+                pendingCount={vaultResetRequests.length}
+                onClick={() => {
+                  vaultResetSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              />
               <Button 
                 variant="ghost" 
                 size="sm"
@@ -395,13 +403,15 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
         )}
 
         {/* Vault Reset Requests Section */}
-        {vaultResetRequests.length > 0 && (
-          <VaultResetRequestsSection
-            requests={vaultResetRequests}
-            onApprove={approveVaultReset}
-            onReject={rejectVaultReset}
-          />
-        )}
+        <div ref={vaultResetSectionRef}>
+          {vaultResetRequests.length > 0 && (
+            <VaultResetRequestsSection
+              requests={vaultResetRequests}
+              onApprove={approveVaultReset}
+              onReject={rejectVaultReset}
+            />
+          )}
+        </div>
 
         {/* Emergency Alerts */}
         {activeAlerts.length > 0 && (
