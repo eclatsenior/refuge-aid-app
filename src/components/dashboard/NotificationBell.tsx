@@ -9,18 +9,16 @@ interface NotificationBellProps {
 }
 
 export function NotificationBell({ pendingCount, onClick }: NotificationBellProps) {
-  if (pendingCount === 0) return null;
-
   return (
     <Button
       variant="ghost"
       size="sm"
       onClick={onClick}
       className="relative"
-      title={`${pendingCount} solicitud(es) pendiente(s)`}
+      title={pendingCount > 0 ? `${pendingCount} solicitud(es) pendiente(s)` : 'Sin notificaciones pendientes'}
     >
       <Bell className={cn(
-        "h-4 w-4",
+        "h-4 w-4 text-muted-foreground",
         pendingCount > 0 && "text-amber-500 animate-pulse"
       )} />
       {pendingCount > 0 && (
