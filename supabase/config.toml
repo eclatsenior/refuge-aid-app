@@ -71,3 +71,9 @@ verify_jwt = false
 
 [functions.super-admin-data]
 verify_jwt = true
+
+[functions.request-vault-reset]
+verify_jwt = true
+
+[functions.approve-vault-reset]
+verify_jwt = true
