@@ -17,59 +17,98 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
-    );
-
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser();
-
-    if (!user) {
-      throw new Error('No autorizado');
+    // Validate Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.error('❌ No Authorization header provided');
+      return new Response(
+        JSON.stringify({ error: 'No autorizado' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      );
     }
 
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
+    // Create client with user's auth header for validation
+    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    // Validate the token and get claims
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+
+    if (claimsError || !claimsData?.claims) {
+      console.error('❌ Invalid token:', claimsError?.message);
+      return new Response(
+        JSON.stringify({ error: 'Token inválido o expirado' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      );
+    }
+
+    const userId = claimsData.claims.sub;
+    console.log('✅ User authenticated:', userId);
+
+    // Create admin client for DB operations
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
     // Verificar que es Refugi Lead
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
+    if (profileError) {
+      console.error('❌ Error fetching profile:', profileError);
+      throw new Error('Error al verificar perfil');
+    }
+
     if (!profile || profile.role !== 'refugi_lead') {
+      console.error('❌ User is not a refugi_lead:', profile?.role);
       throw new Error('Solo Refugi Leads pueden aprobar solicitudes');
     }
 
-    const { requestId, notes } = await req.json();
+    console.log('✅ User is refugi_lead');
+
+    const { requestId, notes, reviewerNotes } = await req.json();
+    const finalNotes = notes || reviewerNotes;
+    console.log('📝 Processing request:', requestId);
 
     // Obtener la solicitud
-    const { data: request, error: fetchError } = await supabaseClient
+    const { data: request, error: fetchError } = await supabaseAdmin
       .from('vault_reset_requests')
       .select('*, profiles!vault_reset_requests_user_id_fkey(user_id)')
       .eq('id', requestId)
       .single();
 
     if (fetchError || !request) {
+      console.error('❌ Request not found:', fetchError);
       throw new Error('Solicitud no encontrada');
     }
 
+    console.log('📝 Found request for user:', request.user_id);
+
     // Verificar que el employee está asignado a este Refugi Lead
-    const { data: assignment } = await supabaseClient
+    const { data: assignment, error: assignmentError } = await supabaseAdmin
       .from('employee_assignments')
       .select('employee_id')
-      .eq('refugi_lead_id', user.id)
+      .eq('refugi_lead_id', userId)
       .eq('employee_id', request.user_id)
       .single();
 
+    if (assignmentError && assignmentError.code !== 'PGRST116') {
+      console.error('❌ Error checking assignment:', assignmentError);
+    }
+
     if (!assignment) {
+      console.error('❌ Employee not assigned to this lead');
       throw new Error('No tienes permiso para aprobar esta solicitud');
     }
+
+    console.log('✅ Assignment verified');
 
     // Generar token temporal de reset (válido 30 minutos)
     const resetToken = await create(
@@ -84,33 +123,41 @@ serve(async (req) => {
       JWT_SECRET
     );
 
+    console.log('🔑 Reset token generated');
+
     // Actualizar solicitud con reset_token
-    const { error: updateError } = await supabaseClient
+    const { error: updateError } = await supabaseAdmin
       .from('vault_reset_requests')
       .update({
         status: 'approved',
         reviewed_at: new Date().toISOString(),
-        reviewed_by: user.id,
-        notes: notes || null,
+        reviewed_by: userId,
+        notes: finalNotes || null,
         reset_token: resetToken,
       })
       .eq('id', requestId);
 
     if (updateError) {
-      console.error('Error al actualizar solicitud:', updateError);
+      console.error('❌ Error updating request:', updateError);
       throw updateError;
     }
 
+    console.log('✅ Request updated to approved');
+
     // Enviar notificación al employee
-    await supabaseClient
+    const { error: messageError } = await supabaseAdmin
       .from('internal_messages')
       .insert({
-        sender_id: user.id,
+        sender_id: userId,
         recipient_id: request.user_id,
         message: `Tu solicitud de reseteo de Caja Fuerte ha sido aprobada. Tienes 30 minutos para establecer una nueva contraseña.`,
       });
 
-    console.log('Solicitud aprobada:', requestId, 'por:', user.id);
+    if (messageError) {
+      console.warn('⚠️ Could not send notification:', messageError);
+    }
+
+    console.log('✅ Vault reset approved:', requestId, 'by:', userId);
 
     return new Response(
       JSON.stringify({ 
@@ -124,7 +171,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error en approve-vault-reset:', error);
+    console.error('❌ Error in approve-vault-reset:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
