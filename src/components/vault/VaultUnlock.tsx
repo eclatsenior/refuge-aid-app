@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Lock, AlertTriangle } from 'lucide-react';
+import { Lock, AlertTriangle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -17,6 +17,7 @@ interface VaultUnlockProps {
 
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutos
+const REQUEST_TIMEOUT = 30000; // 30 segundos timeout
 
 export function VaultUnlock({ open, onSuccess, onForgotPassword, onClose }: VaultUnlockProps) {
   const { t } = useTranslation('notes');
@@ -25,6 +26,7 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword, onClose }: Vaul
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const [countdown, setCountdown] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Verificar si hay bloqueo activo
@@ -68,6 +70,15 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword, onClose }: Vaul
     return () => clearInterval(timer);
   }, [lockedUntil]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const formatCountdown = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -96,17 +107,47 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword, onClose }: Vaul
     }
     
     setIsLoading(true);
+    console.log('[VaultUnlock] Attempting to verify password...');
+    
+    // Set timeout for the request
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutRef.current = setTimeout(() => {
+        reject(new Error('Request timeout - please try again'));
+      }, REQUEST_TIMEOUT);
+    });
     
     try {
-      const { data, error } = await supabase.functions.invoke('verify-vault-password', {
+      const requestPromise = supabase.functions.invoke('verify-vault-password', {
         body: { password }
       });
       
+      // Race between request and timeout
+      const { data, error } = await Promise.race([
+        requestPromise,
+        timeoutPromise
+      ]) as Awaited<typeof requestPromise>;
+      
+      // Clear timeout on success
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
+      console.log('[VaultUnlock] Response received:', { 
+        success: data?.success, 
+        hasToken: !!data?.token,
+        hasError: !!error || !!data?.error 
+      });
+      
       // Error de red o función no disponible
-      if (error) throw error;
+      if (error) {
+        console.error('[VaultUnlock] Function error:', error);
+        throw error;
+      }
       
       // Contraseña incorrecta (ahora viene como success: false)
       if (!data?.success || data?.error) {
+        console.log('[VaultUnlock] Password incorrect, incrementing attempts');
         const newAttempts = attempts + 1;
         setAttempts(newAttempts);
         sessionStorage.setItem('vault_attempts', newAttempts.toString());
@@ -134,6 +175,7 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword, onClose }: Vaul
       }
       
       // Éxito
+      console.log('[VaultUnlock] Password verified successfully');
       sessionStorage.removeItem('vault_attempts');
       sessionStorage.setItem('vault_token', data.token);
       setAttempts(0);
@@ -146,12 +188,28 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword, onClose }: Vaul
       
       onSuccess(data.token);
     } catch (error: any) {
-      console.error('Error al verificar contraseña:', error);
-      toast({
-        title: t('vault.unlock.errorTitle'),
-        description: error.message || t('vault.unlock.errorDescription'),
-        variant: 'destructive',
-      });
+      console.error('[VaultUnlock] Error verifying password:', error);
+      
+      // Clear timeout on error
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
+      // Check if it's a timeout error
+      if (error.message === 'Request timeout - please try again') {
+        toast({
+          title: t('vault.unlock.timeoutTitle'),
+          description: t('vault.unlock.timeoutDescription'),
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: t('vault.unlock.errorTitle'),
+          description: error.message || t('vault.unlock.errorDescription'),
+          variant: 'destructive',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -209,14 +267,22 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword, onClose }: Vaul
             </div>
             
             <DialogFooter className="flex-col gap-2">
-              <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading ? t('vault.unlock.submittingButton') : t('vault.unlock.submitButton')}
+              <Button type="submit" disabled={isLoading} className="w-full gap-2">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t('vault.unlock.verifyingButton')}
+                  </>
+                ) : (
+                  t('vault.unlock.submitButton')
+                )}
               </Button>
               <Button 
                 type="button" 
                 variant="ghost" 
                 onClick={onForgotPassword}
                 className="w-full"
+                disabled={isLoading}
               >
                 {t('vault.unlock.forgotPassword')}
               </Button>

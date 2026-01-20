@@ -772,6 +772,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
           open={showVaultSetup}
           onSuccess={handleVaultSetupSuccess}
           onClose={handleVaultSetupClose}
+          isManagedByLead={profile?.managed_by_lead || false}
         />
       )}
 

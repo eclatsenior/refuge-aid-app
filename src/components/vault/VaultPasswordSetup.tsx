@@ -4,7 +4,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, Lock, Shield } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { AlertCircle, Lock, Shield, AlertTriangle, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -12,14 +13,16 @@ interface VaultPasswordSetupProps {
   open: boolean;
   onSuccess: () => void;
   onClose?: () => void;
+  isManagedByLead?: boolean;
 }
 
-export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSetupProps) {
+export function VaultPasswordSetup({ open, onSuccess, onClose, isManagedByLead = false }: VaultPasswordSetupProps) {
   const { t } = useTranslation('notes');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
+  const [hasConfirmedUnderstanding, setHasConfirmedUnderstanding] = useState(false);
 
   const validatePassword = (pwd: string) => {
     if (pwd.length < 8) {
@@ -55,14 +58,25 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
       setErrors(newErrors);
       return;
     }
+
+    if (!hasConfirmedUnderstanding) {
+      toast({
+        title: t('vault.setup.errorTitle'),
+        description: t('vault.setup.confirmRequired'),
+        variant: 'destructive',
+      });
+      return;
+    }
     
     setIsLoading(true);
+    console.log('[VaultPasswordSetup] Submitting password setup...');
     
     try {
-      // SDK automatically includes auth headers
       const { data, error } = await supabase.functions.invoke('set-vault-password', {
         body: { password }
       });
+      
+      console.log('[VaultPasswordSetup] Response:', { data, error });
       
       if (error) throw error;
       
@@ -77,9 +91,10 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
       
       setPassword('');
       setConfirmPassword('');
+      setHasConfirmedUnderstanding(false);
       onSuccess();
     } catch (error: any) {
-      console.error('Error al configurar contraseña:', error);
+      console.error('[VaultPasswordSetup] Error:', error);
       toast({
         title: t('vault.setup.errorTitle'),
         description: error.message || t('vault.setup.errorDescription'),
@@ -101,13 +116,30 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
           <DialogDescription className="pt-2">
             {t('vault.setup.description')}
           </DialogDescription>
-          <div className="flex items-start gap-2 p-3 bg-warning/10 rounded-lg border border-warning/20 mt-2">
-            <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
-            <div className="text-sm text-warning">
-              <strong>{t('vault.setup.warning')}</strong> {t('vault.setup.warningDescription')}
-            </div>
-          </div>
         </DialogHeader>
+
+        {/* Critical Warning - One Time Setup */}
+        <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-lg border border-destructive/20">
+          <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <strong className="text-destructive">{t('vault.setup.oneTimeWarning')}</strong>
+            <p className="text-muted-foreground mt-1">
+              {t('vault.setup.oneTimeWarningDescription')}
+            </p>
+          </div>
+        </div>
+
+        {/* Info about reset process */}
+        <div className="flex items-start gap-2 p-3 bg-muted rounded-lg border border-border">
+          <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+          <div className="text-sm text-muted-foreground">
+            {isManagedByLead ? (
+              <p>{t('vault.setup.resetInfoManaged')}</p>
+            ) : (
+              <p>{t('vault.setup.resetInfoSelfService')}</p>
+            )}
+          </div>
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -156,9 +188,29 @@ export function VaultPasswordSetup({ open, onSuccess, onClose }: VaultPasswordSe
               <p className="text-sm text-destructive">{errors.confirmPassword}</p>
             )}
           </div>
+
+          {/* Confirmation Checkbox */}
+          <div className="flex items-start space-x-2 p-3 bg-warning/10 rounded-lg border border-warning/20">
+            <Checkbox
+              id="confirm-understanding"
+              checked={hasConfirmedUnderstanding}
+              onCheckedChange={(checked) => setHasConfirmedUnderstanding(checked === true)}
+              disabled={isLoading}
+            />
+            <label
+              htmlFor="confirm-understanding"
+              className="text-sm leading-tight cursor-pointer"
+            >
+              <span className="font-medium text-warning">{t('vault.setup.confirmCheckboxLabel')}</span>
+            </label>
+          </div>
           
           <DialogFooter>
-            <Button type="submit" disabled={isLoading} className="w-full">
+            <Button 
+              type="submit" 
+              disabled={isLoading || !hasConfirmedUnderstanding} 
+              className="w-full"
+            >
               {isLoading ? t('vault.setup.submittingButton') : t('vault.setup.submitButton')}
             </Button>
           </DialogFooter>

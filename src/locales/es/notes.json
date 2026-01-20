@@ -75,6 +75,12 @@
       "description": "Esta contraseña protegerá tus notas más sensibles.",
       "warning": "Importante:",
       "warningDescription": "No olvides esta contraseña. Recuperarla requiere verificación especial y perderás el acceso a tus notas antiguas.",
+      "oneTimeWarning": "⚠️ Configuración única",
+      "oneTimeWarningDescription": "Esta contraseña solo se puede configurar UNA VEZ. Si la olvidas, necesitarás pasar por un proceso de verificación para restablecerla.",
+      "resetInfoManaged": "Si olvidas tu contraseña, tu Refugi Lead podrá aprobar una solicitud de reinicio.",
+      "resetInfoSelfService": "Si olvidas tu contraseña, deberás enviar tu documento de identidad para verificación.",
+      "confirmCheckboxLabel": "Entiendo que esta contraseña solo se configura una vez y que perderé acceso a notas antiguas si la reseteo",
+      "confirmRequired": "Debes confirmar que entiendes las condiciones",
       "passwordLabel": "Contraseña",
       "passwordPlaceholder": "Mínimo 8 caracteres",
       "passwordRequirements": "Debe contener mayúsculas, minúsculas y números",
@@ -100,6 +106,7 @@
       "attemptsRemaining": "intentos restantes",
       "submitButton": "Desbloquear",
       "submittingButton": "Verificando...",
+      "verifyingButton": "Verificando...",
       "forgotPassword": "¿Olvidaste tu contraseña?",
       "locked": "Bloqueado temporalmente",
       "lockedDescription": "Podrás intentar de nuevo en:",
@@ -111,7 +118,9 @@
       "successTitle": "🔓 Caja Fuerte desbloqueada",
       "successDescription": "Accediendo a tus notas seguras...",
       "errorTitle": "Error",
-      "errorDescription": "No se pudo verificar la contraseña"
+      "errorDescription": "No se pudo verificar la contraseña",
+      "timeoutTitle": "Tiempo agotado",
+      "timeoutDescription": "La solicitud tardó demasiado. Por favor intenta de nuevo."
     },
     "reset": {
       "title": "Recuperar acceso a Caja Fuerte",
