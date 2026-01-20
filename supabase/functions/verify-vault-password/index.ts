@@ -75,12 +75,24 @@ serve(async (req) => {
     const scheme = String(vaultPassword.password_hash || '');
     let isValid = false;
 
+    console.log('[VERIFY-VAULT-PASSWORD] Hash scheme check:', {
+      startsWithPbkdf2: scheme.startsWith('pbkdf2$'),
+      schemeLength: scheme.length
+    });
+
     if (scheme.startsWith('pbkdf2$')) {
       // Formato: pbkdf2$sha256$<iteraciones>$<hashHex>
       const parts = scheme.split('$');
       const iterations = parseInt(parts[2]);
       const storedHashHex = parts[3];
       const saltHex = String(vaultPassword.salt || '');
+      
+      console.log('[VERIFY-VAULT-PASSWORD] PBKDF2 params:', {
+        iterations,
+        saltLength: saltHex.length,
+        storedHashLength: storedHashHex.length
+      });
+      
       if (!saltHex) throw new Error('Salt no disponible');
 
       const hexToBytes = (hex: string) => new Uint8Array(hex.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
@@ -93,6 +105,14 @@ serve(async (req) => {
         256
       );
       const computedHex = Array.from(new Uint8Array(derivedBits)).map(b => b.toString(16).padStart(2,'0')).join('');
+      
+      // Debug logging (first 8 chars only for security)
+      console.log('[VERIFY-VAULT-PASSWORD] Hash comparison:', {
+        storedHashStart: storedHashHex.substring(0, 8) + '...',
+        computedHashStart: computedHex.substring(0, 8) + '...',
+        lengthMatch: computedHex.length === storedHashHex.length
+      });
+      
       // Comparación en tiempo constante
       if (computedHex.length === storedHashHex.length) {
         let diff = 0;
@@ -101,7 +121,10 @@ serve(async (req) => {
         }
         isValid = (diff === 0);
       }
+      
+      console.log('[VERIFY-VAULT-PASSWORD] Validation result:', { isValid });
     } else {
+      console.error('[VERIFY-VAULT-PASSWORD] Unsupported hash format:', scheme.substring(0, 20));
       throw new Error('Formato de hash no soportado');
     }
 

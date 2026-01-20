@@ -75,6 +75,12 @@
       "description": "This password will protect your most sensitive notes.",
       "warning": "Important:",
       "warningDescription": "Don't forget this password. Recovering it requires special verification and you will lose access to your old notes.",
+      "oneTimeWarning": "⚠️ One-time setup",
+      "oneTimeWarningDescription": "This password can only be set ONCE. If you forget it, you'll need to go through a verification process to reset it.",
+      "resetInfoManaged": "If you forget your password, your Refugi Lead can approve a reset request.",
+      "resetInfoSelfService": "If you forget your password, you'll need to submit your identity document for verification.",
+      "confirmCheckboxLabel": "I understand this password is set only once and I'll lose access to old notes if I reset it",
+      "confirmRequired": "You must confirm that you understand the conditions",
       "passwordLabel": "Password",
       "passwordPlaceholder": "Minimum 8 characters",
       "passwordRequirements": "Must contain uppercase, lowercase, and numbers",
@@ -100,6 +106,7 @@
       "attemptsRemaining": "attempts remaining",
       "submitButton": "Unlock",
       "submittingButton": "Verifying...",
+      "verifyingButton": "Verifying...",
       "forgotPassword": "Forgot your password?",
       "locked": "Temporarily locked",
       "lockedDescription": "You can try again in:",
@@ -111,7 +118,9 @@
       "successTitle": "🔓 Safe Vault unlocked",
       "successDescription": "Accessing your secure notes...",
       "errorTitle": "Error",
-      "errorDescription": "Could not verify password"
+      "errorDescription": "Could not verify password",
+      "timeoutTitle": "Timeout",
+      "timeoutDescription": "The request took too long. Please try again."
     },
     "reset": {
       "title": "Recover Safe Vault Access",
