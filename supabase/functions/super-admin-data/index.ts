@@ -602,7 +602,11 @@ serve(async (req) => {
         // Generate reset token (30 min expiry)
         const { create } = await import("https://deno.land/x/djwt@v3.0.2/mod.ts");
         const encoder = new TextEncoder();
-        const jwtSecret = Deno.env.get('SUPABASE_JWT_SECRET') || '';
+        // Use service role key as secret for signing (always available)
+        const jwtSecret = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+        if (!jwtSecret) {
+          throw new Error('Server configuration error: missing signing key');
+        }
         const key = await crypto.subtle.importKey(
           "raw",
           encoder.encode(jwtSecret),

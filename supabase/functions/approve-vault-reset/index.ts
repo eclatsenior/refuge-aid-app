@@ -7,8 +7,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Use service role key as secret for signing reset tokens (always available)
 const JWT_SECRET = new TextEncoder().encode(
-  Deno.env.get('SUPABASE_JWT_SECRET') || 'your-secret-key'
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 );
 
 serve(async (req) => {
