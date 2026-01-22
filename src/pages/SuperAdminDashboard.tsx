@@ -12,6 +12,7 @@ import { SuperAdminSubscriptionsTab } from '@/components/super-admin/SuperAdminS
 import { SuperAdminAlertsTab } from '@/components/super-admin/SuperAdminAlertsTab';
 import { SuperAdminMetricsTab } from '@/components/super-admin/SuperAdminMetricsTab';
 import { SuperAdminSettingsTab } from '@/components/super-admin/SuperAdminSettingsTab';
+import { SuperAdminVaultResetTab } from '@/components/super-admin/SuperAdminVaultResetTab';
 import { useSuperAdminReportGeneration } from '@/hooks/useSuperAdminReportGeneration';
 
 export default function SuperAdminDashboard() {
@@ -102,11 +103,12 @@ export default function SuperAdminDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-flex">
+          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-flex">
             <TabsTrigger value="overview">{t('tabs.overview')}</TabsTrigger>
             <TabsTrigger value="users">{t('tabs.users')}</TabsTrigger>
             <TabsTrigger value="subscriptions">{t('tabs.subscriptions')}</TabsTrigger>
             <TabsTrigger value="alerts">{t('tabs.alerts')}</TabsTrigger>
+            <TabsTrigger value="vault">{t('tabs.vaultReset')}</TabsTrigger>
             <TabsTrigger value="metrics">{t('tabs.metrics')}</TabsTrigger>
             <TabsTrigger value="settings">{t('tabs.settings')}</TabsTrigger>
           </TabsList>
@@ -125,6 +127,10 @@ export default function SuperAdminDashboard() {
 
           <TabsContent value="alerts">
             <SuperAdminAlertsTab />
+          </TabsContent>
+
+          <TabsContent value="vault">
+            <SuperAdminVaultResetTab />
           </TabsContent>
 
           <TabsContent value="metrics">
