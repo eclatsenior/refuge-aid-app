@@ -78,10 +78,10 @@ serve(async (req) => {
     const finalNotes = notes || reviewerNotes;
     console.log('📝 Processing request:', requestId);
 
-    // Obtener la solicitud
+    // Obtener la solicitud (user_id ya está en vault_reset_requests)
     const { data: request, error: fetchError } = await supabaseAdmin
       .from('vault_reset_requests')
-      .select('*, profiles!vault_reset_requests_user_id_fkey(user_id)')
+      .select('*')
       .eq('id', requestId)
       .single();
 
