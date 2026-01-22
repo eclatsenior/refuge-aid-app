@@ -4,15 +4,16 @@
   "accessDenied": "Access Denied",
   "noPermission": "You don't have permission to access this panel.",
   "goBack": "Go Back",
-  "controlMaster": "Master Control",
-  "errorLoading": "Error loading data",
   "downloadReport": "Download PDF Report",
   "generatingReport": "Generating...",
+  "controlMaster": "Master Control",
+  "errorLoading": "Error loading data",
   "tabs": {
     "overview": "Overview",
     "users": "Users",
     "subscriptions": "Subscriptions",
     "alerts": "Alerts",
+    "vaultReset": "Vault",
     "metrics": "Metrics",
     "settings": "Settings"
   },
@@ -27,7 +28,8 @@
     "recentSignups": "Recent Signups",
     "last30days": "Last 30 days",
     "avgMood": "Average Mood",
-    "last24h": "Last 24 hours"
+    "last24h": "Last 24 hours",
+    "pendingVaultResets": "Vault Resets"
   },
   "users": {
     "title": "User Management",
@@ -110,6 +112,38 @@
     "unresolved": "Unresolved",
     "resolved": "Resolved"
   },
+  "vaultReset": {
+    "title": "Vault Reset Requests",
+    "description": "Users requiring identity verification to reset their vault password",
+    "noRequests": "No pending requests",
+    "errorLoading": "Error loading requests",
+    "user": "User",
+    "requestType": "Request Type",
+    "status": "Status",
+    "requestedAt": "Requested At",
+    "document": "Document",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "all": "All",
+    "idVerification": "ID Verification",
+    "viewDocument": "View document",
+    "documentTitle": "Identity Document",
+    "noDocument": "No document available",
+    "approve": "Approve",
+    "reject": "Reject",
+    "confirmApprove": "Approve request?",
+    "confirmApproveDescription": "This will allow {{name}} to reset their Vault password. They will have 30 minutes to do so.",
+    "requestApproved": "Request approved",
+    "approvedDescription": "The user has been notified and has 30 minutes to reset their password.",
+    "errorApproving": "Error approving request",
+    "rejectTitle": "Reject Request",
+    "rejectDescription": "Are you sure you want to reject the request from {{name}}?",
+    "rejectNotesPlaceholder": "Reason for rejection (optional)...",
+    "confirmReject": "Confirm Rejection",
+    "requestRejected": "Request rejected",
+    "errorRejecting": "Error rejecting request"
+  },
   "metrics": {
     "sessionsPerDay": "Sessions per Day",
     "avgMoodPerDay": "Average Mood per Day",
@@ -133,7 +167,9 @@
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "close": "Close",
+    "actions": "Actions"
   },
   "errorLoadingUsers": "Error loading users",
   "errorDeletingUser": "Error deleting user",

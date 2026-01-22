@@ -543,6 +543,170 @@ serve(async (req) => {
         break;
       }
 
+      case 'get_vault_reset_requests': {
+        const { status } = params;
+        
+        let query = supabaseAdmin
+          .from('vault_reset_requests')
+          .select('*')
+          .eq('request_type', 'id_verification')
+          .order('created_at', { ascending: false });
+        
+        if (status && status !== 'all') {
+          query = query.eq('status', status);
+        }
+        
+        const { data: requests, error } = await query;
+        if (error) throw error;
+        
+        // Get profiles and signed URLs for documents
+        const enrichedRequests = await Promise.all((requests || []).map(async (req) => {
+          const { data: profile } = await supabaseAdmin
+            .from('profiles')
+            .select('full_name, email')
+            .eq('user_id', req.user_id)
+            .single();
+          
+          let signedUrl = null;
+          if (req.id_document_url) {
+            const { data: urlData } = await supabaseAdmin.storage
+              .from('vault-reset-ids')
+              .createSignedUrl(req.id_document_url, 3600);
+            signedUrl = urlData?.signedUrl;
+          }
+          
+          return {
+            ...req,
+            profiles: profile,
+            id_document_signed_url: signedUrl
+          };
+        }));
+        
+        result = { requests: enrichedRequests };
+        break;
+      }
+
+      case 'approve_vault_reset_admin': {
+        const { requestId } = params;
+        
+        // Get request details
+        const { data: request, error: reqError } = await supabaseAdmin
+          .from('vault_reset_requests')
+          .select('*')
+          .eq('id', requestId)
+          .single();
+        
+        if (reqError || !request) throw new Error('Request not found');
+        if (request.status !== 'pending') throw new Error('Request already processed');
+        
+        // Generate reset token (30 min expiry)
+        const { create } = await import("https://deno.land/x/djwt@v3.0.2/mod.ts");
+        const encoder = new TextEncoder();
+        const jwtSecret = Deno.env.get('SUPABASE_JWT_SECRET') || '';
+        const key = await crypto.subtle.importKey(
+          "raw",
+          encoder.encode(jwtSecret),
+          { name: "HMAC", hash: "SHA-256" },
+          false,
+          ["sign", "verify"]
+        );
+        
+        const resetToken = await create(
+          { alg: "HS256", typ: "JWT" },
+          {
+            sub: request.user_id,
+            vault_reset: true,
+            request_id: requestId,
+            exp: Math.floor(Date.now() / 1000) + (30 * 60)
+          },
+          key
+        );
+        
+        // Update request
+        const { error: updateError } = await supabaseAdmin
+          .from('vault_reset_requests')
+          .update({
+            status: 'approved',
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: user.id,
+            reset_token: resetToken
+          })
+          .eq('id', requestId);
+        
+        if (updateError) throw updateError;
+        
+        // Notify user
+        await supabaseAdmin.from('internal_messages').insert({
+          sender_id: user.id,
+          recipient_id: request.user_id,
+          message: '✅ Tu solicitud de reinicio de contraseña de la Caja Fuerte ha sido aprobada. Tienes 30 minutos para establecer una nueva contraseña.'
+        });
+        
+        // Audit log
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'vault_reset_approved_by_admin',
+          resource_type: 'vault_reset_request',
+          resource_id: requestId,
+          metadata: { target_user_id: request.user_id, performed_by: user.email }
+        });
+        
+        console.log('Vault reset approved by admin:', user.email, 'for user:', request.user_id);
+        result = { success: true, resetToken };
+        break;
+      }
+
+      case 'reject_vault_reset_admin': {
+        const { requestId, notes } = params;
+        
+        // Get request
+        const { data: request, error: reqError } = await supabaseAdmin
+          .from('vault_reset_requests')
+          .select('*')
+          .eq('id', requestId)
+          .single();
+        
+        if (reqError || !request) throw new Error('Request not found');
+        if (request.status !== 'pending') throw new Error('Request already processed');
+        
+        // Update request
+        const { error: updateError } = await supabaseAdmin
+          .from('vault_reset_requests')
+          .update({
+            status: 'rejected',
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: user.id,
+            notes: notes || null
+          })
+          .eq('id', requestId);
+        
+        if (updateError) throw updateError;
+        
+        // Notify user
+        const message = notes 
+          ? `❌ Tu solicitud de reinicio de contraseña de la Caja Fuerte ha sido rechazada. Motivo: ${notes}`
+          : '❌ Tu solicitud de reinicio de contraseña de la Caja Fuerte ha sido rechazada.';
+        
+        await supabaseAdmin.from('internal_messages').insert({
+          sender_id: user.id,
+          recipient_id: request.user_id,
+          message
+        });
+        
+        // Audit log
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'vault_reset_rejected_by_admin',
+          resource_type: 'vault_reset_request',
+          resource_id: requestId,
+          metadata: { target_user_id: request.user_id, performed_by: user.email, notes }
+        });
+        
+        console.log('Vault reset rejected by admin:', user.email, 'for user:', request.user_id);
+        result = { success: true };
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: 'Invalid action' }), {
           status: 400,

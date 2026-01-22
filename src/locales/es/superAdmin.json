@@ -13,6 +13,7 @@
     "users": "Usuarios",
     "subscriptions": "Suscripciones",
     "alerts": "Alertas",
+    "vaultReset": "Caja Fuerte",
     "metrics": "Métricas",
     "settings": "Configuración"
   },
@@ -27,7 +28,8 @@
     "recentSignups": "Registros Recientes",
     "last30days": "Últimos 30 días",
     "avgMood": "Ánimo Promedio",
-    "last24h": "Últimas 24 horas"
+    "last24h": "Últimas 24 horas",
+    "pendingVaultResets": "Resets Caja Fuerte"
   },
   "users": {
     "title": "Gestión de Usuarios",
@@ -110,6 +112,38 @@
     "unresolved": "Sin resolver",
     "resolved": "Resueltas"
   },
+  "vaultReset": {
+    "title": "Solicitudes de Reset de Caja Fuerte",
+    "description": "Usuarios que necesitan verificación de identidad para resetear su contraseña",
+    "noRequests": "No hay solicitudes pendientes",
+    "errorLoading": "Error al cargar solicitudes",
+    "user": "Usuario",
+    "requestType": "Tipo de Solicitud",
+    "status": "Estado",
+    "requestedAt": "Fecha de Solicitud",
+    "document": "Documento",
+    "pending": "Pendiente",
+    "approved": "Aprobada",
+    "rejected": "Rechazada",
+    "all": "Todas",
+    "idVerification": "Verificación de ID",
+    "viewDocument": "Ver documento",
+    "documentTitle": "Documento de Identidad",
+    "noDocument": "No hay documento disponible",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "confirmApprove": "¿Aprobar solicitud?",
+    "confirmApproveDescription": "Esto permitirá a {{name}} restablecer su contraseña de la Caja Fuerte. Tendrá 30 minutos para hacerlo.",
+    "requestApproved": "Solicitud aprobada",
+    "approvedDescription": "El usuario ha sido notificado y tiene 30 minutos para restablecer su contraseña.",
+    "errorApproving": "Error al aprobar la solicitud",
+    "rejectTitle": "Rechazar Solicitud",
+    "rejectDescription": "¿Estás seguro de que deseas rechazar la solicitud de {{name}}?",
+    "rejectNotesPlaceholder": "Motivo del rechazo (opcional)...",
+    "confirmReject": "Confirmar Rechazo",
+    "requestRejected": "Solicitud rechazada",
+    "errorRejecting": "Error al rechazar la solicitud"
+  },
   "metrics": {
     "sessionsPerDay": "Sesiones por Día",
     "avgMoodPerDay": "Ánimo Promedio por Día",
@@ -133,7 +167,9 @@
     "cancel": "Cancelar",
     "save": "Guardar",
     "delete": "Eliminar",
-    "refresh": "Actualizar"
+    "refresh": "Actualizar",
+    "close": "Cerrar",
+    "actions": "Acciones"
   },
   "errorLoadingUsers": "Error al cargar usuarios",
   "errorDeletingUser": "Error al eliminar usuario",
