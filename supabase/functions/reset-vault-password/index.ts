@@ -7,7 +7,11 @@ const corsHeaders = {
 };
 
 async function getJWTSecret(): Promise<CryptoKey> {
-  const secret = Deno.env.get('SUPABASE_JWT_SECRET') || 'your-secret-key';
+  // Use service role key as secret for verifying reset tokens (consistent with approve functions)
+  const secret = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!secret) {
+    throw new Error('Server configuration error: missing signing key');
+  }
   const enc = new TextEncoder();
   return await crypto.subtle.importKey(
     'raw',
