@@ -15,7 +15,3 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     autoRefreshToken: true,
   }
 });
-
-// Export resumable upload endpoint for large files (TUS protocol)
-const projectRef = SUPABASE_URL.split('//')[1].split('.')[0];
-export const SUPABASE_STORAGE_RESUMABLE_URL = `https://${projectRef}.supabase.co/storage/v1/upload/resumable`;
