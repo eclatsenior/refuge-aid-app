@@ -1,1 +1,97 @@
 project_id = "npmyobeqbipvvuaeswnu"
+
+[functions.admin-unlock-account]
+verify_jwt = false
+
+[functions.approve-vault-reset]
+verify_jwt = false
+
+[functions.assign-subscription]
+verify_jwt = false
+
+[functions.auth-signup]
+verify_jwt = false
+
+[functions.auto-assign-basic-plan]
+verify_jwt = false
+
+[functions.calculate-risk-scores]
+verify_jwt = false
+
+[functions.check-subscription]
+verify_jwt = false
+
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.create-individual-checkout]
+verify_jwt = false
+
+[functions.create-payment]
+verify_jwt = false
+
+[functions.create-premium-test-account]
+verify_jwt = false
+
+[functions.create-refugi-lead-test]
+verify_jwt = false
+
+[functions.customer-portal]
+verify_jwt = false
+
+[functions.dashboard-kpis]
+verify_jwt = false
+
+[functions.delete-employee]
+verify_jwt = false
+
+[functions.generate-report-pdf]
+verify_jwt = false
+
+[functions.get-report-data]
+verify_jwt = false
+
+[functions.register-employee]
+verify_jwt = false
+
+[functions.request-password-reset]
+verify_jwt = false
+
+[functions.request-vault-reset]
+verify_jwt = false
+
+[functions.reset-password-with-code]
+verify_jwt = false
+
+[functions.reset-vault-password]
+verify_jwt = false
+
+[functions.send-verification-email]
+verify_jwt = false
+
+[functions.set-vault-password]
+verify_jwt = false
+
+[functions.super-admin-data]
+verify_jwt = false
+
+[functions.track-app-session]
+verify_jwt = false
+
+[functions.track-video-progress]
+verify_jwt = false
+
+[functions.update-employee]
+verify_jwt = false
+
+[functions.verify-custom-email]
+verify_jwt = false
+
+[functions.verify-email-code]
+verify_jwt = false
+
+[functions.verify-reset-code]
+verify_jwt = false
+
+[functions.verify-vault-password]
+verify_jwt = false
