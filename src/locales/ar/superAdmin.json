@@ -69,7 +69,10 @@
     "errorChangingPassword": "خطأ في تغيير كلمة المرور",
     "errorSendingReset": "خطأ في إرسال بريد إعادة التعيين",
     "setPassword": "تعيين كلمة المرور",
-    "saving": "جاري الحفظ..."
+    "saving": "جاري الحفظ...",
+    "editProfile": "تعديل",
+    "profileUpdated": "تم تحديث الملف الشخصي بنجاح",
+    "errorUpdatingProfile": "خطأ في تحديث الملف الشخصي"
   },
   "subscriptions": {
     "title": "إدارة الاشتراكات",

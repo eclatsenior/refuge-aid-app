@@ -69,7 +69,10 @@
     "errorChangingPassword": "Error changing password",
     "errorSendingReset": "Error sending reset email",
     "setPassword": "Set password",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "editProfile": "Edit",
+    "profileUpdated": "Profile updated successfully",
+    "errorUpdatingProfile": "Error updating profile"
   },
   "subscriptions": {
     "title": "Subscription Management",

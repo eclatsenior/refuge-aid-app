@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Trash2, Eye, ChevronLeft, ChevronRight, Key, Mail } from 'lucide-react';
+import { Search, Trash2, Eye, ChevronLeft, ChevronRight, Key, Mail, Pencil, Save, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +37,11 @@ export function SuperAdminUsersTab() {
   const [userDetailsOpen, setUserDetailsOpen] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [passwordDialogUser, setPasswordDialogUser] = useState<User | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editRole, setEditRole] = useState<string>('');
+  const [editPhone, setEditPhone] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
   const limit = 20;
 
   useEffect(() => {
@@ -85,6 +90,7 @@ export function SuperAdminUsersTab() {
   const handleViewUser = async (userId: string) => {
     setLoadingDetails(true);
     setUserDetailsOpen(true);
+    setIsEditing(false);
     try {
       const { data, error } = await supabase.functions.invoke('super-admin-data', {
         body: { action: 'get_user_details', userId }
@@ -97,6 +103,55 @@ export function SuperAdminUsersTab() {
       toast.error(t('errorLoadingUserDetails'));
     } finally {
       setLoadingDetails(false);
+    }
+  };
+
+  const handleStartEdit = () => {
+    if (!selectedUser?.profile) return;
+    setEditName(selectedUser.profile.full_name || '');
+    setEditRole(selectedUser.profile.role || 'employee');
+    setEditPhone(selectedUser.profile.phone || '');
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedUser?.profile) return;
+    setSavingEdit(true);
+    try {
+      const { error } = await supabase.functions.invoke('super-admin-data', {
+        body: {
+          action: 'update_user_profile',
+          userId: selectedUser.profile.user_id,
+          full_name: editName,
+          role: editRole,
+          phone: editPhone,
+        }
+      });
+
+      if (error) throw error;
+      toast.success(t('users.profileUpdated'));
+      
+      // Update local state
+      setSelectedUser((prev: any) => ({
+        ...prev,
+        profile: {
+          ...prev.profile,
+          full_name: editName,
+          role: editRole,
+          phone: editPhone || null,
+        }
+      }));
+      setIsEditing(false);
+      loadUsers();
+    } catch (err: any) {
+      console.error('Error updating user:', err);
+      toast.error(t('users.errorUpdatingProfile'));
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -263,10 +318,18 @@ export function SuperAdminUsersTab() {
         )}
 
         {/* User Details Dialog */}
-        <Dialog open={userDetailsOpen} onOpenChange={setUserDetailsOpen}>
+        <Dialog open={userDetailsOpen} onOpenChange={(open) => { setUserDetailsOpen(open); if (!open) setIsEditing(false); }}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{t('users.userDetails')}</DialogTitle>
+              <div className="flex items-center justify-between">
+                <DialogTitle>{t('users.userDetails')}</DialogTitle>
+                {selectedUser && !loadingDetails && !isEditing && (
+                  <Button variant="outline" size="sm" onClick={handleStartEdit} className="gap-1.5">
+                    <Pencil className="w-3.5 h-3.5" />
+                    {t('users.editProfile')}
+                  </Button>
+                )}
+              </div>
             </DialogHeader>
             {loadingDetails ? (
               <div className="flex items-center justify-center py-8">
@@ -277,12 +340,62 @@ export function SuperAdminUsersTab() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <h4 className="font-semibold mb-2">{t('users.profile')}</h4>
-                    <div className="space-y-2 text-sm">
-                      <p><span className="text-muted-foreground">{t('users.name')}:</span> {selectedUser.profile?.full_name}</p>
-                      <p><span className="text-muted-foreground">{t('users.email')}:</span> {selectedUser.profile?.email}</p>
-                      <p><span className="text-muted-foreground">{t('users.role')}:</span> {selectedUser.profile?.role}</p>
-                      <p><span className="text-muted-foreground">{t('users.phone')}:</span> {selectedUser.profile?.phone || '-'}</p>
-                    </div>
+                    {isEditing ? (
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-sm text-muted-foreground">{t('users.name')}</label>
+                          <Input
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm text-muted-foreground">{t('users.email')}</label>
+                          <Input value={selectedUser.profile?.email || ''} disabled className="opacity-60" />
+                        </div>
+                        <div>
+                          <label className="text-sm text-muted-foreground">{t('users.role')}</label>
+                          <Select value={editRole} onValueChange={setEditRole}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="employee">Employee</SelectItem>
+                              <SelectItem value="refugi_lead">Refugi Lead</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm text-muted-foreground">{t('users.phone')}</label>
+                          <Input
+                            value={editPhone}
+                            onChange={(e) => setEditPhone(e.target.value)}
+                            placeholder="+34..."
+                          />
+                        </div>
+                        <div className="flex gap-2 pt-2">
+                          <Button size="sm" onClick={handleSaveEdit} disabled={savingEdit} className="gap-1.5">
+                            <Save className="w-3.5 h-3.5" />
+                            {savingEdit ? t('users.saving') : t('common.save')}
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={handleCancelEdit} disabled={savingEdit} className="gap-1.5">
+                            <X className="w-3.5 h-3.5" />
+                            {t('common.cancel')}
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 text-sm">
+                        <p><span className="text-muted-foreground">{t('users.name')}:</span> {selectedUser.profile?.full_name}</p>
+                        <p><span className="text-muted-foreground">{t('users.email')}:</span> {selectedUser.profile?.email}</p>
+                        <p><span className="text-muted-foreground">{t('users.role')}:</span> 
+                          <Badge variant={selectedUser.profile?.role === 'refugi_lead' ? 'default' : 'secondary'} className="ml-2">
+                            {selectedUser.profile?.role === 'refugi_lead' ? 'Refugi Lead' : 'Employee'}
+                          </Badge>
+                        </p>
+                        <p><span className="text-muted-foreground">{t('users.phone')}:</span> {selectedUser.profile?.phone || '-'}</p>
+                      </div>
+                    )}
                   </div>
                   {selectedUser.subscription && (
                     <div>
