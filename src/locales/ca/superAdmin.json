@@ -69,7 +69,10 @@
     "errorChangingPassword": "Error en canviar la contrasenya",
     "errorSendingReset": "Error en enviar email de recuperació",
     "setPassword": "Establir contrasenya",
-    "saving": "Desant..."
+    "saving": "Desant...",
+    "editProfile": "Editar",
+    "profileUpdated": "Perfil actualitzat correctament",
+    "errorUpdatingProfile": "Error en actualitzar el perfil"
   },
   "subscriptions": {
     "title": "Gestió de Subscripcions",

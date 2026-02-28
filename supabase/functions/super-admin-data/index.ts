@@ -196,6 +196,43 @@ serve(async (req) => {
         break;
       }
 
+      case 'update_user_profile': {
+        const { userId: targetUserId, full_name, role: newRole, phone } = params;
+        
+        if (!targetUserId) {
+          throw new Error('userId is required');
+        }
+
+        const updateData: Record<string, any> = {};
+        if (full_name !== undefined) updateData.full_name = full_name.trim();
+        if (newRole !== undefined) updateData.role = newRole;
+        if (phone !== undefined) updateData.phone = phone || null;
+
+        if (Object.keys(updateData).length === 0) {
+          throw new Error('No fields to update');
+        }
+
+        const { error } = await supabaseAdmin
+          .from('profiles')
+          .update(updateData)
+          .eq('user_id', targetUserId);
+        
+        if (error) throw error;
+
+        // Log to audit
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'update_user_profile',
+          resource_type: 'user',
+          resource_id: targetUserId,
+          metadata: { updated_fields: Object.keys(updateData), performed_by: user.email }
+        });
+
+        console.log('User profile updated:', targetUserId, 'fields:', Object.keys(updateData));
+        result = { success: true };
+        break;
+      }
+
       case 'get_subscriptions': {
         const { data, error } = await supabaseAdmin
           .from('subscriptions')

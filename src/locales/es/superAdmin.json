@@ -70,7 +70,10 @@
     "errorChangingPassword": "Error al cambiar la contraseña",
     "errorSendingReset": "Error al enviar email de recuperación",
     "setPassword": "Establecer contraseña",
-    "saving": "Guardando..."
+    "saving": "Guardando...",
+    "editProfile": "Editar",
+    "profileUpdated": "Perfil actualizado correctamente",
+    "errorUpdatingProfile": "Error al actualizar el perfil"
   },
   "subscriptions": {
     "title": "Gestión de Suscripciones",
