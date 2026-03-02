@@ -34,8 +34,8 @@ All colors MUST be HSL.
     --primary-glow: 290 90% 75%; /* Electric purple */
 
     /* Colorful accents matching the examples */
-    --coral: 350 85% 65%; /* Bright pink-coral */
-    --coral-foreground: 0 0% 98%;
+    --coral: 45 90% 55%; /* Yellow for anxious */
+    --coral-foreground: 0 0% 10%;
     --cyan: 190 90% 60%; /* Electric cyan */
     --cyan-foreground: 0 0% 98%;
     --mint: 160 85% 55%; /* Bright mint green */
