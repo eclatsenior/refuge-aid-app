@@ -9,148 +9,26 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "@/hooks/use-toast";
 import { VideoPlayer } from "@/components/therapy/VideoPlayer";
 import { useTherapyVideos } from "@/hooks/useTherapyVideos";
+import { useTherapyRoutes, TherapyRoute, TherapyModule } from "@/hooks/useTherapyRoutes";
 import { supabase } from "@/integrations/supabase/client";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 
 interface CaminoTerapeuticoPageProps {
   onNavigate: (path: string) => void;
 }
 
-interface Route {
-  id: string;
-  title: string;
-  description: string;
-  duration: string;
-  icon: React.ReactNode;
-  color: string;
-  modules: Module[];
-}
-
-interface Module {
-  id: string;
-  title: string;
-  description: string;
-  duration: number;
-  content: string;
-  type: 'breathing' | 'grounding' | 'education' | 'tool' | 'reflection';
-}
-
-const routes: Route[] = [
-  {
-    id: 'estabilizacion',
-    title: 'Estabilización emocional',
-    description: 'Baja la intensidad y regresa al ahora.',
-    duration: '5-8 min',
-    icon: <Heart className="h-6 w-6" />,
-    color: 'blue',
-    modules: [
-      {
-        id: 'breathing',
-        title: 'Respiración 4-7-8',
-        description: 'Técnica de respiración para calmar el sistema nervioso',
-        duration: 5,
-        type: 'breathing',
-        content: 'La respiración 4-7-8 ayuda a activar el sistema nervioso parasimpático, reduciendo la ansiedad y promoviendo la calma.'
-      },
-      {
-        id: 'grounding',
-        title: 'Grounding 5-4-3-2-1',
-        description: 'Ejercicio de conexión con el presente',
-        duration: 3,
-        type: 'grounding',
-        content: 'Este ejercicio te ayuda a reconectar con el momento presente usando tus cinco sentidos.'
-      }
-    ]
-  },
-  {
-    id: 'ansiedad',
-    title: 'Ansiedad / Pánico',
-    description: 'Guía breve para atravesar el pico.',
-    duration: '5-8 min',
-    icon: <Wind className="h-6 w-6" />,
-    color: 'coral',
-    modules: [
-      {
-        id: 'wave',
-        title: 'Atraviesa la ola',
-        description: 'Audio guiado para crisis de pánico',
-        duration: 5,
-        type: 'breathing',
-        content: 'Recordar: el pánico es como una ola. Tiene un pico y después baja. No luches contra ella, déjala pasar.'
-      },
-      {
-        id: 'timer',
-        title: 'Temporizador de crisis',
-        description: 'Instrucciones paso a paso con cronómetro',
-        duration: 3,
-        type: 'tool',
-        content: 'Un temporizador que te guía minuto a minuto durante una crisis de ansiedad.'
-      }
-    ]
-  },
-  {
-    id: 'trauma',
-    title: 'Trauma y disociación',
-    description: 'Anclajes cuando te desconectas.',
-    duration: '8-12 min',
-    icon: <Shield className="h-6 w-6" />,
-    color: 'gray-gradient',
-    modules: [
-      {
-        id: 'grounding-intensive',
-        title: 'Volver al presente',
-        description: 'Botón de anclaje inmediato',
-        duration: 2,
-        type: 'grounding',
-        content: 'Técnicas intensivas de grounding para momentos de disociación.'
-      },
-      {
-        id: 'anchor-plan',
-        title: 'Plan personal de anclaje',
-        description: 'Estrategias personalizadas para reconectar',
-        duration: 8,
-        type: 'tool',
-        content: 'Desarrolla tu plan personalizado de técnicas que te ayuden a volver al presente.'
-      }
-    ]
-  },
-  {
-    id: 'aromaterapia',
-    title: 'Aromaterapia',
-    description: 'Calma a través del sentido del olfato.',
-    duration: '6-12 min',
-    icon: <Flower className="h-6 w-6" />,
-    color: 'green',
-    modules: [
-      {
-        id: 'library',
-        title: 'Biblioteca de aromas',
-        description: 'Conoce los aceites esenciales, sus beneficios y contraindicaciones',
-        duration: 5,
-        type: 'education',
-        content: 'Conoce los diferentes aceites esenciales y sus efectos calmantes. Elige el aceite que resuene contigo y acompáñalo de respiración con cada módulo.'
-      },
-      {
-        id: 'routine',
-        title: 'Rutina guiada de 3 minutos',
-        description: 'Sesión corta de aromaterapia',
-        duration: 3,
-        type: 'breathing',
-        content: 'Una rutina breve que combina aromaterapia con respiración consciente.'
-      },
-      {
-        id: 'alternatives',
-        title: 'Alternativas sensoriales',
-        description: 'Opciones si no tienes aceites',
-        duration: 3,
-        type: 'tool',
-        content: 'Técnicas alternativas usando otros sentidos cuando no tienes aceites esenciales.'
-      }
-    ]
-  }
-];
+const ICON_MAP: Record<string, React.ReactNode> = {
+  heart: <Heart className="h-6 w-6" />,
+  wind: <Wind className="h-6 w-6" />,
+  shield: <Shield className="h-6 w-6" />,
+  flower: <Flower className="h-6 w-6" />,
+  book: <Book className="h-6 w-6" />,
+  wrench: <Wrench className="h-6 w-6" />,
+  clock: <Clock className="h-6 w-6" />,
+};
 
 export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps) {
-  const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<TherapyRoute | null>(null);
   const [currentModule, setCurrentModule] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
   const [completedModules, setCompletedModules] = useState<string[]>(
@@ -158,19 +36,19 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
   );
   const [videoWatchedPercentage, setVideoWatchedPercentage] = useState(0);
   
-  const { getVideoForModule } = useTherapyVideos();
+  const { getVideoForModule, loading: videosLoading } = useTherapyVideos();
+  const { routes, loading: routesLoading, error: routesError } = useTherapyRoutes();
 
-  // Reset video progress cuando cambia el módulo
   useEffect(() => {
     if (selectedRoute) {
       setVideoWatchedPercentage(0);
     }
   }, [currentModule, selectedRoute]);
 
-  const handleRouteSelect = (route: Route) => {
+  const handleRouteSelect = (route: TherapyRoute) => {
     setSelectedRoute(route);
     setCurrentModule(0);
-    setVideoWatchedPercentage(0); // Reset al entrar a una ruta
+    setVideoWatchedPercentage(0);
   };
 
   const handleBack = () => {
@@ -183,16 +61,16 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     }
   };
 
-  const handleCompleteModule = (moduleId: string) => {
-    if (!completedModules.includes(moduleId)) {
-      const newCompleted = [...completedModules, moduleId];
+  const handleCompleteModule = (moduleKey: string) => {
+    if (!completedModules.includes(moduleKey)) {
+      const newCompleted = [...completedModules, moduleKey];
       setCompletedModules(newCompleted);
       localStorage.setItem('completed_modules', JSON.stringify(newCompleted));
     }
     
     if (selectedRoute && currentModule < selectedRoute.modules.length - 1) {
       setCurrentModule(currentModule + 1);
-      setVideoWatchedPercentage(0); // Reset para el siguiente módulo
+      setVideoWatchedPercentage(0);
     } else if (selectedRoute && currentModule === selectedRoute.modules.length - 1) {
       setShowSummary(true);
     }
@@ -201,11 +79,12 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
   const handleRepeatModule = (moduleIndex: number) => {
     setCurrentModule(moduleIndex);
     setShowSummary(false);
-    setVideoWatchedPercentage(0); // Reset al cambiar de módulo
+    setVideoWatchedPercentage(0);
   };
 
-  const handleResetRoute = (routeId: string) => {
-    const modulesToRemove = routes.find(r => r.id === routeId)?.modules.map(m => m.id) || [];
+  const handleResetRoute = (routeKey: string) => {
+    const route = routes.find(r => r.route_key === routeKey);
+    const modulesToRemove = route?.modules.map(m => m.module_key) || [];
     const newCompleted = completedModules.filter(id => !modulesToRemove.includes(id));
     setCompletedModules(newCompleted);
     localStorage.setItem('completed_modules', JSON.stringify(newCompleted));
@@ -236,21 +115,20 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
           watched_duration_seconds: Math.floor(duration)
         }
       });
-      
       if (error) throw error;
-      
-      console.log('✅ Video progress tracked:', { videoId, routeId, moduleId });
     } catch (error) {
       console.error('❌ Error tracking video progress:', error);
     }
   };
 
-  const getRouteProgress = (route: Route) => {
+  const getRouteProgress = (route: TherapyRoute) => {
     const completed = route.modules.filter(module => 
-      completedModules.includes(module.id)
+      completedModules.includes(module.module_key)
     ).length;
-    return (completed / route.modules.length) * 100;
+    return route.modules.length > 0 ? (completed / route.modules.length) * 100 : 0;
   };
+
+  const getRouteIcon = (iconName: string) => ICON_MAP[iconName] || <Heart className="h-6 w-6" />;
 
   const getColorClasses = (color: string) => {
     const colorMap: { [key: string]: string } = {
@@ -263,34 +141,62 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     return colorMap[color] || 'bg-muted/10 border-muted/20 text-muted-foreground hover:bg-muted/20';
   };
 
-  const getModuleIcon = (type: Module['type']) => {
+  const getModuleIcon = (type: string) => {
     switch (type) {
-      case 'breathing':
-        return <Wind className="h-5 w-5" />;
-      case 'grounding':
-        return <Eye className="h-5 w-5" />;
-      case 'education':
-        return <Book className="h-5 w-5" />;
-      case 'tool':
-        return <Wrench className="h-5 w-5" />;
-      case 'reflection':
-        return <MessageSquare className="h-5 w-5" />;
-      default:
-        return <Clock className="h-5 w-5" />;
+      case 'breathing': return <Wind className="h-5 w-5" />;
+      case 'grounding': return <Eye className="h-5 w-5" />;
+      case 'education': return <Book className="h-5 w-5" />;
+      case 'tool': return <Wrench className="h-5 w-5" />;
+      case 'reflection': return <MessageSquare className="h-5 w-5" />;
+      default: return <Clock className="h-5 w-5" />;
     }
   };
 
-  // Vista de resumen después de completar la ruta
+  const getIconBgClass = (color: string) => {
+    const map: Record<string, string> = {
+      'blue': 'bg-gradient-to-br from-blue-500 to-blue-600',
+      'coral': 'bg-gradient-to-br from-coral to-coral/80',
+      'gray-gradient': 'bg-gradient-to-br from-gray-400 to-gray-600',
+      'purple': 'bg-gradient-to-br from-purple-500 to-purple-600',
+      'green': 'bg-gradient-to-br from-green-500 to-green-600',
+    };
+    return map[color] || 'bg-gradient-to-br from-primary to-primary/80';
+  };
+
+  // Loading state
+  if (routesLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <LoadingSpinner size="lg" />
+          <p className="text-muted-foreground">Cargando camino terapéutico...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (routesError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <p className="text-destructive font-medium">Error al cargar las rutas</p>
+          <p className="text-sm text-muted-foreground">{routesError}</p>
+          <Button variant="outline" onClick={() => window.location.reload()}>
+            Reintentar
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Summary view
   if (selectedRoute && showSummary) {
     return (
       <div className="min-h-screen bg-gradient-calm p-4 pb-20">
         <div className="max-w-2xl mx-auto">
           <header className="flex items-center justify-between mb-6">
-            <Button
-              variant="ghost"
-              onClick={handleBack}
-              className="gap-2"
-            >
+            <Button variant="ghost" onClick={handleBack} className="gap-2">
               <ArrowLeft size={20} />
               Volver
             </Button>
@@ -313,7 +219,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.id)}>
+                  <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.route_key)}>
                     Reiniciar ruta
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -332,34 +238,21 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
           </div>
 
           <div className="space-y-4 mb-6">
-            <h3 className="text-lg font-semibold text-center mb-4">
-              Volver a cursar módulos
-            </h3>
+            <h3 className="text-lg font-semibold text-center mb-4">Volver a cursar módulos</h3>
             {selectedRoute.modules.map((module, index) => (
-              <Card 
-                key={module.id}
-                className="cursor-pointer transition-all hover:shadow-soft bg-card/90 backdrop-blur-sm"
-              >
+              <Card key={module.id} className="cursor-pointer transition-all hover:shadow-soft bg-card/90 backdrop-blur-sm">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1">
                       <div className="h-12 w-12 rounded-full bg-gradient-primary flex items-center justify-center shadow-sm">
-                        <div className="text-white">
-                          {getModuleIcon(module.type)}
-                        </div>
+                        <div className="text-white">{getModuleIcon(module.type)}</div>
                       </div>
                       <div className="flex-1">
                         <h4 className="font-semibold text-base mb-1">{module.title}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {module.duration} min · {module.description}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{module.duration} min · {module.description}</p>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => handleRepeatModule(index)}
-                      variant="outline"
-                      size="sm"
-                    >
+                    <Button onClick={() => handleRepeatModule(index)} variant="outline" size="sm">
                       Volver a cursar
                     </Button>
                   </div>
@@ -370,10 +263,8 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
 
           <div className="flex flex-col gap-3">
             {(() => {
-              const currentIndex = routes.findIndex(r => r.id === selectedRoute.id);
-              const nextRoute = currentIndex !== -1 && currentIndex < routes.length - 1 
-                ? routes[currentIndex + 1] 
-                : null;
+              const currentIndex = routes.findIndex(r => r.route_key === selectedRoute.route_key);
+              const nextRoute = currentIndex !== -1 && currentIndex < routes.length - 1 ? routes[currentIndex + 1] : null;
               
               if (nextRoute) {
                 return (
@@ -383,10 +274,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                       setCurrentModule(0);
                       setShowSummary(false);
                       setVideoWatchedPercentage(0);
-                      toast({
-                        title: `Iniciando: ${nextRoute.title}`,
-                        description: "¡Continúa tu camino terapéutico!",
-                      });
+                      toast({ title: `Iniciando: ${nextRoute.title}`, description: "¡Continúa tu camino terapéutico!" });
                     }}
                     className="w-full max-w-md mx-auto gap-2"
                   >
@@ -399,11 +287,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
             })()}
             
             <div className="flex gap-3 justify-center">
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                className="flex-1 max-w-xs"
-              >
+              <Button variant="outline" onClick={handleBack} className="flex-1 max-w-xs">
                 Volver al inicio
               </Button>
               <AlertDialog>
@@ -422,7 +306,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.id)}>
+                    <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.route_key)}>
                       Reiniciar ruta
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -439,10 +323,15 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     );
   }
 
+  // Module view
   if (selectedRoute) {
     const module = selectedRoute.modules[currentModule];
+    if (!module) {
+      setCurrentModule(0);
+      return null;
+    }
     const progress = ((currentModule + 1) / selectedRoute.modules.length) * 100;
-    const videoData = getVideoForModule(selectedRoute.id, module.id);
+    const videoData = getVideoForModule(selectedRoute.route_key, module.module_key);
     const videoRequired = videoData?.is_required || false;
     const canProceed = !videoRequired || videoWatchedPercentage >= 80;
     
@@ -450,11 +339,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
       <div className="min-h-screen bg-gradient-calm p-4 pb-20">
         <div className="max-w-2xl mx-auto">
           <header className="flex items-center justify-between mb-6">
-            <Button
-              variant="ghost"
-              onClick={handleBack}
-              className="gap-2"
-            >
+            <Button variant="ghost" onClick={handleBack} className="gap-2">
               <ArrowLeft size={20} />
               Volver
             </Button>
@@ -478,7 +363,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.id)}>
+                  <AlertDialogAction onClick={() => handleResetRoute(selectedRoute.route_key)}>
                     Reiniciar ruta
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -489,7 +374,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
           <Card className="mb-6 bg-card/90 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                {selectedRoute.icon}
+                {getRouteIcon(selectedRoute.icon)}
                 {module.title}
                 {videoData && (
                   <Badge variant="secondary" className="ml-auto text-xs">
@@ -507,15 +392,15 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                   videoUrl={videoData.video_url}
                   videoName={videoData.video_name || undefined}
                   videoId={videoData.id}
-                  routeId={selectedRoute.id}
-                  moduleId={module.id}
+                  routeId={selectedRoute.route_key}
+                  moduleId={module.module_key}
                   required={videoData.is_required}
                   onVideoWatched={setVideoWatchedPercentage}
                   onVideoCompleted={handleVideoCompleted}
                 />
               )}
               
-              {selectedRoute.id === 'aromaterapia' && module.id === 'library' ? (
+              {selectedRoute.route_key === 'aromaterapia' && module.module_key === 'library' ? (
                 <div className="space-y-4">
                   <div className="grid gap-3">
                     <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
@@ -525,7 +410,6 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                       </div>
                       <p className="text-sm text-muted-foreground">Relajante, reduce el estrés y promueve el sueño.</p>
                     </div>
-                    
                     <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-2xl">🌿</span>
@@ -533,7 +417,6 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                       </div>
                       <p className="text-sm text-muted-foreground">Revitalizante, energético, control mental.</p>
                     </div>
-                    
                     <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-2xl">🍋</span>
@@ -541,7 +424,6 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                       </div>
                       <p className="text-sm text-muted-foreground">Purificador refrescante y eleva el estado de ánimo.</p>
                     </div>
-                    
                     <div className="p-4 rounded-xl bg-pink-500/10 border border-pink-500/20">
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-2xl">🌸</span>
@@ -550,7 +432,6 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                       <p className="text-sm text-muted-foreground">Calmante, antidepresivo y para el insomnio.</p>
                     </div>
                   </div>
-                  
                   <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 text-center">
                     <p className="text-sm italic text-foreground/80">
                       ✨ Elige el aceite que resuene contigo y acompáñalo de respiración con cada módulo.
@@ -603,13 +484,13 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                 </Button>
                 
                 <Button
-                  onClick={() => handleCompleteModule(module.id)}
+                  onClick={() => handleCompleteModule(module.module_key)}
                   className="px-8"
                   disabled={!canProceed}
                 >
                   {currentModule === selectedRoute.modules.length - 1
-                    ? completedModules.includes(module.id) ? 'Finalizar de nuevo' : 'Finalizar ruta'
-                    : completedModules.includes(module.id) ? 'Siguiente ✓' : 'Siguiente'
+                    ? completedModules.includes(module.module_key) ? 'Finalizar de nuevo' : 'Finalizar ruta'
+                    : completedModules.includes(module.module_key) ? 'Siguiente ✓' : 'Siguiente'
                   }
                 </Button>
               </div>
@@ -622,7 +503,6 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
             </CardContent>
           </Card>
 
-          {/* Sección "Volver a cursar módulos" siempre visible */}
           <Card className="mb-6 bg-card/90 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-lg">Todos los módulos de esta ruta</CardTitle>
@@ -631,7 +511,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
             <CardContent className="space-y-3">
               {selectedRoute.modules.map((mod, index) => {
                 const isCurrentModule = index === currentModule;
-                const isCompleted = completedModules.includes(mod.id);
+                const isCompleted = completedModules.includes(mod.module_key);
                 
                 return (
                   <div
@@ -657,18 +537,12 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                       </div>
                     </div>
                     {!isCurrentModule && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRepeatModule(index)}
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => handleRepeatModule(index)}>
                         Ir a módulo
                       </Button>
                     )}
                     {isCurrentModule && (
-                      <Badge variant="default" className="text-xs">
-                        Actual
-                      </Badge>
+                      <Badge variant="default" className="text-xs">Actual</Badge>
                     )}
                   </div>
                 );
@@ -684,14 +558,11 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     );
   }
 
+  // Routes list view
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
       <header className="flex items-center justify-between mb-6">
-        <Button
-          variant="ghost"
-          onClick={handleBack}
-          className="gap-2"
-        >
+        <Button variant="ghost" onClick={handleBack} className="gap-2">
           <ArrowLeft size={20} />
           Volver
         </Button>
@@ -711,8 +582,8 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
 
         <div className="grid gap-6">
           {routes.map((route) => {
-            const progress = getRouteProgress(route);
-            const isStarted = progress > 0;
+            const routeProgress = getRouteProgress(route);
+            const isStarted = routeProgress > 0;
             
             return (
               <Card 
@@ -723,17 +594,8 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4 flex-1">
-                      <div className={`h-14 w-14 rounded-full flex items-center justify-center shadow-sm ${
-                        route.color === 'blue' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
-                        route.color === 'coral' ? 'bg-gradient-to-br from-coral to-coral/80' :
-                        route.color === 'gray-gradient' ? 'bg-gradient-to-br from-gray-400 to-gray-600' :
-                        route.color === 'purple' ? 'bg-gradient-to-br from-purple-500 to-purple-600' :
-                        route.color === 'green' ? 'bg-gradient-to-br from-green-500 to-green-600' :
-                        'bg-gradient-to-br from-primary to-primary/80'
-                      }`}>
-                        <div className="text-white">
-                          {route.icon}
-                        </div>
+                      <div className={`h-14 w-14 rounded-full flex items-center justify-center shadow-sm ${getIconBgClass(route.color)}`}>
+                        <div className="text-white">{getRouteIcon(route.icon)}</div>
                       </div>
                       <div className="flex-1">
                         <CardTitle className="text-xl mb-2">{route.title}</CardTitle>
@@ -752,9 +614,9 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                     <div className="mt-4">
                       <div className="flex justify-between text-sm mb-2">
                         <span>Progreso</span>
-                        <span>{Math.round(progress)}%</span>
+                        <span>{Math.round(routeProgress)}%</span>
                       </div>
-                      <Progress value={progress} className="w-full" />
+                      <Progress value={routeProgress} className="w-full" />
                     </div>
                   )}
                 </CardHeader>
