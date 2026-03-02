@@ -44,6 +44,14 @@ export function useAppSessionTracking() {
       if (!sessionIdRef.current) return;
 
       try {
+        // Check if we still have a valid auth session before calling
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          console.debug('[AppSession] No valid session, skipping end tracking');
+          sessionIdRef.current = null;
+          return;
+        }
+
         await supabase.functions.invoke('track-app-session', {
           body: { 
             action: 'end', 
@@ -54,6 +62,7 @@ export function useAppSessionTracking() {
         sessionIdRef.current = null;
       } catch (error) {
         console.error('[AppSession] Error ending session:', error);
+        sessionIdRef.current = null;
       }
     };
 
