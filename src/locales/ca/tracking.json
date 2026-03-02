@@ -21,15 +21,16 @@
     }
   },
   "statusRegistered": "Estat registrat avui",
-  "weeklySummary": {
-    "title": "Resum Setmanal",
-    "description": "Últims 7 dies - {{registered}} de {{total}} dies registrats",
-    "stableDays": "Dies estables",
-    "anxiousDays": "Dies ansiosos",
-    "alertDays": "Dies d'alerta"
+  "summary": {
+    "title": "Resum",
+    "week": "Setmana",
+    "month": "Mes",
+    "year": "Any",
+    "totalRecords": "Total: {{count}} registres"
   },
-  "last7Days": "Últims 7 dies",
-  "recentHistory": "Historial Recent",
+  "history": {
+    "title": "Historial"
+  },
   "toast": {
     "stable": "Estat registrat com a estable",
     "anxious": "Registrat nivell d'ansietat alt",

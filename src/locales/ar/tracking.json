@@ -21,15 +21,16 @@
     }
   },
   "statusRegistered": "تم تسجيل الحالة اليوم",
-  "weeklySummary": {
-    "title": "الملخص الأسبوعي",
-    "description": "آخر 7 أيام - {{registered}} من {{total}} أيام مسجلة",
-    "stableDays": "أيام مستقرة",
-    "anxiousDays": "أيام قلق",
-    "alertDays": "أيام تنبيه"
+  "summary": {
+    "title": "ملخص",
+    "week": "أسبوع",
+    "month": "شهر",
+    "year": "سنة",
+    "totalRecords": "المجموع: {{count}} سجلات"
   },
-  "last7Days": "آخر 7 أيام",
-  "recentHistory": "السجل الأخير",
+  "history": {
+    "title": "السجل"
+  },
   "toast": {
     "stable": "تم تسجيل الحالة كمستقرة",
     "anxious": "تم تسجيل مستوى قلق مرتفع",
