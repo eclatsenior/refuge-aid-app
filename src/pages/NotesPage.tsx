@@ -48,9 +48,10 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const [resetToken, setResetToken] = useState<string | null>(null);
   const [vaultToken, setVaultToken] = useState<string | null>(null);
 
-  // Check if user has vault password configured
+  // Check if user has vault password configured and check for approved reset requests
   useEffect(() => {
     checkVaultPassword();
+    checkPendingApprovedReset();
   }, []);
 
   // Suscripción realtime a cambios en solicitudes de reset
@@ -119,6 +120,33 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     }
   };
 
+  // Check if there's an approved vault reset request with a valid token
+  const checkPendingApprovedReset = async () => {
+    try {
+      const { data: approvedRequest, error } = await supabase
+        .from('vault_reset_requests')
+        .select('id, reset_token, created_at')
+        .eq('status', 'approved')
+        .not('reset_token', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        console.error('[VaultReset] Error checking approved requests:', error);
+        return;
+      }
+
+      if (approvedRequest?.reset_token) {
+        console.log('[VaultReset] Found approved reset request, showing password change dialog');
+        setResetToken(approvedRequest.reset_token);
+        setShowVaultResetComplete(true);
+      }
+    } catch (error) {
+      console.error('[VaultReset] Error checking pending resets:', error);
+    }
+  };
+
   const filteredNotes = notes
     .filter(note => {
       // Show decoy screen if activated
@@ -175,9 +203,27 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     unlockVault(); // Unlock in store
   };
 
-  const handleForgotPassword = () => {
+  const handleForgotPassword = async () => {
     setShowVaultUnlock(false);
-    setShowVaultReset(true);
+    
+    // Check if there's already an approved reset request
+    const { data: approvedRequest } = await supabase
+      .from('vault_reset_requests')
+      .select('id, reset_token')
+      .eq('status', 'approved')
+      .not('reset_token', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (approvedRequest?.reset_token) {
+      // There's already an approved request, go directly to password change
+      setResetToken(approvedRequest.reset_token);
+      setShowVaultResetComplete(true);
+    } else {
+      // No approved request, show the reset request form
+      setShowVaultReset(true);
+    }
   };
 
   const handleVaultResetSuccess = () => {
