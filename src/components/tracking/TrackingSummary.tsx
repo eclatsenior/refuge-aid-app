@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { CheckIn } from "@/store/useAppStore";
-import { safeToDateString } from "@/lib/dateUtils";
 import { useTranslation } from "react-i18next";
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, addWeeks, addMonths, addYears, subWeeks, subMonths, subYears, format, eachDayOfInterval, isSameDay } from "date-fns";
 import { getDateFnsLocale } from "@/lib/dateUtils";
@@ -13,6 +12,55 @@ type PeriodType = "week" | "month" | "year";
 
 interface TrackingSummaryProps {
   checkIns: CheckIn[];
+}
+
+// SVG pie-circle for multi-status days
+function StatusPieCircle({ statuses, isToday }: { statuses: string[]; isToday: boolean }) {
+  const size = 32;
+  const r = 12;
+  const cx = size / 2;
+  const cy = size / 2;
+  const circumference = 2 * Math.PI * r;
+
+  const colorMap: Record<string, string> = {
+    ok: "hsl(var(--mint))",
+    anxious: "hsl(var(--coral))",
+    alert: "hsl(var(--emergency))",
+  };
+
+  // Count each status
+  const counts: Record<string, number> = {};
+  statuses.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
+  const total = statuses.length;
+  const segments = Object.entries(counts);
+
+  let offset = 0;
+
+  return (
+    <svg width={size} height={size} className={isToday ? "ring-2 ring-primary/20 rounded-full" : ""}>
+      {/* Background circle */}
+      <circle cx={cx} cy={cy} r={r + 2} fill="none" stroke={isToday ? "hsl(var(--primary))" : "hsl(var(--border))"} strokeWidth="2" />
+      {segments.map(([status, count], i) => {
+        const segLength = (count / total) * circumference;
+        const seg = (
+          <circle
+            key={status}
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill="none"
+            stroke={colorMap[status] || "hsl(var(--muted))"}
+            strokeWidth="6"
+            strokeDasharray={`${segLength} ${circumference - segLength}`}
+            strokeDashoffset={-offset}
+            transform={`rotate(-90 ${cx} ${cy})`}
+          />
+        );
+        offset += segLength;
+        return seg;
+      })}
+    </svg>
+  );
 }
 
 export function TrackingSummary({ checkIns }: TrackingSummaryProps) {
@@ -52,43 +100,60 @@ export function TrackingSummary({ checkIns }: TrackingSummaryProps) {
     setCurrentDate(fn(currentDate, 1));
   };
 
-  const getCheckInForDate = (date: Date) =>
-    checkIns.find(c => isSameDay(new Date(c.timestamp), date));
+  // Get ALL check-ins for a date (multiple per day)
+  const getCheckInsForDate = (date: Date) =>
+    checkIns.filter(c => isSameDay(new Date(c.timestamp), date));
 
-  const periodCheckIns = useMemo(() =>
-    days.map(d => getCheckInForDate(d)).filter(Boolean),
-    [days, checkIns]
+  // Count all check-ins in the period (not unique per day)
+  const periodAllCheckIns = useMemo(() =>
+    checkIns.filter(c => {
+      const d = new Date(c.timestamp);
+      return d >= start && d <= end;
+    }),
+    [checkIns, start, end]
   );
 
   const stats = useMemo(() => ({
-    ok: periodCheckIns.filter(c => c?.status === "ok").length,
-    anxious: periodCheckIns.filter(c => c?.status === "anxious").length,
-    alert: periodCheckIns.filter(c => c?.status === "alert").length,
-    total: periodCheckIns.length,
-  }), [periodCheckIns]);
+    ok: periodAllCheckIns.filter(c => c.status === "ok").length,
+    anxious: periodAllCheckIns.filter(c => c.status === "anxious").length,
+    alert: periodAllCheckIns.filter(c => c.status === "alert").length,
+    total: periodAllCheckIns.length,
+  }), [periodAllCheckIns]);
 
   const showDayDots = periodType === "week";
 
-  const getStatusDot = (checkIn: CheckIn | undefined, date: Date) => {
+  const renderDayDot = (date: Date) => {
     const isToday = isSameDay(date, new Date());
-    if (!checkIn) {
+    const dayCheckIns = getCheckInsForDate(date);
+
+    if (dayCheckIns.length === 0) {
       return (
         <div className={`w-8 h-8 rounded-full bg-muted/50 border-2 ${isToday ? "border-primary ring-2 ring-primary/20" : "border-border"} flex items-center justify-center`}>
           <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30" />
         </div>
       );
     }
-    const colors = checkIn.status === "ok"
-      ? "bg-gradient-to-br from-mint to-mint/80"
-      : checkIn.status === "anxious"
-        ? "bg-gradient-to-br from-coral to-coral/80"
-        : "bg-gradient-to-br from-emergency to-emergency/80";
-    const Icon = checkIn.status === "ok" ? CheckCircle : checkIn.status === "anxious" ? Clock : AlertCircle;
-    return (
-      <div className={`w-8 h-8 rounded-full ${colors} ${isToday ? "ring-2 ring-primary/20" : ""} flex items-center justify-center shadow-sm`}>
-        <Icon className="h-3.5 w-3.5 text-white" />
-      </div>
-    );
+
+    const uniqueStatuses = new Set(dayCheckIns.map(c => c.status));
+
+    // Single status: solid color circle with icon
+    if (uniqueStatuses.size === 1) {
+      const status = dayCheckIns[0].status;
+      const colors = status === "ok"
+        ? "bg-gradient-to-br from-mint to-mint/80"
+        : status === "anxious"
+          ? "bg-gradient-to-br from-coral to-coral/80"
+          : "bg-gradient-to-br from-emergency to-emergency/80";
+      const Icon = status === "ok" ? CheckCircle : status === "anxious" ? Clock : AlertCircle;
+      return (
+        <div className={`w-8 h-8 rounded-full ${colors} ${isToday ? "ring-2 ring-primary/20" : ""} flex items-center justify-center shadow-sm`}>
+          <Icon className="h-3.5 w-3.5 text-white" />
+        </div>
+      );
+    }
+
+    // Multiple statuses: pie circle
+    return <StatusPieCircle statuses={dayCheckIns.map(c => c.status)} isToday={isToday} />;
   };
 
   return (
@@ -134,7 +199,7 @@ export function TrackingSummary({ checkIns }: TrackingSummaryProps) {
                   {format(date, "EEE", { locale }).slice(0, 3)}
                 </span>
                 <span className="text-sm font-semibold">{date.getDate()}</span>
-                {getStatusDot(getCheckInForDate(date), date)}
+                {renderDayDot(date)}
               </div>
             ))}
           </div>
