@@ -37,19 +37,18 @@ serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    // Validate the token and get claims
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    // Validate the token and get user
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
 
-    if (claimsError || !claimsData?.claims) {
-      console.error('❌ Invalid token:', claimsError?.message);
+    if (userError || !user) {
+      console.error('❌ Invalid token:', userError?.message);
       return new Response(
         JSON.stringify({ error: 'Token inválido o expirado' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
       );
     }
 
-    const userId = claimsData.claims.sub;
+    const userId = user.id;
     console.log('✅ User authenticated:', userId);
 
     // Create admin client for DB operations
