@@ -57,5 +57,18 @@
       "whatsapp": "Te escribo desde Refugi, y necesito tu ayuda",
       "databaseAlert": "Emergencia activada desde el botón de ayuda"
     }
+  },
+  "vaultUnlock": {
+    "title": "Habilitar con caja fuerte",
+    "description": "Introduce tu contraseña de caja fuerte para desactivar el modo discreto y mostrar todas las pantallas.",
+    "passwordLabel": "Contraseña de caja fuerte",
+    "passwordPlaceholder": "Introduce tu contraseña",
+    "submit": "Desbloquear",
+    "verifying": "Verificando...",
+    "incorrectPassword": "Contraseña incorrecta",
+    "attemptsRemaining": "intentos restantes",
+    "locked": "Acceso bloqueado temporalmente",
+    "errorTitle": "Error de verificación",
+    "errorDescription": "No se pudo verificar la contraseña. Inténtalo de nuevo."
   }
 }

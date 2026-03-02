@@ -57,5 +57,18 @@
       "whatsapp": "T'escric des de Refugi, i necessito la teva ajuda",
       "databaseAlert": "Emergència activada des del botó d'ajuda"
     }
+  },
+  "vaultUnlock": {
+    "title": "Habilitar amb caixa forta",
+    "description": "Introdueix la teva contrasenya de caixa forta per desactivar el mode discret i mostrar totes les pantalles.",
+    "passwordLabel": "Contrasenya de caixa forta",
+    "passwordPlaceholder": "Introdueix la teva contrasenya",
+    "submit": "Desbloquejar",
+    "verifying": "Verificant...",
+    "incorrectPassword": "Contrasenya incorrecta",
+    "attemptsRemaining": "intents restants",
+    "locked": "Accés bloquejat temporalment",
+    "errorTitle": "Error de verificació",
+    "errorDescription": "No s'ha pogut verificar la contrasenya. Torna-ho a provar."
   }
 }

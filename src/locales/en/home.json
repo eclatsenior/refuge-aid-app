@@ -57,5 +57,18 @@
       "whatsapp": "I'm writing from Refugi, and I need your help",
       "databaseAlert": "Emergency activated from help button"
     }
+  },
+  "vaultUnlock": {
+    "title": "Enable with vault security",
+    "description": "Enter your vault password to disable discreet mode and show all screens.",
+    "passwordLabel": "Vault password",
+    "passwordPlaceholder": "Enter your password",
+    "submit": "Unlock",
+    "verifying": "Verifying...",
+    "incorrectPassword": "Incorrect password",
+    "attemptsRemaining": "attempts remaining",
+    "locked": "Access temporarily locked",
+    "errorTitle": "Verification error",
+    "errorDescription": "Could not verify the password. Please try again."
   }
 }

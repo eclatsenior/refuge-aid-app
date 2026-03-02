@@ -4,16 +4,18 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const useNavigationItems = () => {
+const useNavigationItems = (isDiscreetMode?: boolean) => {
   const { t } = useTranslation('common');
   
-  return [
-    { icon: Home, label: t('nav.home'), path: "/" },
-    { icon: Calendar, label: t('nav.tracking'), path: "/seguimiento" },
-    { icon: NotebookPen, label: t('nav.notes'), path: "/notas" },
-    { icon: Shield, label: t('nav.path'), path: "/camino" },
-    { icon: MapPin, label: t('nav.resources'), path: "/recursos" },
+  const allItems = [
+    { icon: Home, label: t('nav.home'), path: "/", hideInDiscreet: true },
+    { icon: Calendar, label: t('nav.tracking'), path: "/seguimiento", hideInDiscreet: false },
+    { icon: NotebookPen, label: t('nav.notes'), path: "/notas", hideInDiscreet: true },
+    { icon: Shield, label: t('nav.path'), path: "/camino", hideInDiscreet: false },
+    { icon: MapPin, label: t('nav.resources'), path: "/recursos", hideInDiscreet: false },
   ];
+  
+  return isDiscreetMode ? allItems.filter(item => !item.hideInDiscreet) : allItems;
 };
 
 interface NavigationProps {
@@ -23,7 +25,7 @@ interface NavigationProps {
 }
 
 export function Navigation({ currentPath, onNavigate, isDiscreetMode }: NavigationProps) {
-  const navigationItems = useNavigationItems();
+  const navigationItems = useNavigationItems(isDiscreetMode);
   const { i18n } = useTranslation();
   const [isVerySmallScreen, setIsVerySmallScreen] = useState(false);
   

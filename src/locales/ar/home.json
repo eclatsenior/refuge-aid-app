@@ -57,5 +57,18 @@
       "whatsapp": "أكتب من Refugi، وأحتاج مساعدتك",
       "databaseAlert": "تم تفعيل الطوارئ من زر المساعدة"
     }
+  },
+  "vaultUnlock": {
+    "title": "تفعيل بأمان الخزنة",
+    "description": "أدخل كلمة مرور الخزنة لتعطيل الوضع السري وإظهار جميع الشاشات.",
+    "passwordLabel": "كلمة مرور الخزنة",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "submit": "فتح القفل",
+    "verifying": "جاري التحقق...",
+    "incorrectPassword": "كلمة مرور غير صحيحة",
+    "attemptsRemaining": "محاولات متبقية",
+    "locked": "تم قفل الوصول مؤقتاً",
+    "errorTitle": "خطأ في التحقق",
+    "errorDescription": "تعذر التحقق من كلمة المرور. حاول مرة أخرى."
   }
 }
