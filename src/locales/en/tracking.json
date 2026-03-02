@@ -21,15 +21,16 @@
     }
   },
   "statusRegistered": "Status registered today",
-  "weeklySummary": {
-    "title": "Weekly Summary",
-    "description": "Last 7 days - {{registered}} of {{total}} days recorded",
-    "stableDays": "Stable days",
-    "anxiousDays": "Anxious days",
-    "alertDays": "Alert days"
+  "summary": {
+    "title": "Summary",
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "totalRecords": "Total: {{count}} records"
   },
-  "last7Days": "Last 7 days",
-  "recentHistory": "Recent History",
+  "history": {
+    "title": "History"
+  },
   "toast": {
     "stable": "Status recorded as stable",
     "anxious": "High anxiety level recorded",

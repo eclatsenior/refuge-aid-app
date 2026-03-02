@@ -21,15 +21,16 @@
     }
   },
   "statusRegistered": "Estado registrado hoy",
-  "weeklySummary": {
-    "title": "Resumen Semanal",
-    "description": "Últimos 7 días - {{registered}} de {{total}} días registrados",
-    "stableDays": "Días estables",
-    "anxiousDays": "Días ansiosos",
-    "alertDays": "Días de alerta"
+  "summary": {
+    "title": "Resumen",
+    "week": "Semana",
+    "month": "Mes",
+    "year": "Año",
+    "totalRecords": "Total: {{count}} registros"
   },
-  "last7Days": "Últimos 7 días",
-  "recentHistory": "Historial Reciente",
+  "history": {
+    "title": "Historial"
+  },
   "toast": {
     "stable": "Estado registrado como estable",
     "anxious": "Registrado nivel de ansiedad alto",
