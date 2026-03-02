@@ -9,12 +9,10 @@ const corsHeaders = {
 interface UnlockRequest {
   email: string;
   action: 'confirm_email' | 'reset_password';
-  alternative_email?: string; // Para password reset a otro email
-  admin_secret: string; // Clave secreta adicional para máxima seguridad
+  alternative_email?: string;
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -22,116 +20,124 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const adminSecret = Deno.env.get('ADMIN_UNLOCK_SECRET'); // Clave adicional
 
-    // Verificar que las variables de entorno existen
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error('Missing environment variables');
     }
 
-    // Crear cliente con privilegios de administrador
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
+      auth: { autoRefreshToken: false, persistSession: false }
     });
 
-    const body: UnlockRequest = await req.json();
-    const { email, action, alternative_email, admin_secret } = body;
-
-    console.log('[ADMIN-UNLOCK] Request received:', { email, action });
-
-    // Verificación de seguridad adicional
-    if (adminSecret && admin_secret !== adminSecret) {
-      console.error('[ADMIN-UNLOCK] Invalid admin secret');
+    // SECURITY: Require JWT authentication and verify super admin status
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
       return new Response(
-        JSON.stringify({ error: 'Unauthorized - Invalid admin secret' }),
+        JSON.stringify({ error: 'Unauthorized - Missing authorization' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Buscar usuario por email
-    const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-    
-    if (listError) {
-      console.error('[ADMIN-UNLOCK] Error listing users:', listError);
-      throw listError;
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('[ADMIN-UNLOCK] Auth failed:', authError?.message);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    const user = users.users.find(u => u.email?.toLowerCase() === email.toLowerCase());
+    // Verify caller is super admin
+    const { data: isSuperAdmin } = await supabaseAdmin
+      .from('super_admins')
+      .select('id')
+      .eq('user_id', user.id)
+      .single();
 
-    if (!user) {
+    if (!isSuperAdmin) {
+      console.error('[ADMIN-UNLOCK] Access denied: not super admin', user.id);
+      return new Response(
+        JSON.stringify({ error: 'Forbidden - Super admin access required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const body: UnlockRequest = await req.json();
+    const { email, action, alternative_email } = body;
+
+    // Input validation
+    if (!email || typeof email !== 'string' || email.length > 255) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid email' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!['confirm_email', 'reset_password'].includes(action)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid action' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('[ADMIN-UNLOCK] Request by super admin:', user.email, '| action:', action, '| target:', email);
+
+    // Find target user
+    const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+    if (listError) throw listError;
+
+    const targetUser = users.users.find(u => u.email?.toLowerCase() === email.toLowerCase());
+    if (!targetUser) {
       return new Response(
         JSON.stringify({ error: 'User not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('[ADMIN-UNLOCK] User found:', { id: user.id, email: user.email });
-
-    // Ejecutar acción solicitada
     if (action === 'confirm_email') {
-      // Confirmar email manualmente
       const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-        user.id,
+        targetUser.id,
         { email_confirm: true }
       );
+      if (updateError) throw updateError;
 
-      if (updateError) {
-        console.error('[ADMIN-UNLOCK] Error confirming email:', updateError);
-        throw updateError;
-      }
-
-      console.log('[ADMIN-UNLOCK] ✅ Email confirmed for user:', user.email);
-
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: `Email confirmed for ${user.email}. User can now login.`,
-          user_id: user.id
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-
-    } else if (action === 'reset_password') {
-      // Enviar reset de contraseña
-      const targetEmail = alternative_email || email;
-
-      const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(
-        targetEmail,
-        {
-          redirectTo: `${req.headers.get("origin") || supabaseUrl}/reset-password`
-        }
-      );
-
-      if (resetError) {
-        console.error('[ADMIN-UNLOCK] Error sending password reset:', resetError);
-        throw resetError;
-      }
-
-      console.log('[ADMIN-UNLOCK] ✅ Password reset sent to:', targetEmail);
+      // Audit log
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: user.id,
+        action: 'admin_confirm_email',
+        resource_type: 'user',
+        resource_id: targetUser.id,
+        metadata: { target_email: email, performed_by: user.email }
+      });
 
       return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: `Password reset email sent to ${targetEmail}`,
-          user_id: user.id
-        }),
+        JSON.stringify({ success: true, message: `Email confirmed for ${email}`, user_id: targetUser.id }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
-
     } else {
+      const targetEmail = alternative_email || email;
+      const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(targetEmail);
+      if (resetError) throw resetError;
+
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: user.id,
+        action: 'admin_password_reset',
+        resource_type: 'user',
+        resource_id: targetUser.id,
+        metadata: { target_email: targetEmail, performed_by: user.email }
+      });
+
       return new Response(
-        JSON.stringify({ error: 'Invalid action. Use "confirm_email" or "reset_password"' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: true, message: `Password reset sent to ${targetEmail}`, user_id: targetUser.id }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
   } catch (error) {
-    console.error('[ADMIN-UNLOCK] Error:', error);
+    console.error('[ADMIN-UNLOCK] Error:', error.message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
