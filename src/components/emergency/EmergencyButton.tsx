@@ -105,11 +105,11 @@ export function EmergencyButton({ isDiscreetMode, onEmergencyAction }: Emergency
         size="lg"
         className={cn(
           "h-40 w-40 rounded-full text-xl font-bold shadow-glow relative overflow-hidden",
-          "bg-gradient-to-br from-coral via-emergency to-coral/80",
-          "hover:from-coral/90 hover:via-emergency/90 hover:to-coral/70",
+          "bg-gradient-to-br from-emergency via-destructive to-emergency/80",
+          "hover:from-emergency/90 hover:via-destructive/90 hover:to-emergency/70",
           "text-white border-4 border-white/20",
           "transform transition-all duration-300 active:scale-95",
-          "focus:outline-none focus:ring-4 focus:ring-coral/30 focus:ring-offset-4",
+          "focus:outline-none focus:ring-4 focus:ring-emergency/30 focus:ring-offset-4",
           "before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity",
           isPressed && "scale-95"
         )}
