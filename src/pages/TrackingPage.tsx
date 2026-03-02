@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, TrendingUp, AlertCircle, CheckCircle, Heart } from "lucide-react";
+import { Calendar, Clock, TrendingUp, AlertCircle, CheckCircle, Heart, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { ensureDate, safeToDateString, safeToLocaleTimeString, safeToLocaleDateS
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { DiscreetVaultUnlockDialog } from "@/components/discreet/DiscreetVaultUnlockDialog";
 
 interface TrackingPageProps {
   onNavigate: (path: string) => void;
@@ -16,9 +17,11 @@ interface TrackingPageProps {
 
 export function TrackingPage({ onNavigate }: TrackingPageProps) {
   const [selectedStatus, setSelectedStatus] = useState<'ok' | 'anxious' | 'alert' | null>(null);
-  const { checkIns, addCheckIn, settings, updateEmployeePresence, profile } = useAppStore();
+  const [vaultUnlockOpen, setVaultUnlockOpen] = useState(false);
+  const { checkIns, addCheckIn, settings, updateSettings, updateEmployeePresence, profile } = useAppStore();
   const { toast } = useToast();
   const { t, i18n } = useTranslation('tracking');
+  const { t: tHome } = useTranslation('home');
 
   // Heartbeat system - update presence every 2 minutes while on this page
   useEffect(() => {
@@ -204,8 +207,22 @@ export function TrackingPage({ onNavigate }: TrackingPageProps) {
         <Card className="mb-8 bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
           <CardHeader className="pb-6">
             <CardTitle className="text-xl flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                <Heart className="h-5 w-5 text-primary" />
+              <div 
+                className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                  settings.isDiscreetMode 
+                    ? 'bg-primary/20 cursor-pointer hover:bg-primary/30 transition-colors' 
+                    : 'bg-primary/20'
+                }`}
+                onClick={settings.isDiscreetMode ? () => setVaultUnlockOpen(true) : undefined}
+                role={settings.isDiscreetMode ? 'button' : undefined}
+                tabIndex={settings.isDiscreetMode ? 0 : undefined}
+                aria-label={settings.isDiscreetMode ? tHome('vaultUnlock.title') : undefined}
+              >
+                {settings.isDiscreetMode ? (
+                  <Lock className="h-5 w-5 text-primary" />
+                ) : (
+                  <Heart className="h-5 w-5 text-primary" />
+                )}
               </div>
               {t('todayQuestion')}
             </CardTitle>
@@ -429,6 +446,18 @@ export function TrackingPage({ onNavigate }: TrackingPageProps) {
           </CardContent>
         </Card>
       )}
+      
+      <DiscreetVaultUnlockDialog
+        open={vaultUnlockOpen}
+        onOpenChange={setVaultUnlockOpen}
+        onSuccess={() => {
+          updateSettings({ isDiscreetMode: false });
+          toast({
+            title: tHome('modeToggle.normalActivated'),
+            description: tHome('modeToggle.normalDescription'),
+          });
+        }}
+      />
     </div>
   );
 }

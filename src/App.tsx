@@ -277,6 +277,12 @@ const App = () => {
         }
       }
       
+      // In discreet mode, redirect home and notes to tracking
+      if (settings.isDiscreetMode && (currentPath === '/' || currentPath === '/notas')) {
+        handleNavigate('/seguimiento');
+        return null;
+      }
+      
       return (
         <>
           {renderCurrentPage()}
