@@ -748,6 +748,76 @@ serve(async (req) => {
         break;
       }
 
+      case 'create_therapy_route': {
+        const { route_key, title, description, duration, icon, color, sort_order } = params;
+        if (!route_key || !title) throw new Error('route_key and title are required');
+        const { data: newRoute, error } = await supabaseAdmin
+          .from('therapy_routes')
+          .insert({ route_key, title, description: description || '', duration: duration || '5-8 min', icon: icon || 'heart', color: color || 'blue', sort_order: sort_order || 0 })
+          .select()
+          .single();
+        if (error) throw error;
+        await supabaseAdmin.from('audit_logs').insert({ user_id: user.id, action: 'create_therapy_route', resource_type: 'therapy_route', resource_id: newRoute.id, metadata: { route_key, performed_by: user.email } });
+        result = { success: true, route: newRoute };
+        break;
+      }
+
+      case 'update_therapy_route': {
+        const { id: routeId, ...updateFields } = params;
+        if (!routeId) throw new Error('id is required');
+        delete updateFields.action;
+        const { error } = await supabaseAdmin.from('therapy_routes').update(updateFields).eq('id', routeId);
+        if (error) throw error;
+        await supabaseAdmin.from('audit_logs').insert({ user_id: user.id, action: 'update_therapy_route', resource_type: 'therapy_route', resource_id: routeId, metadata: { updated_fields: Object.keys(updateFields), performed_by: user.email } });
+        result = { success: true };
+        break;
+      }
+
+      case 'delete_therapy_route': {
+        const { id: routeId } = params;
+        if (!routeId) throw new Error('id is required');
+        const { error } = await supabaseAdmin.from('therapy_routes').delete().eq('id', routeId);
+        if (error) throw error;
+        await supabaseAdmin.from('audit_logs').insert({ user_id: user.id, action: 'delete_therapy_route', resource_type: 'therapy_route', resource_id: routeId, metadata: { performed_by: user.email } });
+        result = { success: true };
+        break;
+      }
+
+      case 'create_therapy_module': {
+        const { route_id, module_key, title, description, content, duration, type, sort_order } = params;
+        if (!route_id || !module_key || !title) throw new Error('route_id, module_key and title are required');
+        const { data: newModule, error } = await supabaseAdmin
+          .from('therapy_modules')
+          .insert({ route_id, module_key, title, description: description || '', content: content || '', duration: duration || 5, type: type || 'breathing', sort_order: sort_order || 0 })
+          .select()
+          .single();
+        if (error) throw error;
+        await supabaseAdmin.from('audit_logs').insert({ user_id: user.id, action: 'create_therapy_module', resource_type: 'therapy_module', resource_id: newModule.id, metadata: { module_key, performed_by: user.email } });
+        result = { success: true, module: newModule };
+        break;
+      }
+
+      case 'update_therapy_module': {
+        const { id: modId, ...modUpdateFields } = params;
+        if (!modId) throw new Error('id is required');
+        delete modUpdateFields.action;
+        const { error } = await supabaseAdmin.from('therapy_modules').update(modUpdateFields).eq('id', modId);
+        if (error) throw error;
+        await supabaseAdmin.from('audit_logs').insert({ user_id: user.id, action: 'update_therapy_module', resource_type: 'therapy_module', resource_id: modId, metadata: { updated_fields: Object.keys(modUpdateFields), performed_by: user.email } });
+        result = { success: true };
+        break;
+      }
+
+      case 'delete_therapy_module': {
+        const { id: modId } = params;
+        if (!modId) throw new Error('id is required');
+        const { error } = await supabaseAdmin.from('therapy_modules').delete().eq('id', modId);
+        if (error) throw error;
+        await supabaseAdmin.from('audit_logs').insert({ user_id: user.id, action: 'delete_therapy_module', resource_type: 'therapy_module', resource_id: modId, metadata: { performed_by: user.email } });
+        result = { success: true };
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: 'Invalid action' }), {
           status: 400,

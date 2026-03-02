@@ -14,6 +14,7 @@ import { SuperAdminMetricsTab } from '@/components/super-admin/SuperAdminMetrics
 import { SuperAdminSettingsTab } from '@/components/super-admin/SuperAdminSettingsTab';
 import { SuperAdminVaultResetTab } from '@/components/super-admin/SuperAdminVaultResetTab';
 import { SuperAdminVideosTab } from '@/components/super-admin/SuperAdminVideosTab';
+import { SuperAdminTherapyTab } from '@/components/super-admin/SuperAdminTherapyTab';
 import { useSuperAdminReportGeneration } from '@/hooks/useSuperAdminReportGeneration';
 
 export default function SuperAdminDashboard() {
@@ -104,13 +105,14 @@ export default function SuperAdminDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 lg:w-auto lg:inline-flex">
+          <TabsList className="grid w-full grid-cols-9 lg:w-auto lg:inline-flex">
             <TabsTrigger value="overview">{t('tabs.overview')}</TabsTrigger>
             <TabsTrigger value="users">{t('tabs.users')}</TabsTrigger>
             <TabsTrigger value="subscriptions">{t('tabs.subscriptions')}</TabsTrigger>
             <TabsTrigger value="alerts">{t('tabs.alerts')}</TabsTrigger>
             <TabsTrigger value="vault">{t('tabs.vaultReset')}</TabsTrigger>
             <TabsTrigger value="videos">{t('tabs.videos', 'Videos')}</TabsTrigger>
+            <TabsTrigger value="therapy">{t('tabs.therapy', 'Terapia')}</TabsTrigger>
             <TabsTrigger value="metrics">{t('tabs.metrics')}</TabsTrigger>
             <TabsTrigger value="settings">{t('tabs.settings')}</TabsTrigger>
           </TabsList>
@@ -137,6 +139,10 @@ export default function SuperAdminDashboard() {
 
           <TabsContent value="videos">
             <SuperAdminVideosTab />
+          </TabsContent>
+
+          <TabsContent value="therapy">
+            <SuperAdminTherapyTab />
           </TabsContent>
 
           <TabsContent value="metrics">

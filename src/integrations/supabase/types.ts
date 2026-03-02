@@ -824,6 +824,101 @@ export type Database = {
         }
         Relationships: []
       }
+      therapy_modules: {
+        Row: {
+          content: string
+          created_at: string
+          description: string
+          duration: number
+          id: string
+          is_active: boolean
+          module_key: string
+          route_id: string
+          sort_order: number
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          description?: string
+          duration?: number
+          id?: string
+          is_active?: boolean
+          module_key: string
+          route_id: string
+          sort_order?: number
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          description?: string
+          duration?: number
+          id?: string
+          is_active?: boolean
+          module_key?: string
+          route_id?: string
+          sort_order?: number
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapy_modules_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "therapy_routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      therapy_routes: {
+        Row: {
+          color: string
+          created_at: string
+          description: string
+          duration: string
+          icon: string
+          id: string
+          is_active: boolean
+          route_key: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string
+          duration?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          route_key: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string
+          duration?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          route_key?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       therapy_videos: {
         Row: {
           created_at: string | null
