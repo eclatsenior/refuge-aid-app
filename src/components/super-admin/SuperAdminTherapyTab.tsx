@@ -104,12 +104,9 @@ export function SuperAdminTherapyTab() {
     setSaving(true);
     try {
       const { data, error } = await supabase.functions.invoke('super-admin-data', {
-        body: {
-          action: editingRoute ? 'update_therapy_route' : 'create_therapy_route',
-          params: editingRoute 
-            ? { id: editingRoute.id, ...routeForm }
-            : { ...routeForm, sort_order: routes.length + 1 }
-        }
+        body: editingRoute 
+          ? { action: 'update_therapy_route', id: editingRoute.id, ...routeForm }
+          : { action: 'create_therapy_route', ...routeForm, sort_order: routes.length + 1 }
       });
       if (error || data?.error) throw new Error(data?.error || error?.message);
       toast({ title: editingRoute ? '✅ Ruta actualizada' : '✅ Ruta creada' });
@@ -127,7 +124,7 @@ export function SuperAdminTherapyTab() {
     if (!confirm('¿Eliminar esta ruta y todos sus módulos? Esta acción no se puede deshacer.')) return;
     try {
       const { data, error } = await supabase.functions.invoke('super-admin-data', {
-        body: { action: 'delete_therapy_route', params: { id } }
+        body: { action: 'delete_therapy_route', id }
       });
       if (error || data?.error) throw new Error(data?.error || error?.message);
       toast({ title: '✅ Ruta eliminada' });
@@ -140,7 +137,7 @@ export function SuperAdminTherapyTab() {
   const handleToggleRoute = async (route: TherapyRoute) => {
     try {
       const { data, error } = await supabase.functions.invoke('super-admin-data', {
-        body: { action: 'update_therapy_route', params: { id: route.id, is_active: !route.is_active } }
+        body: { action: 'update_therapy_route', id: route.id, is_active: !route.is_active }
       });
       if (error || data?.error) throw new Error(data?.error || error?.message);
       loadData();
@@ -154,12 +151,9 @@ export function SuperAdminTherapyTab() {
     try {
       const routeModules = modules.filter(m => m.route_id === moduleRouteId);
       const { data, error } = await supabase.functions.invoke('super-admin-data', {
-        body: {
-          action: editingModule ? 'update_therapy_module' : 'create_therapy_module',
-          params: editingModule
-            ? { id: editingModule.id, ...moduleForm }
-            : { route_id: moduleRouteId, ...moduleForm, sort_order: routeModules.length + 1 }
-        }
+        body: editingModule
+          ? { action: 'update_therapy_module', id: editingModule.id, ...moduleForm }
+          : { action: 'create_therapy_module', route_id: moduleRouteId, ...moduleForm, sort_order: routeModules.length + 1 }
       });
       if (error || data?.error) throw new Error(data?.error || error?.message);
       toast({ title: editingModule ? '✅ Módulo actualizado' : '✅ Módulo creado' });
@@ -177,7 +171,7 @@ export function SuperAdminTherapyTab() {
     if (!confirm('¿Eliminar este módulo?')) return;
     try {
       const { data, error } = await supabase.functions.invoke('super-admin-data', {
-        body: { action: 'delete_therapy_module', params: { id } }
+        body: { action: 'delete_therapy_module', id }
       });
       if (error || data?.error) throw new Error(data?.error || error?.message);
       toast({ title: '✅ Módulo eliminado' });
@@ -190,7 +184,7 @@ export function SuperAdminTherapyTab() {
   const handleToggleModule = async (mod: TherapyModule) => {
     try {
       const { data, error } = await supabase.functions.invoke('super-admin-data', {
-        body: { action: 'update_therapy_module', params: { id: mod.id, is_active: !mod.is_active } }
+        body: { action: 'update_therapy_module', id: mod.id, is_active: !mod.is_active }
       });
       if (error || data?.error) throw new Error(data?.error || error?.message);
       loadData();
