@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, Star, StarOff, Edit, Trash2, Save, X, Lock, Vault, Heart, ArrowLeft, Download, Shield, AlertTriangle } from "lucide-react";
+import { Plus, Search, Star, StarOff, Edit, Trash2, Save, X, Lock, LockOpen, Vault, Heart, ArrowLeft, Download, Shield, AlertTriangle } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -121,14 +121,19 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   };
 
   // Check if there's an approved vault reset request with a valid token
+  // Only show the dialog if the user hasn't already unlocked the vault
   const checkPendingApprovedReset = async () => {
     try {
+      // Don't show reset dialog if vault is already unlocked (user knows their password)
+      const storedToken = sessionStorage.getItem('vault_token');
+      if (storedToken) return;
+
       const { data: approvedRequest, error } = await supabase
         .from('vault_reset_requests')
-        .select('id, reset_token, created_at')
+        .select('id, reset_token, reviewed_at')
         .eq('status', 'approved')
         .not('reset_token', 'is', null)
-        .order('created_at', { ascending: false })
+        .order('reviewed_at', { ascending: false })
         .limit(1)
         .maybeSingle();
 
@@ -138,9 +143,16 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
       }
 
       if (approvedRequest?.reset_token) {
-        console.log('[VaultReset] Found approved reset request, showing password change dialog');
-        setResetToken(approvedRequest.reset_token);
-        setShowVaultResetComplete(true);
+        // Check if the token was approved within the last 30 minutes (token validity)
+        const reviewedAt = new Date(approvedRequest.reviewed_at).getTime();
+        const now = Date.now();
+        const thirtyMinutes = 30 * 60 * 1000;
+        
+        if (now - reviewedAt < thirtyMinutes) {
+          console.log('[VaultReset] Found valid approved reset request');
+          setResetToken(approvedRequest.reset_token);
+          setShowVaultResetComplete(true);
+        }
       }
     } catch (error) {
       console.error('[VaultReset] Error checking pending resets:', error);
@@ -201,6 +213,17 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     setVaultToken(token);
     sessionStorage.setItem('vault_token', token);
     unlockVault(); // Unlock in store
+  };
+
+  const handleLockVault = () => {
+    sessionStorage.removeItem('vault_token');
+    setVaultToken(null);
+    // Use the store's setState to explicitly lock the vault
+    useAppStore.setState({ vaultLocked: true, isVaultLocked: true });
+    toast({
+      title: t('vault.lock.title', { defaultValue: 'Caja Fuerte bloqueada' }),
+      description: t('vault.lock.description', { defaultValue: 'Tus notas protegidas han sido bloqueadas' }),
+    });
   };
 
   const handleForgotPassword = async () => {
@@ -584,12 +607,25 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
           {/* Caja Fuerte Section */}
           {vaultNotes.length > 0 || (vaultNotes.length === 0 && isVaultLocked) ? (
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Vault className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold text-primary">{t('sections.vault')}</h2>
-                <Badge variant="secondary" className="bg-primary/10 text-primary">
-                  {vaultNotes.length}
-                </Badge>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Vault className="h-5 w-5 text-primary" />
+                  <h2 className="text-lg font-semibold text-primary">{t('sections.vault')}</h2>
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    {vaultNotes.length}
+                  </Badge>
+                </div>
+                {!isVaultLocked && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLockVault}
+                    className="gap-2 text-muted-foreground"
+                  >
+                    <LockOpen size={14} />
+                    {t('vault.lock.button', { defaultValue: 'Bloquear' })}
+                  </Button>
+                )}
               </div>
               
               {isVaultLocked ? (
