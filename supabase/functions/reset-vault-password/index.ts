@@ -130,9 +130,20 @@ serve(async (req) => {
       throw updateError;
     }
 
-    // IMPORTANTE: Las notas cifradas con la contraseña antigua ya no podrán descifrarse
-    // Opcionalmente, marcar las notas antiguas de la caja fuerte como no descifrables
-    // O simplemente eliminarlas (más seguro)
+    // Mark the vault reset request as completed so the dialog doesn't appear again
+    const { error: requestUpdateError } = await supabaseAdmin
+      .from('vault_reset_requests')
+      .update({ 
+        status: 'completed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', user.id)
+      .eq('status', 'approved');
+
+    if (requestUpdateError) {
+      console.error('Error updating reset request status:', requestUpdateError);
+      // Non-critical, don't throw
+    }
 
     console.log('Contraseña de caja fuerte reseteada para usuario:', user.id);
 

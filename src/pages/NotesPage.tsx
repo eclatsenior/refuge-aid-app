@@ -121,7 +121,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   };
 
   // Check if there's an approved vault reset request with a valid token
-  // Only show the dialog if the user hasn't already unlocked the vault
+  // Only show the dialog if the request is approved (not completed) and token is still valid
   const checkPendingApprovedReset = async () => {
     try {
       // Don't show reset dialog if vault is already unlocked (user knows their password)
@@ -142,7 +142,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
         return;
       }
 
-      if (approvedRequest?.reset_token) {
+      if (approvedRequest?.reset_token && approvedRequest?.reviewed_at) {
         // Check if the token was approved within the last 30 minutes (token validity)
         const reviewedAt = new Date(approvedRequest.reviewed_at).getTime();
         const now = Date.now();
