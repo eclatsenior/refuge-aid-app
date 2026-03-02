@@ -1,16 +1,24 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { create } from "https://deno.land/x/djwt@v3.0.1/mod.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.0";
+import { create } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Use service role key as secret for signing reset tokens (always available)
-const JWT_SECRET = new TextEncoder().encode(
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-);
+// Use crypto.subtle.importKey for consistent signing with reset-vault-password
+async function getSigningKey(): Promise<CryptoKey> {
+  const secret = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!secret) throw new Error('Server configuration error: missing signing key');
+  return await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign', 'verify']
+  );
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -111,16 +119,17 @@ serve(async (req) => {
     console.log('✅ Assignment verified');
 
     // Generar token temporal de reset (válido 30 minutos)
+    const signingKey = await getSigningKey();
     const resetToken = await create(
       { alg: "HS256", typ: "JWT" },
       {
         sub: request.user_id,
-        exp: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutos
+        exp: Math.floor(Date.now() / 1000) + (30 * 60),
         iat: Math.floor(Date.now() / 1000),
         vault_reset: true,
         request_id: requestId,
       },
-      JWT_SECRET
+      signingKey
     );
 
     console.log('🔑 Reset token generated');
