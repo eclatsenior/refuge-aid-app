@@ -31,7 +31,45 @@ serve(async (req: Request) => {
     
     const { email, password, fullName, role, companyData, redirectOrigin, send_custom_verification }: SignUpRequest = await req.json();
     
-    console.log('[AUTH-SIGNUP] Received signup request:', { email, fullName, role });
+    // Input validation
+    if (!email || typeof email !== 'string' || email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return new Response(
+        JSON.stringify({ error: 'Formato de email inválido' }),
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
+    if (!password || typeof password !== 'string' || password.length < 8 || password.length > 128) {
+      return new Response(
+        JSON.stringify({ error: 'La contraseña debe tener entre 8 y 128 caracteres' }),
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
+    if (!fullName || typeof fullName !== 'string' || fullName.trim().length < 2 || fullName.trim().length > 100) {
+      return new Response(
+        JSON.stringify({ error: 'El nombre debe tener entre 2 y 100 caracteres' }),
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
+    if (!role || !['employee', 'refugi_lead'].includes(role)) {
+      return new Response(
+        JSON.stringify({ error: 'Rol inválido' }),
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
+    if (companyData) {
+      if (companyData.company_name && (typeof companyData.company_name !== 'string' || companyData.company_name.length > 200)) {
+        return new Response(
+          JSON.stringify({ error: 'Nombre de empresa inválido' }),
+          { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        );
+      }
+    }
+
+    console.log('[AUTH-SIGNUP] Received signup request:', { email, fullName: fullName.substring(0, 20), role });
 
     // Initialize Supabase Admin client
     const supabaseAdmin = createClient(

@@ -19,9 +19,9 @@ serve(async (req) => {
     // Service client for admin operations
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Decode JWT to get user info (Supabase validates JWT via verify_jwt=true in config)
+    // SECURITY: Validate JWT using auth.getUser() for proper signature verification
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
+    if (!authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -29,27 +29,17 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const tokenParts = token.split('.');
-    if (tokenParts.length !== 3) {
-      return new Response(JSON.stringify({ error: 'Invalid token format' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    const { data: { user: authUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
-    const payload = JSON.parse(atob(tokenParts[1]));
-    const userId = payload.sub;
-    const userEmail = payload.email;
-
-    if (!userId) {
+    if (authError || !authUser) {
+      console.error('Auth validation failed:', authError?.message);
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Create user object for compatibility
-    const user = { id: userId, email: userEmail };
+    const user = { id: authUser.id, email: authUser.email };
 
     // CRITICAL: Verify user is super admin
     const { data: isSuperAdmin } = await supabaseAdmin
@@ -186,6 +176,10 @@ serve(async (req) => {
       case 'update_user_role': {
         const { userId, newRole } = params;
         
+        // Input validation
+        if (!userId || typeof userId !== 'string') throw new Error('userId is required');
+        if (!['employee', 'refugi_lead'].includes(newRole)) throw new Error('Invalid role');
+        
         const { error } = await supabaseAdmin
           .from('profiles')
           .update({ role: newRole })
@@ -199,14 +193,24 @@ serve(async (req) => {
       case 'update_user_profile': {
         const { userId: targetUserId, full_name, role: newRole, phone } = params;
         
-        if (!targetUserId) {
+        if (!targetUserId || typeof targetUserId !== 'string') {
           throw new Error('userId is required');
         }
 
         const updateData: Record<string, any> = {};
-        if (full_name !== undefined) updateData.full_name = full_name.trim();
-        if (newRole !== undefined) updateData.role = newRole;
-        if (phone !== undefined) updateData.phone = phone || null;
+        if (full_name !== undefined) {
+          const trimmed = String(full_name).trim();
+          if (trimmed.length < 2 || trimmed.length > 100) throw new Error('Name must be 2-100 characters');
+          updateData.full_name = trimmed;
+        }
+        if (newRole !== undefined) {
+          if (!['employee', 'refugi_lead'].includes(newRole)) throw new Error('Invalid role');
+          updateData.role = newRole;
+        }
+        if (phone !== undefined) {
+          if (phone && (typeof phone !== 'string' || phone.length > 20)) throw new Error('Invalid phone');
+          updateData.phone = phone || null;
+        }
 
         if (Object.keys(updateData).length === 0) {
           throw new Error('No fields to update');
