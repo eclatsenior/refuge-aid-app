@@ -176,7 +176,7 @@ export function TrackingPage({ onNavigate }: TrackingPageProps) {
         onOpenChange={setShowConsecutiveAlert}
         onGoTherapy={() => {
           setShowConsecutiveAlert(false);
-          onNavigate('/camino-terapeutico');
+          onNavigate('/camino');
         }}
         onGoNotes={() => {
           setShowConsecutiveAlert(false);
