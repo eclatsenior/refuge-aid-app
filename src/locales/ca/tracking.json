@@ -41,5 +41,12 @@
     "useEmergency": "Considera utilitzar el botó d'emergència a la pantalla d'inici",
     "error": "Error en registrar",
     "errorDescription": "No s'ha pogut guardar el teu estat al servidor"
+  },
+  "consecutiveAlert": {
+    "title": "T'acompanyem",
+    "description": "Hem notat que portes diversos registres seguits sentint-te malament. Volem recordar-te que no estàs sola i que hi ha recursos disponibles per a tu.",
+    "goTherapy": "Anar al Camí Terapèutic",
+    "goNotes": "Vull escriure sobre com em sento",
+    "dismiss": "Ara no, gràcies"
   }
 }
