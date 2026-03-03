@@ -1,8 +1,8 @@
-import { CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { CheckIn } from "@/store/useAppStore";
 import { safeGetTime, safeToLocaleDateString } from "@/lib/dateUtils";
 import { useTranslation } from "react-i18next";
+import { StatusHeartSmall } from "./StatusHeart";
 
 interface TrackingHistoryProps {
   checkIns: CheckIn[];
@@ -31,34 +31,23 @@ export function TrackingHistory({ checkIns }: TrackingHistoryProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {sorted.map((checkIn, index) => {
-            const colors = checkIn.status === "ok"
-              ? "bg-gradient-to-br from-mint to-mint/80"
-              : checkIn.status === "anxious"
-                ? "bg-gradient-to-br from-coral to-coral/80"
-                : "bg-gradient-to-br from-emergency to-emergency/80";
-            const Icon = checkIn.status === "ok" ? CheckCircle : checkIn.status === "anxious" ? Clock : AlertCircle;
-
-            return (
-              <div key={index} className="flex items-center gap-4 py-3 border-b border-border/30 last:border-b-0">
-                <div className={`h-10 w-10 rounded-full flex items-center justify-center shadow-sm ${colors}`}>
-                  <Icon className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <div className="font-semibold text-foreground">{getStatusLabel(checkIn.status)}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {safeToLocaleDateString(checkIn.timestamp, i18n.language, {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </div>
+          {sorted.map((checkIn, index) => (
+            <div key={index} className="flex items-center gap-4 py-3 border-b border-border/30 last:border-b-0">
+              <StatusHeartSmall status={checkIn.status as "ok" | "anxious" | "alert"} size={40} />
+              <div>
+                <div className="font-semibold text-foreground">{getStatusLabel(checkIn.status)}</div>
+                <div className="text-sm text-muted-foreground">
+                  {safeToLocaleDateString(checkIn.timestamp, i18n.language, {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>
