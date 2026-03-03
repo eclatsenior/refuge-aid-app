@@ -41,5 +41,12 @@
     "useEmergency": "Considera usar el botón de emergencia en la pantalla de inicio",
     "error": "Error al registrar",
     "errorDescription": "No se pudo guardar tu estado en el servidor"
+  },
+  "consecutiveAlert": {
+    "title": "Te acompañamos",
+    "description": "Hemos notado que llevas varios registros seguidos sintiéndote mal. Queremos recordarte que no estás sola y que hay recursos disponibles para ti.",
+    "goTherapy": "Ir al Camino Terapéutico",
+    "goNotes": "Quiero escribir sobre cómo me siento",
+    "dismiss": "Ahora no, gracias"
   }
 }

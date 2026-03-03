@@ -41,5 +41,12 @@
     "useEmergency": "Consider using the emergency button on the home screen",
     "error": "Error recording",
     "errorDescription": "Could not save your status to the server"
+  },
+  "consecutiveAlert": {
+    "title": "We're here for you",
+    "description": "We've noticed you've been feeling unwell for several consecutive records. We want to remind you that you're not alone and there are resources available for you.",
+    "goTherapy": "Go to Therapeutic Path",
+    "goNotes": "I want to write about how I feel",
+    "dismiss": "Not now, thanks"
   }
 }
