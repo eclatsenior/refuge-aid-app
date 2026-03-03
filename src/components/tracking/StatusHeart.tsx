@@ -12,6 +12,7 @@ interface StatusHeartProps {
   anxious?: number;
   alert?: number;
   size?: number;
+  strokeWidth?: number;
   className?: string;
 }
 
@@ -23,6 +24,7 @@ export function StatusHeart({
   anxious = 0,
   alert = 0,
   size = 120,
+  strokeWidth = 10,
   className = "",
 }: StatusHeartProps) {
   const cx = 60;
@@ -30,9 +32,9 @@ export function StatusHeart({
 
   // Three rings – outer = stable (green/mint), middle = anxious (yellow), inner = alert (red)
   const rings = [
-    { radius: 38, width: 10, fill: stable, color: "hsl(var(--mint))", bg: "hsl(var(--mint) / 0.15)" },
-    { radius: 26, width: 10, fill: anxious, color: "hsl(var(--coral))", bg: "hsl(var(--coral) / 0.15)" },
-    { radius: 14, width: 10, fill: alert, color: "hsl(var(--emergency))", bg: "hsl(var(--emergency) / 0.15)" },
+    { radius: 38, width: strokeWidth, fill: stable, color: "hsl(var(--mint))", bg: "hsl(var(--mint) / 0.15)" },
+    { radius: 26, width: strokeWidth, fill: anxious, color: "hsl(var(--coral))", bg: "hsl(var(--coral) / 0.15)" },
+    { radius: 14, width: strokeWidth, fill: alert, color: "hsl(var(--emergency))", bg: "hsl(var(--emergency) / 0.15)" },
   ];
 
   return (
