@@ -26,7 +26,8 @@
     "week": "Setmana",
     "month": "Mes",
     "year": "Any",
-    "totalRecords": "Total: {{count}} registres"
+    "totalRecords": "Total: {{count}} registres",
+    "noRecords": "Sense registres aquest dia"
   },
   "history": {
     "title": "Historial"

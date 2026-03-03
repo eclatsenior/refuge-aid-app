@@ -139,13 +139,10 @@ export function TrackingPage({ onNavigate }: TrackingPageProps) {
         </CardContent>
       </Card>
 
-      {/* Summary with period filters */}
+      {/* Summary with period filters and interactive day heart */}
       <div className="mb-8">
         <TrackingSummary checkIns={checkIns} />
       </div>
-
-      {/* Full history */}
-      <TrackingHistory checkIns={checkIns} />
 
       <DiscreetVaultUnlockDialog
         open={vaultUnlockOpen}

@@ -26,7 +26,8 @@
     "week": "Semana",
     "month": "Mes",
     "year": "Año",
-    "totalRecords": "Total: {{count}} registros"
+    "totalRecords": "Total: {{count}} registros",
+    "noRecords": "Sin registros este día"
   },
   "history": {
     "title": "Historial"

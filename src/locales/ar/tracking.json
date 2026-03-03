@@ -26,7 +26,8 @@
     "week": "أسبوع",
     "month": "شهر",
     "year": "سنة",
-    "totalRecords": "المجموع: {{count}} سجلات"
+    "totalRecords": "المجموع: {{count}} سجلات",
+    "noRecords": "لا توجد سجلات في هذا اليوم"
   },
   "history": {
     "title": "السجل"

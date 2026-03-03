@@ -26,7 +26,8 @@
     "week": "Week",
     "month": "Month",
     "year": "Year",
-    "totalRecords": "Total: {{count}} records"
+    "totalRecords": "Total: {{count}} records",
+    "noRecords": "No records this day"
   },
   "history": {
     "title": "History"

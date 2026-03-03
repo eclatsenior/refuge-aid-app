@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, TrendingUp, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { StatusHeart } from "./StatusHeart";
+import { DayHeartDetail } from "./DayHeartDetail";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -69,6 +70,7 @@ export function TrackingSummary({ checkIns }: TrackingSummaryProps) {
   const locale = getDateFnsLocale(i18n.language);
   const [periodType, setPeriodType] = useState<PeriodType>("week");
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
   const { start, end } = useMemo(() => {
     switch (periodType) {
@@ -125,19 +127,23 @@ export function TrackingSummary({ checkIns }: TrackingSummaryProps) {
 
   const renderDayDot = (date: Date) => {
     const isToday = isSameDay(date, new Date());
+    const isSelected = selectedDay ? isSameDay(date, selectedDay) : false;
     const dayCheckIns = getCheckInsForDate(date);
+
+    const handleClick = () => {
+      setSelectedDay(isSelected ? null : date);
+    };
 
     if (dayCheckIns.length === 0) {
       return (
-        <div className={`w-8 h-8 rounded-full bg-muted/50 border-2 ${isToday ? "border-primary ring-2 ring-primary/20" : "border-border"} flex items-center justify-center`}>
+        <button onClick={handleClick} className={`w-8 h-8 rounded-full bg-muted/50 border-2 ${isSelected ? "border-primary ring-2 ring-primary/40" : isToday ? "border-primary ring-2 ring-primary/20" : "border-border"} flex items-center justify-center transition-all`}>
           <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30" />
-        </div>
+        </button>
       );
     }
 
     const uniqueStatuses = new Set(dayCheckIns.map(c => c.status));
 
-    // Single status: solid color circle with icon
     if (uniqueStatuses.size === 1) {
       const status = dayCheckIns[0].status;
       const colors = status === "ok"
@@ -147,17 +153,21 @@ export function TrackingSummary({ checkIns }: TrackingSummaryProps) {
           : "bg-gradient-to-br from-emergency to-emergency/80";
       const Icon = status === "ok" ? CheckCircle : status === "anxious" ? Clock : AlertCircle;
       return (
-        <div className={`w-8 h-8 rounded-full ${colors} ${isToday ? "ring-2 ring-primary/20" : ""} flex items-center justify-center shadow-sm`}>
+        <button onClick={handleClick} className={`w-8 h-8 rounded-full ${colors} ${isSelected ? "ring-2 ring-primary/40 scale-110" : isToday ? "ring-2 ring-primary/20" : ""} flex items-center justify-center shadow-sm transition-all`}>
           <Icon className="h-3.5 w-3.5 text-white" />
-        </div>
+        </button>
       );
     }
 
-    // Multiple statuses: pie circle
-    return <StatusPieCircle statuses={dayCheckIns.map(c => c.status)} isToday={isToday} />;
+    return (
+      <button onClick={handleClick} className={`${isSelected ? "scale-110" : ""} transition-all`}>
+        <StatusPieCircle statuses={dayCheckIns.map(c => c.status)} isToday={isToday || isSelected} />
+      </button>
+    );
   };
 
   return (
+    <>
     <Card className="bg-gradient-card backdrop-blur-sm border-white/20 shadow-soft">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
@@ -231,23 +241,19 @@ export function TrackingSummary({ checkIns }: TrackingSummaryProps) {
           </div>
         </div>
 
-        {/* Heart visualization with 3 rings */}
-        {stats.total > 0 && (
-          <div className="flex justify-center py-2">
-            <StatusHeart
-              stable={stats.total > 0 ? stats.ok / stats.total : 0}
-              anxious={stats.total > 0 ? stats.anxious / stats.total : 0}
-              alert={stats.total > 0 ? stats.alert / stats.total : 0}
-              size={140}
-            />
-          </div>
-        )}
-
         {/* Total */}
         <p className="text-center text-sm text-muted-foreground">
           {t("summary.totalRecords", { count: stats.total })}
         </p>
       </CardContent>
     </Card>
+
+    {/* Day detail heart - shown when a day is selected */}
+    {selectedDay && showDayDots && (
+      <div className="mt-4">
+        <DayHeartDetail date={selectedDay} checkIns={checkIns} />
+      </div>
+    )}
+    </>
   );
 }
