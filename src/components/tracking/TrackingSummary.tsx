@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, TrendingUp, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { StatusHeart } from "./StatusHeart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -229,6 +230,18 @@ export function TrackingSummary({ checkIns }: TrackingSummaryProps) {
             <span className="text-xs text-muted-foreground font-medium">{t("status.alert.label")}</span>
           </div>
         </div>
+
+        {/* Heart visualization with 3 rings */}
+        {stats.total > 0 && (
+          <div className="flex justify-center py-2">
+            <StatusHeart
+              stable={stats.total > 0 ? stats.ok / stats.total : 0}
+              anxious={stats.total > 0 ? stats.anxious / stats.total : 0}
+              alert={stats.total > 0 ? stats.alert / stats.total : 0}
+              size={140}
+            />
+          </div>
+        )}
 
         {/* Total */}
         <p className="text-center text-sm text-muted-foreground">
