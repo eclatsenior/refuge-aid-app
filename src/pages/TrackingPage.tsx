@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Heart, Lock, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { UserMenu } from "@/components/layout/UserMenu";
 import { DiscreetVaultUnlockDialog } from "@/components/discreet/DiscreetVaultUnlockDialog";
 import { TrackingSummary } from "@/components/tracking/TrackingSummary";
 import { TrackingHistory } from "@/components/tracking/TrackingHistory";
+import { ConsecutiveAlertDialog } from "@/components/tracking/ConsecutiveAlertDialog";
 
 interface TrackingPageProps {
   onNavigate: (path: string) => void;
@@ -18,10 +19,29 @@ interface TrackingPageProps {
 
 export function TrackingPage({ onNavigate }: TrackingPageProps) {
   const [vaultUnlockOpen, setVaultUnlockOpen] = useState(false);
+  const [showConsecutiveAlert, setShowConsecutiveAlert] = useState(false);
   const { checkIns, addCheckIn, settings, updateSettings, updateEmployeePresence, profile } = useAppStore();
   const { toast } = useToast();
   const { t, i18n } = useTranslation('tracking');
   const { t: tHome } = useTranslation('home');
+
+  // Check for 20+ consecutive anxious/alert check-ins
+  const hasConsecutiveNegative = useMemo(() => {
+    if (checkIns.length === 0) return false;
+    const sorted = [...checkIns].sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
+    let consecutive = 0;
+    for (const c of sorted) {
+      if (c.status === 'anxious' || c.status === 'alert') {
+        consecutive++;
+        if (consecutive >= 20) return true;
+      } else {
+        consecutive = 0;
+      }
+    }
+    return false;
+  }, [checkIns]);
 
   // Heartbeat system
   useEffect(() => {
@@ -76,6 +96,13 @@ export function TrackingPage({ onNavigate }: TrackingPageProps) {
         toast({ title: t('toast.needHelp'), description: t('toast.useEmergency'), duration: 8000 });
       }, 2000);
     }
+
+    // Check for 20+ consecutive anxious/alert after adding
+    setTimeout(() => {
+      if (hasConsecutiveNegative) {
+        setShowConsecutiveAlert(true);
+      }
+    }, 500);
   };
 
   return (
@@ -143,6 +170,19 @@ export function TrackingPage({ onNavigate }: TrackingPageProps) {
       <div className="mb-8">
         <TrackingSummary checkIns={checkIns} />
       </div>
+
+      <ConsecutiveAlertDialog
+        open={showConsecutiveAlert}
+        onOpenChange={setShowConsecutiveAlert}
+        onGoTherapy={() => {
+          setShowConsecutiveAlert(false);
+          onNavigate('/camino-terapeutico');
+        }}
+        onGoNotes={() => {
+          setShowConsecutiveAlert(false);
+          onNavigate('/notas');
+        }}
+      />
 
       <DiscreetVaultUnlockDialog
         open={vaultUnlockOpen}
