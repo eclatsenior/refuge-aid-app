@@ -124,8 +124,8 @@ serve(async (req) => {
       
       console.log('[VERIFY-VAULT-PASSWORD] Validation result:', { isValid });
     } else {
-      console.error('[VERIFY-VAULT-PASSWORD] Unsupported hash format:', scheme.substring(0, 20));
-      throw new Error('Formato de hash no soportado');
+      console.error('[VERIFY-VAULT-PASSWORD] Unsupported hash format');
+      throw new Error('Verification failed');
     }
 
     if (!isValid) {
