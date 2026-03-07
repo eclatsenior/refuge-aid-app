@@ -175,9 +175,9 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error en verify-vault-password:', error);
+    console.error('[VERIFY-VAULT-PASSWORD] Error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'An error occurred processing your request' }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,

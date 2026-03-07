@@ -199,10 +199,12 @@ serve(async (req) => {
 
   } catch (error: any) {
     console.error('[DELETE-EMPLOYEE] Fatal error:', error.message);
+    const safeMessages = ['Access denied', 'Unauthorized'];
+    const clientMessage = safeMessages.includes(error.message) ? error.message : 'An error occurred processing your request';
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message || 'Error al eliminar empleada' 
+        error: clientMessage
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
