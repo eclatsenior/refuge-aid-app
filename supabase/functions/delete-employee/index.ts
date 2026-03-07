@@ -48,7 +48,7 @@ serve(async (req) => {
 
     if (callerError || !callerProfile || callerProfile.role !== 'refugi_lead') {
       console.error('[DELETE-EMPLOYEE] Caller is not refugi_lead:', user.id);
-      throw new Error('Solo los Refugi Leads pueden eliminar empleadas');
+      throw new Error('Access denied');
     }
 
     // Validación 2: Verificar que el empleado está asignado a este refugi_lead
