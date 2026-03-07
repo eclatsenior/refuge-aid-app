@@ -204,11 +204,11 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   } catch (error: any) {
-    console.error("Error in send-verification-email function:", error);
+    console.error("[send-verification-email] Error:", error.message);
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: error.message 
+        error: 'An error occurred processing your request' 
       }),
       {
         status: 500,

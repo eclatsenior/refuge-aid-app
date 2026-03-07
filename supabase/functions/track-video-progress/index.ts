@@ -58,8 +58,8 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error: any) {
-    console.error('Error tracking video progress:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('[track-video-progress] Error:', error.message);
+    return new Response(JSON.stringify({ error: 'An error occurred processing your request' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
     });

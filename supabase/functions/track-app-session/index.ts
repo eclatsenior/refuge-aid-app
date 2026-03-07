@@ -91,7 +91,8 @@ serve(async (req) => {
     // Return 401 for auth errors, 400 for others
     const isAuthError = error.message?.includes('Unauthorized') || error.message?.includes('Auth');
     
-    return new Response(JSON.stringify({ error: error.message }), {
+    const clientMessage = isAuthError ? 'Unauthorized' : 'An error occurred processing your request';
+    return new Response(JSON.stringify({ error: clientMessage }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: isAuthError ? 401 : 400,
     });

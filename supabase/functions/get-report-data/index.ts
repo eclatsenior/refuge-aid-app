@@ -408,8 +408,8 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error: any) {
-    console.error('[GET-REPORT-DATA] Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('[GET-REPORT-DATA] Error:', error.message);
+    return new Response(JSON.stringify({ error: 'An error occurred processing your request' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
     });

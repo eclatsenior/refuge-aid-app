@@ -158,10 +158,12 @@ serve(async (req) => {
         status: 200,
       }
     );
-  } catch (error) {
-    console.error('Error en reset-vault-password:', error);
+  } catch (error: any) {
+    console.error('[reset-vault-password] Error:', error.message);
+    const safeMessages = ['Token y nueva contraseña requeridos', 'La contraseña debe tener al menos 8 caracteres', 'Token de reset inválido o expirado'];
+    const clientMessage = safeMessages.includes(error.message) ? error.message : 'An error occurred processing your request';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: clientMessage }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
