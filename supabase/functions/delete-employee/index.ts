@@ -61,7 +61,7 @@ serve(async (req) => {
 
     if (assignmentError || !assignment) {
       console.error('[DELETE-EMPLOYEE] Employee not assigned to this lead:', employeeId);
-      throw new Error('Esta empleada no está asignada a ti');
+      throw new Error('Access denied');
     }
 
     // Validación 3: Verificar que el empleado existe y tiene rol 'employee'
