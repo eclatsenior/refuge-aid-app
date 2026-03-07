@@ -48,7 +48,7 @@ serve(async (req) => {
 
     if (callerError || !callerProfile || callerProfile.role !== 'refugi_lead') {
       console.error('[DELETE-EMPLOYEE] Caller is not refugi_lead:', user.id);
-      throw new Error('Solo los Refugi Leads pueden eliminar empleadas');
+      throw new Error('Access denied');
     }
 
     // Validación 2: Verificar que el empleado está asignado a este refugi_lead
@@ -61,7 +61,7 @@ serve(async (req) => {
 
     if (assignmentError || !assignment) {
       console.error('[DELETE-EMPLOYEE] Employee not assigned to this lead:', employeeId);
-      throw new Error('Esta empleada no está asignada a ti');
+      throw new Error('Access denied');
     }
 
     // Validación 3: Verificar que el empleado existe y tiene rol 'employee'
@@ -199,10 +199,12 @@ serve(async (req) => {
 
   } catch (error: any) {
     console.error('[DELETE-EMPLOYEE] Fatal error:', error.message);
+    const safeMessages = ['Access denied', 'Unauthorized'];
+    const clientMessage = safeMessages.includes(error.message) ? error.message : 'An error occurred processing your request';
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message || 'Error al eliminar empleada' 
+        error: clientMessage
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

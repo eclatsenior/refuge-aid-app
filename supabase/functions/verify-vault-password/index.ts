@@ -124,8 +124,8 @@ serve(async (req) => {
       
       console.log('[VERIFY-VAULT-PASSWORD] Validation result:', { isValid });
     } else {
-      console.error('[VERIFY-VAULT-PASSWORD] Unsupported hash format:', scheme.substring(0, 20));
-      throw new Error('Formato de hash no soportado');
+      console.error('[VERIFY-VAULT-PASSWORD] Unsupported hash format');
+      throw new Error('Verification failed');
     }
 
     if (!isValid) {
@@ -175,9 +175,9 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error en verify-vault-password:', error);
+    console.error('[VERIFY-VAULT-PASSWORD] Error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'An error occurred processing your request' }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,

@@ -6,11 +6,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const logStep = (step: string, details?: any) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[ASSIGN-SUBSCRIPTION] ${step}${detailsStr}`);
-};
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -23,26 +18,49 @@ serve(async (req) => {
   );
 
   try {
-    logStep("Function started");
-
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
 
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    
+    if (userError || !userData.user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
+
     const user = userData.user;
-    logStep("User authenticated", { userId: user.id });
+
+    // SECURITY: Verify caller is super admin
+    const { data: isSuperAdmin } = await supabaseClient
+      .from('super_admins')
+      .select('id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!isSuperAdmin) {
+      console.error('[ASSIGN-SUBSCRIPTION] Non-admin attempted access:', user.id);
+      return new Response(
+        JSON.stringify({ error: "Access denied" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
+      );
+    }
 
     // Parse request body
     const { userEmail, productId, priceId, employeeLimit } = await req.json();
     
     if (!userEmail || !productId || !priceId || !employeeLimit) {
-      throw new Error("Missing required fields: userEmail, productId, priceId, employeeLimit");
+      return new Response(
+        JSON.stringify({ error: "Missing required fields" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
     }
-
-    logStep("Request data", { userEmail, productId, priceId, employeeLimit });
 
     // Find user by email
     const { data: profiles, error: profileError } = await supabaseClient
@@ -52,11 +70,13 @@ serve(async (req) => {
       .single();
 
     if (profileError || !profiles) {
-      throw new Error(`User not found: ${userEmail}`);
+      return new Response(
+        JSON.stringify({ error: "User not found" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 404 }
+      );
     }
 
     const targetUserId = profiles.user_id;
-    logStep("Target user found", { targetUserId });
 
     // Check if subscription already exists
     const { data: existingSub } = await supabaseClient
@@ -69,14 +89,10 @@ serve(async (req) => {
     const currentPeriodEnd = new Date();
     currentPeriodEnd.setDate(currentPeriodEnd.getDate() + 30);
 
-    // Generate mock Stripe IDs
     const stripeCustomerId = `cus_manual_${targetUserId.substring(0, 8)}`;
     const stripeSubscriptionId = `sub_manual_${Date.now()}`;
 
     if (existingSub) {
-      // Update existing subscription
-      logStep("Updating existing subscription", { subscriptionId: existingSub.id });
-      
       const { error: updateError } = await supabaseClient
         .from('subscriptions')
         .update({
@@ -89,12 +105,11 @@ serve(async (req) => {
         })
         .eq('id', existingSub.id);
 
-      if (updateError) throw updateError;
-      logStep("Subscription updated successfully");
+      if (updateError) {
+        console.error('[ASSIGN-SUBSCRIPTION] Update error:', updateError);
+        throw new Error('Failed to update subscription');
+      }
     } else {
-      // Create new subscription
-      logStep("Creating new subscription");
-      
       const { error: insertError } = await supabaseClient
         .from('subscriptions')
         .insert({
@@ -108,35 +123,24 @@ serve(async (req) => {
           current_period_end: currentPeriodEnd.toISOString()
         });
 
-      if (insertError) throw insertError;
-      logStep("Subscription created successfully");
+      if (insertError) {
+        console.error('[ASSIGN-SUBSCRIPTION] Insert error:', insertError);
+        throw new Error('Failed to create subscription');
+      }
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Subscription assigned to ${userEmail}`,
-        subscription: {
-          productId,
-          priceId,
-          employeeLimit,
-          currentPeriodEnd: currentPeriodEnd.toISOString()
-        }
+        message: `Subscription assigned successfully`
       }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in assign-subscription", { message: errorMessage });
+    console.error('[ASSIGN-SUBSCRIPTION] Error:', error);
     return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
+      JSON.stringify({ error: "An error occurred processing your request" }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }
 });
