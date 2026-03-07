@@ -25,6 +25,43 @@ Deno.serve(async (req) => {
       throw new Error('Missing Supabase environment variables');
     }
 
+    // SECURITY: Validate that this request comes from the service role (DB trigger)
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    // Only allow service role key (from DB trigger) or super admin
+    if (token !== supabaseServiceKey) {
+      // Check if it's a super admin calling manually
+      const supabaseAuth = createClient(supabaseUrl, supabaseServiceKey);
+      const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+      
+      if (authError || !user) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+        );
+      }
+
+      const { data: isSuperAdmin } = await supabaseAuth
+        .from('super_admins')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!isSuperAdmin) {
+        return new Response(
+          JSON.stringify({ error: 'Access denied' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+        );
+      }
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Parse request body
@@ -33,6 +70,12 @@ Deno.serve(async (req) => {
 
     if (!user_id) {
       throw new Error('user_id is required');
+    }
+
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(user_id)) {
+      throw new Error('Invalid user_id format');
     }
 
     // Verify user exists and is refugi_lead
@@ -44,7 +87,7 @@ Deno.serve(async (req) => {
 
     if (profileError) {
       console.error('[AUTO-ASSIGN-BASIC-PLAN] Profile not found:', profileError);
-      throw new Error(`Profile not found: ${profileError.message}`);
+      throw new Error('Profile not found');
     }
 
     if (profile.role !== 'refugi_lead') {
@@ -98,7 +141,7 @@ Deno.serve(async (req) => {
 
     if (subError) {
       console.error('[AUTO-ASSIGN-BASIC-PLAN] Error creating subscription:', subError);
-      throw new Error(`Failed to create subscription: ${subError.message}`);
+      throw new Error('Failed to create subscription');
     }
 
     console.log('[AUTO-ASSIGN-BASIC-PLAN] Subscription created successfully:', subscription.id);
@@ -115,7 +158,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('[AUTO-ASSIGN-BASIC-PLAN] Error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'An error occurred processing your request' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }

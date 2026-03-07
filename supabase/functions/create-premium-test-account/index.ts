@@ -20,15 +20,48 @@ serve(async (req: Request) => {
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
+    // SECURITY: Validate JWT
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user: callerUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !callerUser) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      );
+    }
+
+    // SECURITY: Verify caller is super admin
+    const { data: isSuperAdmin } = await supabaseAdmin
+      .from('super_admins')
+      .select('id')
+      .eq('user_id', callerUser.id)
+      .single();
+
+    if (!isSuperAdmin) {
+      console.error('[CREATE-PREMIUM-TEST] Non-admin attempted access:', callerUser.id);
+      return new Response(
+        JSON.stringify({ error: 'Access denied' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+      );
+    }
+
     const { email, password, fullName } = await req.json();
     console.log('[CREATE-PREMIUM-TEST] Request received for:', email);
 
     // 1. Crear usuario con email confirmado
-    console.log('[CREATE-PREMIUM-TEST] Creating user...');
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // Email confirmado automáticamente
+      email_confirm: true,
       user_metadata: {
         full_name: fullName,
         role: 'employee'
@@ -37,12 +70,10 @@ serve(async (req: Request) => {
 
     if (userError) {
       console.error('[CREATE-PREMIUM-TEST] Error creating user:', userError);
-      throw userError;
+      throw new Error('Failed to create user');
     }
-    console.log('[CREATE-PREMIUM-TEST] ✅ Usuario creado:', userData.user.id);
 
     // 2. Crear perfil
-    console.log('[CREATE-PREMIUM-TEST] Creating profile...');
     const { error: profileError } = await supabaseAdmin.from('profiles').upsert({
       user_id: userData.user.id,
       email: email,
@@ -53,12 +84,10 @@ serve(async (req: Request) => {
     
     if (profileError) {
       console.error('[CREATE-PREMIUM-TEST] Error creating profile:', profileError);
-      throw profileError;
+      throw new Error('Failed to create profile');
     }
-    console.log('[CREATE-PREMIUM-TEST] ✅ Perfil creado');
 
     // 3. Crear employee_status
-    console.log('[CREATE-PREMIUM-TEST] Creating employee status...');
     const { error: statusError } = await supabaseAdmin.from('employee_status').insert({
       employee_id: userData.user.id,
       mood_level: null,
@@ -67,20 +96,18 @@ serve(async (req: Request) => {
     
     if (statusError) {
       console.error('[CREATE-PREMIUM-TEST] Error creating employee status:', statusError);
-      throw statusError;
+      throw new Error('Failed to create employee status');
     }
-    console.log('[CREATE-PREMIUM-TEST] ✅ Employee status creado');
 
     // 4. Crear suscripción Premium/Individual
-    console.log('[CREATE-PREMIUM-TEST] Creating premium subscription...');
     const currentPeriodEnd = new Date();
-    currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 1); // 1 año de suscripción
+    currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 1);
 
     const { error: subError } = await supabaseAdmin.from('subscriptions').insert({
       refugi_lead_id: userData.user.id,
       stripe_customer_id: `cus_test_${userData.user.id.substring(0, 8)}`,
       stripe_subscription_id: `sub_test_${Date.now()}`,
-      product_id: 'prod_TD9UdEM6XDdBZT', // Plan Individual
+      product_id: 'prod_TD9UdEM6XDdBZT',
       price_id: 'price_1SGjBeR3C9Xn67YcQrAPwhDO',
       status: 'active',
       employee_limit: 1,
@@ -89,14 +116,13 @@ serve(async (req: Request) => {
     
     if (subError) {
       console.error('[CREATE-PREMIUM-TEST] Error creating subscription:', subError);
-      throw subError;
+      throw new Error('Failed to create subscription');
     }
-    console.log('[CREATE-PREMIUM-TEST] ✅ Suscripción Premium creada (válida por 1 año)');
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Cuenta Premium creada exitosamente',
+        message: 'Premium account created successfully',
         user_id: userData.user.id,
         email: email,
         subscription_expires: currentPeriodEnd.toISOString()
@@ -105,9 +131,9 @@ serve(async (req: Request) => {
     );
 
   } catch (error) {
-    console.error('[CREATE-PREMIUM-TEST] ❌ Error:', error);
+    console.error('[CREATE-PREMIUM-TEST] Error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'An error occurred processing your request' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
