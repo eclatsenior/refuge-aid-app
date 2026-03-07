@@ -109,12 +109,44 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // --- Authentication: require either a valid user JWT or service-role key ---
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      console.error("[SEND-VERIFICATION] Missing authorization header");
+      return new Response(
+        JSON.stringify({ success: true, message: "If the email is registered, a verification code has been sent." }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+
+    // Allow if the caller is using the service role key (server-to-server)
+    const isServiceRole = token === serviceRoleKey;
+
+    if (!isServiceRole) {
+      // Validate as a user JWT
+      const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+      if (authError || !user) {
+        console.error("[SEND-VERIFICATION] Invalid JWT:", authError?.message);
+        return new Response(
+          JSON.stringify({ success: true, message: "If the email is registered, a verification code has been sent." }),
+          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+    }
+
     const { email, userName } = await req.json();
 
     console.log('[SEND-VERIFICATION] Function invoked with:', {
-      email,
-      userName,
-      hasEmail: !!email,
+      email: email ? '***@***' : undefined,
       hasUserName: !!userName
     });
 
@@ -122,14 +154,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Email is required");
     }
 
-    console.log("[SEND-VERIFICATION] Sending verification email to:", email);
-
-    // Crear cliente de Supabase con service role para acceso completo
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
+    console.log("[SEND-VERIFICATION] Sending verification email");
 
     // Buscar usuario por email
     const { data: { users }, error: userError } = await supabaseAdmin.auth.admin.listUsers();
@@ -142,8 +167,12 @@ const handler = async (req: Request): Promise<Response> => {
     const user = users.find(u => u.email?.toLowerCase() === email.toLowerCase());
     
     if (!user) {
-      console.error("User not found for email:", email);
-      throw new Error("User not found");
+      // Return consistent response to prevent user enumeration
+      console.log("[SEND-VERIFICATION] User not found for email, returning success to prevent enumeration");
+      return new Response(
+        JSON.stringify({ success: true, message: "If the email is registered, a verification code has been sent." }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
 
     console.log("Found user:", user.id);
@@ -185,7 +214,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (emailError) {
       console.error("Error sending email via Resend:", emailError);
-      throw new Error(`Failed to send email: ${emailError.message || JSON.stringify(emailError)}`);
+      throw new Error("Failed to send email");
     }
 
     console.log("Email sent successfully:", data);
@@ -193,7 +222,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: true,
-        message: "Verification email sent successfully" 
+        message: "If the email is registered, a verification code has been sent." 
       }),
       {
         status: 200,
