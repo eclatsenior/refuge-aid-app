@@ -102,10 +102,12 @@ serve(async (req) => {
         status: 200,
       }
     );
-  } catch (error) {
-    console.error('Error en set-vault-password:', error);
+  } catch (error: any) {
+    console.error('[set-vault-password] Error:', error.message);
+    const safeMessages = ['La contraseña debe tener al menos 8 caracteres', 'Ya existe una contraseña de caja fuerte configurada'];
+    const clientMessage = safeMessages.includes(error.message) ? error.message : 'An error occurred processing your request';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: clientMessage }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,

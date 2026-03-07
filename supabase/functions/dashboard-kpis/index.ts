@@ -42,8 +42,8 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error: any) {
-    console.error('Error fetching KPIs:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('[dashboard-kpis] Error:', error.message);
+    return new Response(JSON.stringify({ error: 'An error occurred processing your request' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
     });
