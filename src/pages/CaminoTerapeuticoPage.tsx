@@ -332,6 +332,8 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     }
     const progress = ((currentModule + 1) / selectedRoute.modules.length) * 100;
     const videoData = getVideoForModule(selectedRoute.route_key, module.module_key);
+    const fallbackSignedUrl = videoData?.video_url?.includes('/object/sign/') ? videoData.video_url : null;
+    const playableVideoUrl = videoData?.signed_url || fallbackSignedUrl || null;
     const videoRequired = videoData?.is_required || false;
     const canProceed = !videoRequired || videoWatchedPercentage >= 80;
     
@@ -387,9 +389,9 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {videoData && (
+              {videoData && playableVideoUrl && (
                 <VideoPlayer
-                  videoUrl={videoData.signed_url || videoData.video_url}
+                  videoUrl={playableVideoUrl}
                   videoName={videoData.video_name || undefined}
                   videoId={videoData.id}
                   routeId={selectedRoute.route_key}
@@ -398,6 +400,12 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                   onVideoWatched={setVideoWatchedPercentage}
                   onVideoCompleted={handleVideoCompleted}
                 />
+              )}
+
+              {videoData && !playableVideoUrl && (
+                <div className="rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
+                  No se pudo generar un enlace seguro para este video. Reintenta en unos segundos.
+                </div>
               )}
               
               {selectedRoute.route_key === 'aromaterapia' && module.module_key === 'library' ? (
