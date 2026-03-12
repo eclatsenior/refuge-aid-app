@@ -194,7 +194,7 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
       const sanitizedName = sanitizeFileName(videoFile.name);
       const fileName = `${selectedRoute}/${selectedModule}/${Date.now()}_${sanitizedName}`;
       const largeFileThreshold = 50 * 1024 * 1024; // 50MB
-      let publicUrl: string;
+      let storagePath: string;
 
       if (videoFile.size > largeFileThreshold) {
         // Usar TUS (subida reanudable) para archivos > 50MB
