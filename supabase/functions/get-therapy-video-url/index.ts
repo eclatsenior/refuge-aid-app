@@ -95,11 +95,13 @@ serve(async (req) => {
       });
     }
 
-    const { data: video, error: videoError } = await supabaseAdmin
+    const { data: videoData, error: videoError } = await supabaseAdmin
       .from('therapy_videos')
       .select('id, video_url, storage_bucket, storage_path')
       .eq('id', videoId)
-      .single<TherapyVideoRow>();
+      .single();
+
+    const video = videoData as TherapyVideoRow | null;
 
     if (videoError || !video) {
       return new Response(JSON.stringify({ error: 'Video not found' }), {
