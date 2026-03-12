@@ -30,6 +30,17 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
     if (userError || !user) {
+      const authMessage = (userError?.message || '').toLowerCase();
+      const isStaleOrMissingSession = authMessage.includes('session');
+
+      if (isStaleOrMissingSession) {
+        console.warn('[track-app-session] Ignoring request with stale session token');
+        return new Response(JSON.stringify({ success: true, ignored: 'stale_session' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      }
+
       console.error('[track-app-session] Auth error:', userError?.message || 'No user');
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
