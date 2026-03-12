@@ -15,7 +15,7 @@ interface VideoPlayerProps {
   required?: boolean;
 }
 
-const LOAD_TIMEOUT_MS = 15000; // 15 seconds timeout
+const LOAD_TIMEOUT_MS = 15000;
 
 export function VideoPlayer({
   videoUrl,
@@ -28,8 +28,11 @@ export function VideoPlayer({
   onVideoCompleted,
   required = false
 }: VideoPlayerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const unlockedRef = useRef(false);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -38,7 +41,6 @@ export function VideoPlayer({
   const [isLoading, setIsLoading] = useState(true);
   const [timedOut, setTimedOut] = useState(false);
 
-  // Clear timeout helper
   const clearLoadTimeout = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -46,19 +48,34 @@ export function VideoPlayer({
     }
   }, []);
 
-  // Start a loading timeout
   const startLoadTimeout = useCallback(() => {
     clearLoadTimeout();
     timeoutRef.current = setTimeout(() => {
-      if (isLoading && !isPlaying) {
-        setTimedOut(true);
-        setIsLoading(false);
-        console.warn('[VideoPlayer] Load timeout reached for:', videoUrl);
-      }
+      setTimedOut(true);
+      setIsLoading(false);
+      console.warn('[VideoPlayer] Load timeout reached for:', videoUrl);
     }, LOAD_TIMEOUT_MS);
-  }, [clearLoadTimeout, isLoading, isPlaying, videoUrl]);
+  }, [clearLoadTimeout, videoUrl]);
 
-  // Reset state when URL changes
+  const unlockForMobilePlayback = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video || unlockedRef.current) return;
+
+    const originalMuted = video.muted;
+
+    try {
+      video.muted = true;
+      await video.play();
+      video.pause();
+      video.currentTime = 0;
+      unlockedRef.current = true;
+    } catch {
+      // Best-effort unlock; keep normal play flow
+    } finally {
+      video.muted = originalMuted;
+    }
+  }, []);
+
   useEffect(() => {
     setVideoError(false);
     setIsLoading(true);
@@ -66,44 +83,60 @@ export function VideoPlayer({
     setProgress(0);
     setWatchedPercentage(0);
     setTimedOut(false);
+    unlockedRef.current = false;
     startLoadTimeout();
 
     return () => clearLoadTimeout();
-  }, [videoUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [videoUrl, startLoadTimeout, clearLoadTimeout]);
 
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play().catch(() => {
-          setVideoError(true);
-        });
-      }
-      setIsPlaying(!isPlaying);
+  const togglePlay = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+      video.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    try {
+      setVideoError(false);
+      setTimedOut(false);
+      setIsLoading(true);
+      startLoadTimeout();
+
+      await unlockForMobilePlayback();
+      await video.play();
+      setIsPlaying(true);
+    } catch {
+      setVideoError(true);
+      setIsPlaying(false);
+      setIsLoading(false);
+      clearLoadTimeout();
     }
   };
 
   const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
+    const video = videoRef.current;
+    if (!video) return;
+
+    const nextMuted = !isMuted;
+    video.muted = nextMuted;
+    setIsMuted(nextMuted);
   };
 
-  const toggleFullscreen = () => {
-    if (videoRef.current) {
+  const toggleFullscreen = async () => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    try {
       if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        videoRef.current.requestFullscreen().catch(() => {
-          // Fallback for iOS Safari - use webkitEnterFullscreen
-          const video = videoRef.current as any;
-          if (video?.webkitEnterFullscreen) {
-            video.webkitEnterFullscreen();
-          }
-        });
+        await document.exitFullscreen();
+      } else if (container.requestFullscreen) {
+        await container.requestFullscreen();
       }
+    } catch (error) {
+      console.warn('[VideoPlayer] Fullscreen not available:', error);
     }
   };
 
@@ -112,9 +145,7 @@ export function VideoPlayer({
     setTimedOut(false);
     setIsLoading(true);
     startLoadTimeout();
-    if (videoRef.current) {
-      videoRef.current.load();
-    }
+    videoRef.current?.load();
   };
 
   useEffect(() => {
@@ -122,7 +153,7 @@ export function VideoPlayer({
     if (!video) return;
 
     const handleTimeUpdate = () => {
-      if (!video.duration || isNaN(video.duration)) return;
+      if (!video.duration || Number.isNaN(video.duration)) return;
       const percentage = (video.currentTime / video.duration) * 100;
       setProgress(percentage);
 
@@ -152,7 +183,13 @@ export function VideoPlayer({
       setIsLoading(false);
       setVideoError(true);
       clearLoadTimeout();
-      console.error('[VideoPlayer] Error loading video:', videoUrl);
+      const mediaErrorCode = video.error?.code;
+      console.error('[VideoPlayer] Error loading video:', {
+        url: videoUrl,
+        mediaErrorCode,
+        networkState: video.networkState,
+        readyState: video.readyState,
+      });
     };
 
     const handleWaiting = () => setIsLoading(true);
@@ -180,7 +217,6 @@ export function VideoPlayer({
     };
   }, [watchedPercentage, onVideoEnd, onVideoWatched, onVideoCompleted, videoId, routeId, moduleId, videoUrl, clearLoadTimeout]);
 
-  // Error or timeout state
   if (videoError || timedOut) {
     return (
       <div className="w-full">
@@ -191,7 +227,7 @@ export function VideoPlayer({
           </p>
           <p className="text-xs text-muted-foreground">
             {timedOut
-              ? 'Tu conexión puede ser lenta. Intenta de nuevo o conéctate a una red Wi-Fi.'
+              ? 'Tu conexión puede ser lenta. Intenta de nuevo o conéctate a una red Wi‑Fi.'
               : 'Verifica tu conexión a internet e inténtalo de nuevo.'}
           </p>
           <Button variant="outline" size="sm" onClick={handleRetry} className="gap-2">
@@ -205,7 +241,7 @@ export function VideoPlayer({
 
   return (
     <div className="w-full space-y-3">
-      <div className="relative bg-black rounded-lg overflow-hidden shadow-lg">
+      <div ref={containerRef} className="relative bg-black rounded-lg overflow-hidden shadow-lg" onContextMenu={(e) => e.preventDefault()}>
         {isLoading && !isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
             <div className="flex flex-col items-center gap-2">
@@ -214,13 +250,16 @@ export function VideoPlayer({
             </div>
           </div>
         )}
+
         <video
           ref={videoRef}
           src={videoUrl}
           className="w-full h-auto"
           playsInline
-          muted={false}
           preload="metadata"
+          disablePictureInPicture
+          disableRemotePlayback
+          controlsList="nodownload noplaybackrate noremoteplayback"
         />
 
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
@@ -228,31 +267,16 @@ export function VideoPlayer({
 
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={togglePlay}
-                className="text-white hover:bg-white/20"
-              >
+              <Button variant="ghost" size="icon" onClick={togglePlay} className="text-white hover:bg-white/20">
                 {isPlaying ? <Pause size={20} /> : <Play size={20} />}
               </Button>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleMute}
-                className="text-white hover:bg-white/20"
-              >
+              <Button variant="ghost" size="icon" onClick={toggleMute} className="text-white hover:bg-white/20">
                 {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
               </Button>
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleFullscreen}
-              className="text-white hover:bg-white/20"
-            >
+            <Button variant="ghost" size="icon" onClick={toggleFullscreen} className="text-white hover:bg-white/20">
               <Maximize size={20} />
             </Button>
           </div>

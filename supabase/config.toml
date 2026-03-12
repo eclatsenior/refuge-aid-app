@@ -95,3 +95,6 @@ verify_jwt = false
 
 [functions.verify-vault-password]
 verify_jwt = false
+
+[functions.get-therapy-video-url]
+verify_jwt = false

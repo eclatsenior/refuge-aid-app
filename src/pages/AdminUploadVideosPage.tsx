@@ -278,7 +278,9 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
         .insert({
           route_id: selectedRoute,
           module_id: selectedModule,
-          video_url: publicUrl,
+          video_url: storagePath,
+          storage_bucket: 'therapy-videos',
+          storage_path: storagePath,
           video_name: videoFile.name,
           file_size: videoFile.size,
           is_required: isRequired
