@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 serve(async (req) => {
@@ -12,11 +12,12 @@ serve(async (req) => {
   }
 
   try {
-    // Verify authorization header exists
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      console.error('[track-app-session] No authorization header');
-      throw new Error('Unauthorized: No authorization header');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401,
+      });
     }
 
     const supabase = createClient(
@@ -25,39 +26,39 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    
-    if (userError || !user) {
-      console.error('[track-app-session] Auth error:', userError?.message || 'No user');
-      throw new Error('Unauthorized: ' + (userError?.message || 'Invalid session'));
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+
+    if (claimsError || !claimsData?.claims?.sub) {
+      console.error('[track-app-session] Auth error:', claimsError?.message || 'No claims');
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401,
+      });
     }
 
-    console.log('[track-app-session] User authenticated:', user.id);
-    
+    const userId = claimsData.claims.sub;
     const { action, session_id } = await req.json();
 
     if (action === 'start') {
-      // Create new session
       const { data, error } = await supabase
         .from('app_sessions')
-        .insert({ employee_id: user.id })
+        .insert({ employee_id: userId })
         .select()
         .single();
 
       if (error) throw error;
 
-      // Update employee_status last_check_in
       await supabase
         .from('employee_status')
         .update({ last_check_in: new Date().toISOString() })
-        .eq('employee_id', user.id);
+        .eq('employee_id', userId);
 
       return new Response(JSON.stringify({ session_id: data.id }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       });
     } else if (action === 'end' && session_id) {
-      // Update session with end time and duration
       const { data: session } = await supabase
         .from('app_sessions')
         .select('started_at')
@@ -87,14 +88,9 @@ serve(async (req) => {
     throw new Error('Invalid action');
   } catch (error: any) {
     console.error('[track-app-session] Error:', error.message);
-    
-    // Return 401 for auth errors, 400 for others
-    const isAuthError = error.message?.includes('Unauthorized') || error.message?.includes('Auth');
-    
-    const clientMessage = isAuthError ? 'Unauthorized' : 'An error occurred processing your request';
-    return new Response(JSON.stringify({ error: clientMessage }), {
+    return new Response(JSON.stringify({ error: 'An error occurred processing your request' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: isAuthError ? 401 : 400,
+      status: 400,
     });
   }
 });
