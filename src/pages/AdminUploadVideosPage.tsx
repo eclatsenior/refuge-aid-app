@@ -200,7 +200,7 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
         // Usar TUS (subida reanudable) para archivos > 50MB
         console.log('📤 Archivo grande detectado, usando subida reanudable (TUS)...');
         
-        publicUrl = await new Promise<string>((resolve, reject) => {
+        storagePath = await new Promise<string>((resolve, reject) => {
           const upload = new tus.Upload(videoFile, {
             endpoint: SUPABASE_STORAGE_RESUMABLE_URL,
             retryDelays: [0, 3000, 5000, 10000, 20000],
