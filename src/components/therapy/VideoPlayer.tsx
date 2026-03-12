@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -15,24 +15,48 @@ interface VideoPlayerProps {
   required?: boolean;
 }
 
-export function VideoPlayer({ 
-  videoUrl, 
+const LOAD_TIMEOUT_MS = 15000; // 15 seconds timeout
+
+export function VideoPlayer({
+  videoUrl,
   videoName,
   videoId,
   routeId,
   moduleId,
-  onVideoEnd, 
+  onVideoEnd,
   onVideoWatched,
   onVideoCompleted,
-  required = false 
+  required = false
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [watchedPercentage, setWatchedPercentage] = useState(0);
   const [videoError, setVideoError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [timedOut, setTimedOut] = useState(false);
+
+  // Clear timeout helper
+  const clearLoadTimeout = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
+
+  // Start a loading timeout
+  const startLoadTimeout = useCallback(() => {
+    clearLoadTimeout();
+    timeoutRef.current = setTimeout(() => {
+      if (isLoading && !isPlaying) {
+        setTimedOut(true);
+        setIsLoading(false);
+        console.warn('[VideoPlayer] Load timeout reached for:', videoUrl);
+      }
+    }, LOAD_TIMEOUT_MS);
+  }, [clearLoadTimeout, isLoading, isPlaying, videoUrl]);
 
   // Reset state when URL changes
   useEffect(() => {
@@ -41,7 +65,11 @@ export function VideoPlayer({
     setIsPlaying(false);
     setProgress(0);
     setWatchedPercentage(0);
-  }, [videoUrl]);
+    setTimedOut(false);
+    startLoadTimeout();
+
+    return () => clearLoadTimeout();
+  }, [videoUrl]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -68,14 +96,22 @@ export function VideoPlayer({
       if (document.fullscreenElement) {
         document.exitFullscreen();
       } else {
-        videoRef.current.requestFullscreen();
+        videoRef.current.requestFullscreen().catch(() => {
+          // Fallback for iOS Safari - use webkitEnterFullscreen
+          const video = videoRef.current as any;
+          if (video?.webkitEnterFullscreen) {
+            video.webkitEnterFullscreen();
+          }
+        });
       }
     }
   };
 
   const handleRetry = () => {
     setVideoError(false);
+    setTimedOut(false);
     setIsLoading(true);
+    startLoadTimeout();
     if (videoRef.current) {
       videoRef.current.load();
     }
@@ -89,7 +125,7 @@ export function VideoPlayer({
       if (!video.duration || isNaN(video.duration)) return;
       const percentage = (video.currentTime / video.duration) * 100;
       setProgress(percentage);
-      
+
       if (percentage > watchedPercentage) {
         setWatchedPercentage(percentage);
         onVideoWatched?.(percentage);
@@ -99,7 +135,7 @@ export function VideoPlayer({
     const handleEnded = () => {
       setIsPlaying(false);
       onVideoEnd?.();
-      
+
       if (watchedPercentage >= 80 && videoId && routeId && moduleId) {
         onVideoCompleted?.(videoId, routeId, moduleId, video.currentTime);
       }
@@ -108,16 +144,24 @@ export function VideoPlayer({
     const handleCanPlay = () => {
       setIsLoading(false);
       setVideoError(false);
+      setTimedOut(false);
+      clearLoadTimeout();
     };
 
     const handleError = () => {
       setIsLoading(false);
       setVideoError(true);
+      clearLoadTimeout();
       console.error('[VideoPlayer] Error loading video:', videoUrl);
     };
 
     const handleWaiting = () => setIsLoading(true);
-    const handlePlaying = () => { setIsLoading(false); setIsPlaying(true); };
+    const handlePlaying = () => {
+      setIsLoading(false);
+      setIsPlaying(true);
+      setTimedOut(false);
+      clearLoadTimeout();
+    };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('ended', handleEnded);
@@ -134,16 +178,21 @@ export function VideoPlayer({
       video.removeEventListener('waiting', handleWaiting);
       video.removeEventListener('playing', handlePlaying);
     };
-  }, [watchedPercentage, onVideoEnd, onVideoWatched, onVideoCompleted, videoId, routeId, moduleId, videoUrl]);
+  }, [watchedPercentage, onVideoEnd, onVideoWatched, onVideoCompleted, videoId, routeId, moduleId, videoUrl, clearLoadTimeout]);
 
-  if (videoError) {
+  // Error or timeout state
+  if (videoError || timedOut) {
     return (
       <div className="w-full">
         <div className="bg-muted rounded-lg p-8 text-center space-y-3">
           <AlertCircle className="h-10 w-10 text-destructive mx-auto" />
-          <p className="text-sm font-medium">No se pudo cargar el video</p>
+          <p className="text-sm font-medium">
+            {timedOut ? 'El video tarda demasiado en cargar' : 'No se pudo cargar el video'}
+          </p>
           <p className="text-xs text-muted-foreground">
-            Verifica tu conexión a internet e inténtalo de nuevo.
+            {timedOut
+              ? 'Tu conexión puede ser lenta. Intenta de nuevo o conéctate a una red Wi-Fi.'
+              : 'Verifica tu conexión a internet e inténtalo de nuevo.'}
           </p>
           <Button variant="outline" size="sm" onClick={handleRetry} className="gap-2">
             <RefreshCw size={14} />
@@ -170,12 +219,13 @@ export function VideoPlayer({
           src={videoUrl}
           className="w-full h-auto"
           playsInline
-          preload="auto"
+          preload="metadata"
+          crossOrigin="anonymous"
         />
-        
+
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
           <Progress value={progress} className="mb-2" />
-          
+
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
               <Button
@@ -186,7 +236,7 @@ export function VideoPlayer({
               >
                 {isPlaying ? <Pause size={20} /> : <Play size={20} />}
               </Button>
-              
+
               <Button
                 variant="ghost"
                 size="icon"
@@ -196,7 +246,7 @@ export function VideoPlayer({
                 {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
               </Button>
             </div>
-            
+
             <Button
               variant="ghost"
               size="icon"
@@ -208,7 +258,7 @@ export function VideoPlayer({
           </div>
         </div>
       </div>
-      
+
       {required && watchedPercentage < 80 && (
         <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 p-2 rounded">
           ⚠️ Debes ver al menos el 80% del video para continuar

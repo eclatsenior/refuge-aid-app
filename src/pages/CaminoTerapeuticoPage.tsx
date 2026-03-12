@@ -389,7 +389,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
             <CardContent className="space-y-6">
               {videoData && (
                 <VideoPlayer
-                  videoUrl={videoData.video_url}
+                  videoUrl={videoData.signed_url || videoData.video_url}
                   videoName={videoData.video_name || undefined}
                   videoId={videoData.id}
                   routeId={selectedRoute.route_key}
