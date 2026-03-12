@@ -41,28 +41,23 @@ export function useAppSessionTracking() {
     };
 
     const endSession = async () => {
-      if (!sessionIdRef.current) return;
+      const currentSessionId = sessionIdRef.current;
+      if (!currentSessionId) return;
+      sessionIdRef.current = null;
 
       try {
-        // Check if we still have a valid auth session before calling
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) {
           console.debug('[AppSession] No valid session, skipping end tracking');
-          sessionIdRef.current = null;
           return;
         }
 
         await supabase.functions.invoke('track-app-session', {
-          body: { 
-            action: 'end', 
-            session_id: sessionIdRef.current 
-          }
+          body: { action: 'end', session_id: currentSessionId }
         });
-        console.debug('[AppSession] Session ended:', sessionIdRef.current);
-        sessionIdRef.current = null;
+        console.debug('[AppSession] Session ended:', currentSessionId);
       } catch (error) {
-        console.error('[AppSession] Error ending session:', error);
-        sessionIdRef.current = null;
+        console.debug('[AppSession] Could not end session (likely logged out):', error);
       }
     };
 
