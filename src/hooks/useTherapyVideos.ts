@@ -10,9 +10,71 @@ interface TherapyVideo {
   is_required: boolean;
 }
 
+interface TherapyVideoWithSignedUrl extends TherapyVideo {
+  signed_url: string | null;
+}
+
+/**
+ * Extracts the storage path from a Supabase public URL or returns the value as-is if it's already a path.
+ * Handles: https://xxx.supabase.co/storage/v1/object/public/therapy-videos/path/to/file.mp4
+ */
+function extractStoragePath(videoUrl: string): string {
+  const marker = '/therapy-videos/';
+  const idx = videoUrl.indexOf(marker);
+  if (idx !== -1) {
+    return decodeURIComponent(videoUrl.substring(idx + marker.length));
+  }
+  // Already a relative path
+  return videoUrl;
+}
+
+/**
+ * Generates a signed URL for a video in the private therapy-videos bucket.
+ * Signed URLs are valid for 1 hour (3600 seconds).
+ */
+async function getSignedUrl(videoUrl: string): Promise<string | null> {
+  try {
+    const path = extractStoragePath(videoUrl);
+    const { data, error } = await supabase.storage
+      .from('therapy-videos')
+      .createSignedUrl(path, 3600); // 1 hour expiry
+
+    if (error) {
+      console.error('[useTherapyVideos] Error creating signed URL for', path, error.message);
+      return null;
+    }
+    return data.signedUrl;
+  } catch (e) {
+    console.error('[useTherapyVideos] Exception creating signed URL:', e);
+    return null;
+  }
+}
+
 export function useTherapyVideos() {
-  const [videos, setVideos] = useState<Record<string, TherapyVideo>>({});
+  const [videos, setVideos] = useState<Record<string, TherapyVideoWithSignedUrl>>({});
   const [loading, setLoading] = useState(true);
+
+  const generateSignedUrls = useCallback(async (videoList: TherapyVideo[]): Promise<Record<string, TherapyVideoWithSignedUrl>> => {
+    const videoMap: Record<string, TherapyVideoWithSignedUrl> = {};
+
+    // Generate signed URLs in parallel (batch of all videos)
+    const results = await Promise.allSettled(
+      videoList.map(async (video) => {
+        const signedUrl = await getSignedUrl(video.video_url);
+        return { video, signedUrl };
+      })
+    );
+
+    results.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        const { video, signedUrl } = result.value;
+        const key = `${video.route_id}-${video.module_id}`;
+        videoMap[key] = { ...video, signed_url: signedUrl };
+      }
+    });
+
+    return videoMap;
+  }, []);
 
   const fetchVideos = useCallback(async () => {
     try {
@@ -23,62 +85,42 @@ export function useTherapyVideos() {
 
       if (error) throw error;
 
-      // Si obtenemos 0 videos, reintentar una vez después de 1.5s
       if (!data || data.length === 0) {
-        console.debug('[useTherapyVideos] Primera carga: 0 videos. Reintentando en 1.5s...');
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        const { data: retryData, error: retryError } = await supabase
-          .from('therapy_videos')
-          .select('*');
-        
-        if (retryError) throw retryError;
-        
-        const videoMap: Record<string, TherapyVideo> = {};
-        retryData?.forEach(video => {
-          const key = `${video.route_id}-${video.module_id}`;
-          videoMap[key] = video;
-        });
-        
-        setVideos(videoMap);
-        console.debug('[useTherapyVideos] Reintento exitoso. Videos:', Object.keys(videoMap));
+        setVideos({});
+        console.debug('[useTherapyVideos] No videos found.');
       } else {
-        const videoMap: Record<string, TherapyVideo> = {};
-        data.forEach(video => {
-          const key = `${video.route_id}-${video.module_id}`;
-          videoMap[key] = video;
-        });
-        
+        const videoMap = await generateSignedUrls(data);
         setVideos(videoMap);
-        console.debug('[useTherapyVideos] Loaded videos:', Object.keys(videoMap));
+        console.debug('[useTherapyVideos] Loaded videos with signed URLs:', Object.keys(videoMap));
       }
     } catch (error) {
       console.error('[useTherapyVideos] Error loading therapy videos:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [generateSignedUrls]);
 
   useEffect(() => {
     fetchVideos();
 
-    // Suscripción Realtime para actualizaciones en vivo
+    // Realtime subscription for live updates
     const channel = supabase
       .channel('therapy_videos_changes')
       .on(
         'postgres_changes',
         {
-          event: '*', // INSERT, UPDATE, DELETE
+          event: '*',
           schema: 'public',
           table: 'therapy_videos'
         },
-        (payload) => {
-          console.debug('[useTherapyVideos] Realtime event:', payload.eventType, payload);
-          
+        async (payload) => {
+          console.debug('[useTherapyVideos] Realtime event:', payload.eventType);
+
           if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
             const video = payload.new as TherapyVideo;
             const key = `${video.route_id}-${video.module_id}`;
-            setVideos(prev => ({ ...prev, [key]: video }));
+            const signedUrl = await getSignedUrl(video.video_url);
+            setVideos(prev => ({ ...prev, [key]: { ...video, signed_url: signedUrl } }));
           } else if (payload.eventType === 'DELETE') {
             const video = payload.old as TherapyVideo;
             const key = `${video.route_id}-${video.module_id}`;
@@ -92,14 +134,14 @@ export function useTherapyVideos() {
       )
       .subscribe();
 
-    // Recargar cuando el usuario vuelve a la pestaña
+    // Refresh signed URLs when user returns to the tab (they expire after 1h)
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        console.debug('[useTherapyVideos] Pestaña visible, recargando videos...');
+        console.debug('[useTherapyVideos] Tab visible, refreshing signed URLs...');
         fetchVideos();
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
