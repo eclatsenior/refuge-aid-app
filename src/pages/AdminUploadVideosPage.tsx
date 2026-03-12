@@ -269,11 +269,7 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl: url } } = supabase.storage
-          .from('therapy-videos')
-          .getPublicUrl(fileName);
-        
-        publicUrl = url;
+        storagePath = fileName;
       }
 
       // Insertar en base de datos
