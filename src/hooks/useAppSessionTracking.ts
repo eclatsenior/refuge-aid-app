@@ -7,15 +7,35 @@ export function useAppSessionTracking() {
   useEffect(() => {
     let isActive = true;
 
+    const getValidatedUser = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        const message = (error?.message || '').toLowerCase();
+        const isStaleSession =
+          message.includes('session') ||
+          message.includes('jwt') ||
+          message.includes('token');
+
+        if (isStaleSession) {
+          await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined);
+        }
+
+        return null;
+      }
+
+      return user;
+    };
+
     const startSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user || !isActive) {
-          console.debug('[AppSession] No active session, skipping tracking');
+        const user = await getValidatedUser();
+        if (!user || !isActive) {
+          console.debug('[AppSession] No valid user, skipping tracking');
           return;
         }
 
-        console.debug('[AppSession] Starting session for user:', session.user.id);
+        console.debug('[AppSession] Starting session for user:', user.id);
 
         const { data, error } = await supabase.functions.invoke('track-app-session', {
           body: { action: 'start' }
