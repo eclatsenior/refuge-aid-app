@@ -122,17 +122,22 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
     }
   };
 
-  const getStoragePath = (videoUrl: string): string | null => {
+  const getStoragePath = (videoUrlOrPath: string): string | null => {
     try {
-      // Extract path after /therapy-videos/ from the public URL
-      // URL format: https://xxx.supabase.co/storage/v1/object/public/therapy-videos/path/to/file.mp4
+      if (!videoUrlOrPath) return null;
+
       const marker = '/therapy-videos/';
-      const idx = videoUrl.indexOf(marker);
-      if (idx === -1) return null;
-      const path = videoUrl.substring(idx + marker.length);
-      return decodeURIComponent(path);
+      const idx = videoUrlOrPath.indexOf(marker);
+
+      if (idx !== -1) {
+        const path = videoUrlOrPath.substring(idx + marker.length);
+        return decodeURIComponent(path);
+      }
+
+      // Already a relative storage path
+      return decodeURIComponent(videoUrlOrPath.replace(/^\/+/, ''));
     } catch (e) {
-      console.error('Error parsing video URL:', e);
+      console.error('Error parsing video URL/path:', e);
       return null;
     }
   };
