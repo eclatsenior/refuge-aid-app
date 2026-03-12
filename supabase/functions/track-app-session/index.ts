@@ -27,17 +27,17 @@ serve(async (req) => {
     );
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
-    if (claimsError || !claimsData?.claims?.sub) {
-      console.error('[track-app-session] Auth error:', claimsError?.message || 'No claims');
+    if (userError || !user) {
+      console.error('[track-app-session] Auth error:', userError?.message || 'No user');
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 401,
       });
     }
 
-    const userId = claimsData.claims.sub;
+    const userId = user.id;
     const { action, session_id } = await req.json();
 
     if (action === 'start') {
