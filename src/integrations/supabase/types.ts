@@ -928,6 +928,8 @@ export type Database = {
           is_required: boolean | null
           module_id: string
           route_id: string
+          storage_bucket: string | null
+          storage_path: string | null
           updated_at: string | null
           video_name: string | null
           video_url: string
@@ -940,6 +942,8 @@ export type Database = {
           is_required?: boolean | null
           module_id: string
           route_id: string
+          storage_bucket?: string | null
+          storage_path?: string | null
           updated_at?: string | null
           video_name?: string | null
           video_url: string
@@ -952,6 +956,8 @@ export type Database = {
           is_required?: boolean | null
           module_id?: string
           route_id?: string
+          storage_bucket?: string | null
+          storage_path?: string | null
           updated_at?: string | null
           video_name?: string | null
           video_url?: string

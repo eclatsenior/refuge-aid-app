@@ -122,17 +122,22 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
     }
   };
 
-  const getStoragePath = (videoUrl: string): string | null => {
+  const getStoragePath = (videoUrlOrPath: string): string | null => {
     try {
-      // Extract path after /therapy-videos/ from the public URL
-      // URL format: https://xxx.supabase.co/storage/v1/object/public/therapy-videos/path/to/file.mp4
+      if (!videoUrlOrPath) return null;
+
       const marker = '/therapy-videos/';
-      const idx = videoUrl.indexOf(marker);
-      if (idx === -1) return null;
-      const path = videoUrl.substring(idx + marker.length);
-      return decodeURIComponent(path);
+      const idx = videoUrlOrPath.indexOf(marker);
+
+      if (idx !== -1) {
+        const path = videoUrlOrPath.substring(idx + marker.length);
+        return decodeURIComponent(path);
+      }
+
+      // Already a relative storage path
+      return decodeURIComponent(videoUrlOrPath.replace(/^\/+/, ''));
     } catch (e) {
-      console.error('Error parsing video URL:', e);
+      console.error('Error parsing video URL/path:', e);
       return null;
     }
   };
@@ -189,13 +194,13 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
       const sanitizedName = sanitizeFileName(videoFile.name);
       const fileName = `${selectedRoute}/${selectedModule}/${Date.now()}_${sanitizedName}`;
       const largeFileThreshold = 50 * 1024 * 1024; // 50MB
-      let publicUrl: string;
+      let storagePath: string;
 
       if (videoFile.size > largeFileThreshold) {
         // Usar TUS (subida reanudable) para archivos > 50MB
         console.log('📤 Archivo grande detectado, usando subida reanudable (TUS)...');
         
-        publicUrl = await new Promise<string>((resolve, reject) => {
+        storagePath = await new Promise<string>((resolve, reject) => {
           const upload = new tus.Upload(videoFile, {
             endpoint: SUPABASE_STORAGE_RESUMABLE_URL,
             retryDelays: [0, 3000, 5000, 10000, 20000],
@@ -233,10 +238,7 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
             },
             onSuccess: () => {
               console.log('✅ Subida TUS completada');
-              const { data: { publicUrl: url } } = supabase.storage
-                .from('therapy-videos')
-                .getPublicUrl(fileName);
-              resolve(url);
+              resolve(fileName);
             }
           });
 
@@ -267,11 +269,7 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl: url } } = supabase.storage
-          .from('therapy-videos')
-          .getPublicUrl(fileName);
-        
-        publicUrl = url;
+        storagePath = fileName;
       }
 
       // Insertar en base de datos
@@ -280,7 +278,9 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
         .insert({
           route_id: selectedRoute,
           module_id: selectedModule,
-          video_url: publicUrl,
+          video_url: storagePath,
+          storage_bucket: 'therapy-videos',
+          storage_path: storagePath,
           video_name: videoFile.name,
           file_size: videoFile.size,
           is_required: isRequired
