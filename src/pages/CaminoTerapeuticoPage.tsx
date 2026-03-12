@@ -332,6 +332,8 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
     }
     const progress = ((currentModule + 1) / selectedRoute.modules.length) * 100;
     const videoData = getVideoForModule(selectedRoute.route_key, module.module_key);
+    const fallbackSignedUrl = videoData?.video_url?.includes('/object/sign/') ? videoData.video_url : null;
+    const playableVideoUrl = videoData?.signed_url || fallbackSignedUrl || null;
     const videoRequired = videoData?.is_required || false;
     const canProceed = !videoRequired || videoWatchedPercentage >= 80;
     
