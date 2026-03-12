@@ -219,8 +219,8 @@ export function VideoPlayer({
           src={videoUrl}
           className="w-full h-auto"
           playsInline
+          muted={false}
           preload="metadata"
-          crossOrigin="anonymous"
         />
 
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
