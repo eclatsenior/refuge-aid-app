@@ -96,7 +96,7 @@ export function CalmPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
-  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+  const [timer, setTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
   const { toast } = useToast();
   
   const startExercise = (exercise: CalmExercise) => {
