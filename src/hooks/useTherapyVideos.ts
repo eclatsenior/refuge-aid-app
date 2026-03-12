@@ -33,21 +33,40 @@ function extractStoragePath(videoUrl: string): string {
  * Signed URLs are valid for 1 hour (3600 seconds).
  */
 async function getSignedUrl(videoUrl: string): Promise<string | null> {
-  try {
-    const path = extractStoragePath(videoUrl);
-    const { data, error } = await supabase.storage
-      .from('therapy-videos')
-      .createSignedUrl(path, 3600); // 1 hour expiry
+  const path = extractStoragePath(videoUrl);
+  const maxAttempts = 2;
 
-    if (error) {
-      console.error('[useTherapyVideos] Error creating signed URL for', path, error.message);
-      return null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const { data, error } = await supabase.storage
+        .from('therapy-videos')
+        .createSignedUrl(path, 3600); // 1 hour expiry
+
+      if (error || !data?.signedUrl) {
+        console.error(`[useTherapyVideos] Signed URL attempt ${attempt}/${maxAttempts} failed for ${path}:`, error?.message || 'No signedUrl returned');
+      } else {
+        const signedUrl = data.signedUrl;
+        if (signedUrl.startsWith('http')) return signedUrl;
+
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        if (!supabaseUrl) {
+          console.error('[useTherapyVideos] Missing VITE_SUPABASE_URL to normalize signed URL');
+          return null;
+        }
+
+        // Normalize relative signed URL (e.g. /object/sign/...) to absolute URL
+        return `${supabaseUrl}/storage/v1${signedUrl}`;
+      }
+    } catch (e) {
+      console.error(`[useTherapyVideos] Exception creating signed URL (attempt ${attempt}/${maxAttempts}):`, e);
     }
-    return data.signedUrl;
-  } catch (e) {
-    console.error('[useTherapyVideos] Exception creating signed URL:', e);
-    return null;
+
+    if (attempt < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
   }
+
+  return null;
 }
 
 export function useTherapyVideos() {

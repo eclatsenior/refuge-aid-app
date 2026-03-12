@@ -401,6 +401,12 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                   onVideoCompleted={handleVideoCompleted}
                 />
               )}
+
+              {videoData && !playableVideoUrl && (
+                <div className="rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground">
+                  No se pudo generar un enlace seguro para este video. Reintenta en unos segundos.
+                </div>
+              )}
               
               {selectedRoute.route_key === 'aromaterapia' && module.module_key === 'library' ? (
                 <div className="space-y-4">
