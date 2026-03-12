@@ -26,7 +26,7 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword, onClose }: Vaul
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const [countdown, setCountdown] = useState(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Verificar si hay bloqueo activo
