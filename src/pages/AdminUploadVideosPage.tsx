@@ -238,10 +238,7 @@ export function AdminUploadVideosPage({ embedded = false, onBack }: AdminUploadV
             },
             onSuccess: () => {
               console.log('✅ Subida TUS completada');
-              const { data: { publicUrl: url } } = supabase.storage
-                .from('therapy-videos')
-                .getPublicUrl(fileName);
-              resolve(url);
+              resolve(fileName);
             }
           });
 
