@@ -276,7 +276,7 @@ export function VideoPlayer({
   return (
     <div className="w-full space-y-3">
       <div ref={containerRef} className="relative bg-black rounded-lg overflow-hidden shadow-lg" onContextMenu={(e) => e.preventDefault()}>
-        {isLoading && !isPlaying && (
+        {hasPlaybackAttempt && isLoading && !isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
             <div className="flex flex-col items-center gap-2">
               <RefreshCw size={24} className="text-white animate-spin" />
