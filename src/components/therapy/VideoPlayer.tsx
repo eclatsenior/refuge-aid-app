@@ -103,39 +103,35 @@ export function VideoPlayer({
       return;
     }
 
+    setHasPlaybackAttempt(true);
+    setVideoError(false);
+    setTimedOut(false);
+    setIsLoading(true);
+    startLoadTimeout(LOAD_TIMEOUT_MS);
+
+    if (video.networkState === HTMLMediaElement.NETWORK_EMPTY) {
+      video.load();
+    }
+
+    // Importante: intentar play() inmediatamente dentro del gesto del usuario
+    // para evitar bloqueos de reproducción en iOS/Android.
     try {
-      setHasPlaybackAttempt(true);
-      setVideoError(false);
-      setTimedOut(false);
-      setIsLoading(true);
-      startLoadTimeout(LOAD_TIMEOUT_MS);
-
-      if (video.networkState === HTMLMediaElement.NETWORK_EMPTY) {
-        video.load();
-      }
-
-      // Wait for enough data before attempting play on mobile
-      if (video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) {
-        await new Promise<void>((resolve, reject) => {
-          const onReady = () => { cleanup(); resolve(); };
-          const onErr = () => { cleanup(); reject(new Error('load_error')); };
-          const cleanup = () => {
-            video.removeEventListener('canplay', onReady);
-            video.removeEventListener('error', onErr);
-          };
-          video.addEventListener('canplay', onReady, { once: true });
-          video.addEventListener('error', onErr, { once: true });
-        });
-      }
-
-      await unlockForMobilePlayback();
       await video.play();
       setIsPlaying(true);
+      return;
     } catch {
-      setVideoError(true);
-      setIsPlaying(false);
-      setIsLoading(false);
-      clearLoadTimeout();
+      // Fallback para navegadores móviles más estrictos.
+      try {
+        await unlockForMobilePlayback();
+        await video.play();
+        setIsPlaying(true);
+        return;
+      } catch {
+        setVideoError(true);
+        setIsPlaying(false);
+        setIsLoading(false);
+        clearLoadTimeout();
+      }
     }
   };
 
