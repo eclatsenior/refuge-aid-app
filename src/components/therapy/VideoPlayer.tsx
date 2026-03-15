@@ -103,10 +103,15 @@ export function VideoPlayer({
     }
 
     try {
+      setHasPlaybackAttempt(true);
       setVideoError(false);
       setTimedOut(false);
       setIsLoading(true);
       startLoadTimeout();
+
+      if (video.networkState === HTMLMediaElement.NETWORK_EMPTY) {
+        video.load();
+      }
 
       await unlockForMobilePlayback();
       await video.play();
