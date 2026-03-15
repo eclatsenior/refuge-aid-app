@@ -251,7 +251,7 @@ export function VideoPlayer({
     startLoadTimeout,
   ]);
 
-  if (videoError || timedOut) {
+  if (hasPlaybackAttempt && (videoError || timedOut)) {
     return (
       <div className="w-full">
         <div className="bg-muted rounded-lg p-8 text-center space-y-3">
