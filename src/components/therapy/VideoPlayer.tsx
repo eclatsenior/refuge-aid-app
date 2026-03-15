@@ -208,7 +208,13 @@ export function VideoPlayer({
       });
     };
 
-    const handleWaiting = () => setIsLoading(true);
+    const handleWaiting = () => {
+      if (hasPlaybackAttempt) {
+        setIsLoading(true);
+        startLoadTimeout();
+      }
+    };
+
     const handlePlaying = () => {
       setIsLoading(false);
       setIsPlaying(true);
