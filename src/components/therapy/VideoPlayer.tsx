@@ -226,7 +226,7 @@ export function VideoPlayer({
     const handleWaiting = () => {
       if (hasPlaybackAttempt) {
         setIsLoading(true);
-        startLoadTimeout();
+        startLoadTimeout(BUFFERING_TIMEOUT_MS);
       }
     };
 
