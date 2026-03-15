@@ -16,7 +16,8 @@ interface VideoPlayerProps {
   required?: boolean;
 }
 
-const LOAD_TIMEOUT_MS = 15000;
+const LOAD_TIMEOUT_MS = 45000; // 45s for large files on mobile
+const BUFFERING_TIMEOUT_MS = 30000; // 30s for mid-stream buffering
 
 export function VideoPlayer({
   videoUrl,
