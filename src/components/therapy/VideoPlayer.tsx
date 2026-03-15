@@ -12,6 +12,7 @@ interface VideoPlayerProps {
   onVideoEnd?: () => void;
   onVideoWatched?: (percentage: number) => void;
   onVideoCompleted?: (videoId: string, routeId: string, moduleId: string, duration: number) => void;
+  onRefreshVideoUrl?: () => Promise<void> | void;
   required?: boolean;
 }
 
