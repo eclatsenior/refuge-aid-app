@@ -301,7 +301,7 @@ export function VideoPlayer({
           src={videoUrl}
           className="w-full h-auto"
           playsInline
-          preload="none"
+          preload="metadata"
           disablePictureInPicture
           disableRemotePlayback
           controlsList="nodownload noplaybackrate noremoteplayback"
