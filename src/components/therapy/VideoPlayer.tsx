@@ -52,13 +52,13 @@ export function VideoPlayer({
     }
   }, []);
 
-  const startLoadTimeout = useCallback(() => {
+  const startLoadTimeout = useCallback((ms: number = LOAD_TIMEOUT_MS) => {
     clearLoadTimeout();
     timeoutRef.current = setTimeout(() => {
       setTimedOut(true);
       setIsLoading(false);
       console.warn('[VideoPlayer] Load timeout reached for:', videoUrl);
-    }, LOAD_TIMEOUT_MS);
+    }, ms);
   }, [clearLoadTimeout, videoUrl]);
 
   const unlockForMobilePlayback = useCallback(async () => {
