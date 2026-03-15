@@ -36,7 +36,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
   );
   const [videoWatchedPercentage, setVideoWatchedPercentage] = useState(0);
   
-  const { getVideoForModule, loading: videosLoading } = useTherapyVideos();
+  const { getVideoForModule, loading: videosLoading, refresh: refreshTherapyVideos } = useTherapyVideos();
   const { routes, loading: routesLoading, error: routesError } = useTherapyRoutes();
 
   useEffect(() => {
