@@ -12,6 +12,7 @@ interface VideoPlayerProps {
   onVideoEnd?: () => void;
   onVideoWatched?: (percentage: number) => void;
   onVideoCompleted?: (videoId: string, routeId: string, moduleId: string, duration: number) => void;
+  onRefreshVideoUrl?: () => Promise<void> | void;
   required?: boolean;
 }
 
@@ -26,6 +27,7 @@ export function VideoPlayer({
   onVideoEnd,
   onVideoWatched,
   onVideoCompleted,
+  onRefreshVideoUrl,
   required = false
 }: VideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -38,8 +40,9 @@ export function VideoPlayer({
   const [progress, setProgress] = useState(0);
   const [watchedPercentage, setWatchedPercentage] = useState(0);
   const [videoError, setVideoError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
+  const [hasPlaybackAttempt, setHasPlaybackAttempt] = useState(false);
 
   const clearLoadTimeout = useCallback(() => {
     if (timeoutRef.current) {
@@ -78,16 +81,16 @@ export function VideoPlayer({
 
   useEffect(() => {
     setVideoError(false);
-    setIsLoading(true);
+    setIsLoading(false);
     setIsPlaying(false);
     setProgress(0);
     setWatchedPercentage(0);
     setTimedOut(false);
+    setHasPlaybackAttempt(false);
     unlockedRef.current = false;
-    startLoadTimeout();
 
     return () => clearLoadTimeout();
-  }, [videoUrl, startLoadTimeout, clearLoadTimeout]);
+  }, [videoUrl, clearLoadTimeout]);
 
   const togglePlay = async () => {
     const video = videoRef.current;
@@ -100,10 +103,15 @@ export function VideoPlayer({
     }
 
     try {
+      setHasPlaybackAttempt(true);
       setVideoError(false);
       setTimedOut(false);
       setIsLoading(true);
       startLoadTimeout();
+
+      if (video.networkState === HTMLMediaElement.NETWORK_EMPTY) {
+        video.load();
+      }
 
       await unlockForMobilePlayback();
       await video.play();
@@ -140,11 +148,19 @@ export function VideoPlayer({
     }
   };
 
-  const handleRetry = () => {
+  const handleRetry = async () => {
+    setHasPlaybackAttempt(true);
     setVideoError(false);
     setTimedOut(false);
     setIsLoading(true);
     startLoadTimeout();
+
+    try {
+      await onRefreshVideoUrl?.();
+    } catch {
+      // Si falla el refresh, igualmente intentamos recargar el elemento de video
+    }
+
     videoRef.current?.load();
   };
 
@@ -192,7 +208,13 @@ export function VideoPlayer({
       });
     };
 
-    const handleWaiting = () => setIsLoading(true);
+    const handleWaiting = () => {
+      if (hasPlaybackAttempt) {
+        setIsLoading(true);
+        startLoadTimeout();
+      }
+    };
+
     const handlePlaying = () => {
       setIsLoading(false);
       setIsPlaying(true);
@@ -215,9 +237,21 @@ export function VideoPlayer({
       video.removeEventListener('waiting', handleWaiting);
       video.removeEventListener('playing', handlePlaying);
     };
-  }, [watchedPercentage, onVideoEnd, onVideoWatched, onVideoCompleted, videoId, routeId, moduleId, videoUrl, clearLoadTimeout]);
+  }, [
+    watchedPercentage,
+    onVideoEnd,
+    onVideoWatched,
+    onVideoCompleted,
+    videoId,
+    routeId,
+    moduleId,
+    videoUrl,
+    clearLoadTimeout,
+    hasPlaybackAttempt,
+    startLoadTimeout,
+  ]);
 
-  if (videoError || timedOut) {
+  if (hasPlaybackAttempt && (videoError || timedOut)) {
     return (
       <div className="w-full">
         <div className="bg-muted rounded-lg p-8 text-center space-y-3">
@@ -242,7 +276,7 @@ export function VideoPlayer({
   return (
     <div className="w-full space-y-3">
       <div ref={containerRef} className="relative bg-black rounded-lg overflow-hidden shadow-lg" onContextMenu={(e) => e.preventDefault()}>
-        {isLoading && !isPlaying && (
+        {hasPlaybackAttempt && isLoading && !isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
             <div className="flex flex-col items-center gap-2">
               <RefreshCw size={24} className="text-white animate-spin" />
@@ -256,7 +290,7 @@ export function VideoPlayer({
           src={videoUrl}
           className="w-full h-auto"
           playsInline
-          preload="metadata"
+          preload="none"
           disablePictureInPicture
           disableRemotePlayback
           controlsList="nodownload noplaybackrate noremoteplayback"
