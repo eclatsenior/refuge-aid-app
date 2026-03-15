@@ -16,7 +16,8 @@ interface VideoPlayerProps {
   required?: boolean;
 }
 
-const LOAD_TIMEOUT_MS = 15000;
+const LOAD_TIMEOUT_MS = 45000; // 45s for large files on mobile
+const BUFFERING_TIMEOUT_MS = 30000; // 30s for mid-stream buffering
 
 export function VideoPlayer({
   videoUrl,
@@ -51,13 +52,13 @@ export function VideoPlayer({
     }
   }, []);
 
-  const startLoadTimeout = useCallback(() => {
+  const startLoadTimeout = useCallback((ms: number = LOAD_TIMEOUT_MS) => {
     clearLoadTimeout();
     timeoutRef.current = setTimeout(() => {
       setTimedOut(true);
       setIsLoading(false);
       console.warn('[VideoPlayer] Load timeout reached for:', videoUrl);
-    }, LOAD_TIMEOUT_MS);
+    }, ms);
   }, [clearLoadTimeout, videoUrl]);
 
   const unlockForMobilePlayback = useCallback(async () => {
@@ -107,10 +108,24 @@ export function VideoPlayer({
       setVideoError(false);
       setTimedOut(false);
       setIsLoading(true);
-      startLoadTimeout();
+      startLoadTimeout(LOAD_TIMEOUT_MS);
 
       if (video.networkState === HTMLMediaElement.NETWORK_EMPTY) {
         video.load();
+      }
+
+      // Wait for enough data before attempting play on mobile
+      if (video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) {
+        await new Promise<void>((resolve, reject) => {
+          const onReady = () => { cleanup(); resolve(); };
+          const onErr = () => { cleanup(); reject(new Error('load_error')); };
+          const cleanup = () => {
+            video.removeEventListener('canplay', onReady);
+            video.removeEventListener('error', onErr);
+          };
+          video.addEventListener('canplay', onReady, { once: true });
+          video.addEventListener('error', onErr, { once: true });
+        });
       }
 
       await unlockForMobilePlayback();
@@ -211,7 +226,7 @@ export function VideoPlayer({
     const handleWaiting = () => {
       if (hasPlaybackAttempt) {
         setIsLoading(true);
-        startLoadTimeout();
+        startLoadTimeout(BUFFERING_TIMEOUT_MS);
       }
     };
 
