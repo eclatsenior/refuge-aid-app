@@ -27,6 +27,7 @@ export function VideoPlayer({
   onVideoEnd,
   onVideoWatched,
   onVideoCompleted,
+  onRefreshVideoUrl,
   required = false
 }: VideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
