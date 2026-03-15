@@ -81,16 +81,16 @@ export function VideoPlayer({
 
   useEffect(() => {
     setVideoError(false);
-    setIsLoading(true);
+    setIsLoading(false);
     setIsPlaying(false);
     setProgress(0);
     setWatchedPercentage(0);
     setTimedOut(false);
+    setHasPlaybackAttempt(false);
     unlockedRef.current = false;
-    startLoadTimeout();
 
     return () => clearLoadTimeout();
-  }, [videoUrl, startLoadTimeout, clearLoadTimeout]);
+  }, [videoUrl, clearLoadTimeout]);
 
   const togglePlay = async () => {
     const video = videoRef.current;
