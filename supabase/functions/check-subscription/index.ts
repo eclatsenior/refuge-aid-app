@@ -76,49 +76,58 @@ serve(async (req) => {
 
     logStep("Profile loaded", { role: profile.role, managed: profile.managed_by_lead });
 
-    // Si es empleado y está gestionado por un Lead
-    if (profile.role === 'employee' && profile.managed_by_lead) {
-      logStep("Checking managed employee access");
+    // Si es empleado, primero intentar acceso por empresa (Lead asignado)
+    if (profile.role === 'employee') {
+      logStep("Checking company-managed employee access");
       
-      // Buscar su asignación a un Lead
       const { data: assignment, error: assignmentError } = await supabaseClient
         .from('employee_assignments')
         .select('refugi_lead_id')
         .eq('employee_id', userId)
-        .single();
-      
-      if (assignment && !assignmentError) {
+        .maybeSingle();
+
+      if (assignmentError) {
+        logStep("Error checking assignment", { error: assignmentError.message });
+      }
+
+      if (assignment?.refugi_lead_id) {
         logStep("Assignment found", { leadId: assignment.refugi_lead_id });
-        
-        // Verificar que el Lead tenga suscripción activa
+
         const { data: leadSub, error: leadSubError } = await supabaseClient
           .from('subscriptions')
           .select('*')
           .eq('refugi_lead_id', assignment.refugi_lead_id)
           .eq('status', 'active')
-          .single();
-        
-        if (leadSub && !leadSubError && new Date(leadSub.current_period_end) > new Date()) {
-          logStep("Lead has active subscription", { 
+          .gt('current_period_end', new Date().toISOString())
+          .order('current_period_end', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (leadSubError) {
+          logStep("Error checking lead subscription", { error: leadSubError.message });
+        }
+
+        if (leadSub) {
+          logStep("Lead has active subscription", {
             productId: leadSub.product_id,
-            employeeLimit: leadSub.employee_limit 
+            employeeLimit: leadSub.employee_limit,
           });
-          
+
           return new Response(JSON.stringify({
             subscribed: true,
             type: 'managed',
             managed_by: assignment.refugi_lead_id,
             product_id: leadSub.product_id,
             subscription_end: leadSub.current_period_end,
-            employee_limit: leadSub.employee_limit
+            employee_limit: leadSub.employee_limit,
           }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
             status: 200,
           });
         }
       }
-      
-      logStep("No valid Lead subscription found for managed employee");
+
+      logStep("No valid company subscription found for employee");
     }
 
     // Si es empleado individual (no gestionado) o si el Lead no tiene sub activa
