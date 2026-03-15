@@ -237,7 +237,19 @@ export function VideoPlayer({
       video.removeEventListener('waiting', handleWaiting);
       video.removeEventListener('playing', handlePlaying);
     };
-  }, [watchedPercentage, onVideoEnd, onVideoWatched, onVideoCompleted, videoId, routeId, moduleId, videoUrl, clearLoadTimeout]);
+  }, [
+    watchedPercentage,
+    onVideoEnd,
+    onVideoWatched,
+    onVideoCompleted,
+    videoId,
+    routeId,
+    moduleId,
+    videoUrl,
+    clearLoadTimeout,
+    hasPlaybackAttempt,
+    startLoadTimeout,
+  ]);
 
   if (videoError || timedOut) {
     return (
