@@ -148,11 +148,19 @@ export function VideoPlayer({
     }
   };
 
-  const handleRetry = () => {
+  const handleRetry = async () => {
+    setHasPlaybackAttempt(true);
     setVideoError(false);
     setTimedOut(false);
     setIsLoading(true);
     startLoadTimeout();
+
+    try {
+      await onRefreshVideoUrl?.();
+    } catch {
+      // Si falla el refresh, igualmente intentamos recargar el elemento de video
+    }
+
     videoRef.current?.load();
   };
 
