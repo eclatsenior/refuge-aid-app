@@ -398,6 +398,7 @@ export function CaminoTerapeuticoPage({ onNavigate }: CaminoTerapeuticoPageProps
                   required={videoData.is_required}
                   onVideoWatched={setVideoWatchedPercentage}
                   onVideoCompleted={handleVideoCompleted}
+                  onRefreshVideoUrl={refreshTherapyVideos}
                 />
               )}
 
