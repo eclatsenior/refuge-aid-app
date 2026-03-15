@@ -40,8 +40,9 @@ export function VideoPlayer({
   const [progress, setProgress] = useState(0);
   const [watchedPercentage, setWatchedPercentage] = useState(0);
   const [videoError, setVideoError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
+  const [hasPlaybackAttempt, setHasPlaybackAttempt] = useState(false);
 
   const clearLoadTimeout = useCallback(() => {
     if (timeoutRef.current) {
