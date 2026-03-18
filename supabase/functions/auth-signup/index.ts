@@ -272,7 +272,7 @@ serve(async (req: Request) => {
       console.log('[AUTH-SIGNUP] Skipping profile/status creation for existing user');
     }
 
-    // Invoke send-verification-email to send our branded email
+    // Invoke send-verification-email using fetch with service role key
     console.log('[AUTH-SIGNUP] About to invoke send-verification-email with:', {
       email,
       fullName,
@@ -281,38 +281,35 @@ serve(async (req: Request) => {
       send_custom_verification
     });
     
-    const { data: emailData, error: emailError } = await supabaseAdmin.functions.invoke(
-      'send-verification-email',
-      {
-        body: {
-          type: 'INSERT',
-          table: 'users',
-          record: {
-            id: userData.user.id,
-            email: email,
-            raw_user_meta_data: {
-              full_name: fullName,
-              role: role
-            }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    
+    try {
+      const emailResponse = await fetch(
+        `${supabaseUrl}/functions/v1/send-verification-email`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${serviceRoleKey}`,
           },
-          send_custom_verification: send_custom_verification === true,
-          redirectOrigin
+          body: JSON.stringify({
+            email: email,
+            userName: fullName
+          }),
         }
+      );
+      
+      const emailData = await emailResponse.json();
+      
+      if (!emailResponse.ok) {
+        console.error('[AUTH-SIGNUP] Error sending verification email:', emailData);
+      } else {
+        console.log('[AUTH-SIGNUP] Verification email sent successfully:', emailData);
       }
-    );
-
-    if (emailError) {
-      console.error('[AUTH-SIGNUP] Error sending verification email:', {
-        error: emailError,
-        message: emailError.message,
-        details: emailError
-      });
+    } catch (emailError: any) {
+      console.error('[AUTH-SIGNUP] Error calling send-verification-email:', emailError.message);
       // Don't fail the signup if email fails
-    } else {
-      console.log('[AUTH-SIGNUP] Verification email sent successfully:', {
-        data: emailData,
-        emailSent: true
-      });
     }
 
     console.log('[AUTH-SIGNUP] Signup completed successfully');
