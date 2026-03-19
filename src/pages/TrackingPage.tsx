@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Heart, Lock, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,24 @@ import { TrackingSummary } from "@/components/tracking/TrackingSummary";
 import { TrackingHistory } from "@/components/tracking/TrackingHistory";
 import { ConsecutiveAlertDialog } from "@/components/tracking/ConsecutiveAlertDialog";
 
+const CONSECUTIVE_ALERT_KEY = 'consecutive-alert-state';
+const CONSECUTIVE_THRESHOLD = 20;
+
+function getStoredAlertState(): { count: number; date: string } {
+  try {
+    const stored = localStorage.getItem(CONSECUTIVE_ALERT_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  return { count: 0, date: new Date().toDateString() };
+}
+
+function saveAlertState(count: number) {
+  localStorage.setItem(CONSECUTIVE_ALERT_KEY, JSON.stringify({
+    count,
+    date: new Date().toDateString(),
+  }));
+}
+
 interface TrackingPageProps {
   onNavigate: (path: string) => void;
 }
@@ -20,28 +38,24 @@ interface TrackingPageProps {
 export function TrackingPage({ onNavigate }: TrackingPageProps) {
   const [vaultUnlockOpen, setVaultUnlockOpen] = useState(false);
   const [showConsecutiveAlert, setShowConsecutiveAlert] = useState(false);
+  const consecutiveCountRef = useRef(0);
   const { checkIns, addCheckIn, settings, updateSettings, updateEmployeePresence, profile } = useAppStore();
   const { toast } = useToast();
   const { t, i18n } = useTranslation('tracking');
   const { t: tHome } = useTranslation('home');
 
-  // Check for 20+ consecutive anxious/alert check-ins
-  const hasConsecutiveNegative = useMemo(() => {
-    if (checkIns.length === 0) return false;
-    const sorted = [...checkIns].sort(
-      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
-    let consecutive = 0;
-    for (const c of sorted) {
-      if (c.status === 'anxious' || c.status === 'alert') {
-        consecutive++;
-        if (consecutive >= 20) return true;
-      } else {
-        consecutive = 0;
-      }
-    }
-    return false;
-  }, [checkIns]);
+  // Initialize counter from localStorage, reset if different day
+  useEffect(() => {
+    const state = getStoredAlertState();
+    const today = new Date().toDateString();
+    consecutiveCountRef.current = state.date === today ? state.count : 0;
+    if (state.date !== today) saveAlertState(0);
+  }, []);
+
+  const resetConsecutiveCounter = useCallback(() => {
+    consecutiveCountRef.current = 0;
+    saveAlertState(0);
+  }, []);
 
   // Heartbeat system
   useEffect(() => {
@@ -97,12 +111,16 @@ export function TrackingPage({ onNavigate }: TrackingPageProps) {
       }, 2000);
     }
 
-    // Check for 20+ consecutive anxious/alert after adding
-    setTimeout(() => {
-      if (hasConsecutiveNegative) {
-        setShowConsecutiveAlert(true);
+    // Update consecutive counter
+    if (status === 'anxious' || status === 'alert') {
+      consecutiveCountRef.current += 1;
+      saveAlertState(consecutiveCountRef.current);
+      if (consecutiveCountRef.current >= CONSECUTIVE_THRESHOLD) {
+        setTimeout(() => setShowConsecutiveAlert(true), 500);
       }
-    }, 500);
+    } else {
+      resetConsecutiveCounter();
+    }
   };
 
   return (
