@@ -194,10 +194,12 @@ export function TrackingPage({ onNavigate }: TrackingPageProps) {
         onOpenChange={setShowConsecutiveAlert}
         onGoTherapy={() => {
           setShowConsecutiveAlert(false);
+          resetConsecutiveCounter();
           onNavigate('/camino');
         }}
         onGoNotes={() => {
           setShowConsecutiveAlert(false);
+          resetConsecutiveCounter();
           onNavigate('/notas');
         }}
       />
