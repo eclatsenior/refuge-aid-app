@@ -285,14 +285,53 @@ export function AdminSoporteCompaniesTab() {
                         {format(new Date(company.created_at), 'dd/MM/yyyy')}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleViewDetails(company.user_id)}
-                          title="Ver detalles"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleViewDetails(company.user_id)}
+                            title="Ver detalles"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                disabled={togglingUser === company.user_id}
+                                title={company.subscription?.status === 'active' ? 'Dar de baja' : 'Dar de alta'}
+                                className={company.subscription?.status === 'active' ? 'text-destructive' : 'text-primary'}
+                              >
+                                {togglingUser === company.user_id ? (
+                                  <LoadingSpinner size="sm" />
+                                ) : company.subscription?.status === 'active' ? (
+                                  <PowerOff className="w-4 h-4" />
+                                ) : (
+                                  <Power className="w-4 h-4" />
+                                )}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  {company.subscription?.status === 'active' ? 'Dar de baja' : 'Dar de alta'} - {company.full_name}
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  {company.subscription?.status === 'active'
+                                    ? 'El usuario será deshabilitado y no podrá acceder a la plataforma. ¿Continuar?'
+                                    : 'El usuario será habilitado y podrá acceder a la plataforma. ¿Continuar?'}
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleToggleStatus(company.user_id, company.subscription?.status === 'active')}>
+                                  Confirmar
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
