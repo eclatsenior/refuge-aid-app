@@ -1062,13 +1062,38 @@ serve(async (req) => {
           }
         }
 
+        // For refugi_lead, create a manual subscription with the specified employee_limit
+        if (role === 'refugi_lead') {
+          const empLimit = parseInt(params.employee_limit) || 15;
+          const periodEnd = new Date();
+          periodEnd.setFullYear(periodEnd.getFullYear() + 10); // 10 years for admin-created accounts
+
+          const { data: existingSub } = await supabaseAdmin
+            .from('subscriptions')
+            .select('id')
+            .eq('refugi_lead_id', newUserId)
+            .maybeSingle();
+
+          if (!existingSub) {
+            await supabaseAdmin.from('subscriptions').insert({
+              refugi_lead_id: newUserId,
+              status: 'active',
+              employee_limit: empLimit,
+              product_id: 'admin_manual',
+              price_id: 'admin_manual',
+              stripe_customer_id: `admin_${newUserId}`,
+              current_period_end: periodEnd.toISOString(),
+            });
+          }
+        }
+
         // Audit log
         await supabaseAdmin.from('audit_logs').insert({
           user_id: user.id,
           action: 'admin_create_user',
           resource_type: 'user',
           resource_id: newUserId,
-          metadata: { email: email.trim().toLowerCase(), role, performed_by: user.email }
+          metadata: { email: email.trim().toLowerCase(), role, employee_limit: role === 'refugi_lead' ? (parseInt(params.employee_limit) || 15) : undefined, performed_by: user.email }
         });
 
         console.log('User created by admin:', email, 'role:', role);
