@@ -1,0 +1,1 @@
+INSERT INTO public.super_admins (user_id, email) VALUES ('40ad8aa2-731e-48d1-b469-d33efc73f206', 'femsecuretech@gmail.com');
