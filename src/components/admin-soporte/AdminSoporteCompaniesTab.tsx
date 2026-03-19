@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Building2, Users, CreditCard, Eye, Search, ChevronLeft, ChevronRight, Mail, UserPlus, Power, PowerOff } from 'lucide-react';
+import { Building2, Users, CreditCard, Eye, Search, Power, PowerOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
