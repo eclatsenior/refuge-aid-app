@@ -169,6 +169,8 @@ const App = () => {
         return <AdminUploadVideosPage />;
       case "/super-admin":
         return <SuperAdminDashboard />;
+      case "/admin-soporte":
+        return <AdminSoportePage />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
