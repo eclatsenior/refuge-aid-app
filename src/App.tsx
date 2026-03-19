@@ -242,6 +242,11 @@ const App = () => {
       return <AuthPage />;
     }
     
+    // Allow admin-soporte for any authenticated super_admin (regardless of role)
+    if (currentPath === '/admin-soporte') {
+      return <AdminSoportePage />;
+    }
+    
     
     // If Refugi Lead, handle dashboard routes
     if (userRole === 'refugi_lead') {
