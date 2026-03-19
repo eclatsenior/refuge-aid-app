@@ -174,14 +174,6 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem 
-                  onClick={() => handleContact('phone')}
-                  disabled={!employee.employee_phone}
-                >
-                  <Phone className="mr-2 h-4 w-4" />
-                  {t('employeeCard.call')}
-                  {!employee.employee_phone && <span className="ml-auto text-xs text-muted-foreground">{t('emergencyAlerts.notAvailable')}</span>}
-                </DropdownMenuItem>
-                <DropdownMenuItem 
                   onClick={() => handleContact('message')}
                   disabled={!employee.employee_phone}
                 >
@@ -189,7 +181,6 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
                   {t('employeeCard.message')}
                   {!employee.employee_phone && <span className="ml-auto text-xs text-muted-foreground">{t('emergencyAlerts.notAvailable')}</span>}
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={(e) => {
                   e.stopPropagation();
                   setShowMessageDialog(true);
