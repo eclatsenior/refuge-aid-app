@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Building2, Users, CreditCard, Eye, Search, ChevronLeft, ChevronRight, Mail, UserPlus, Power, PowerOff } from 'lucide-react';
+import { Building2, Users, CreditCard, Eye, Search, Power, PowerOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { CreateUserDialog } from './CreateUserDialog';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -137,12 +136,9 @@ export function AdminSoporteCompaniesTab() {
           <p className="text-sm text-muted-foreground">{companies.length} empresas registradas</p>
         </div>
         <div className="flex gap-2">
-          <CreateUserDialog defaultRole="refugi_lead" onCreated={loadCompanies} trigger={
-            <Button className="gap-2">
-              <UserPlus className="w-4 h-4" />
-              Nueva Empresa
-            </Button>
-          } />
+          <Button variant="outline" size="sm" onClick={loadCompanies}>
+            Actualizar
+          </Button>
           <Button variant="outline" size="sm" onClick={loadCompanies}>
             Actualizar
           </Button>
