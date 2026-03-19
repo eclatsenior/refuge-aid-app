@@ -30,6 +30,7 @@ import AdminCreateRefugiLeadTest from "@/pages/AdminCreateRefugiLeadTest";
 import { EmailVerifiedPage } from "@/pages/EmailVerifiedPage";
 import { AdminUploadVideosPage } from "@/pages/AdminUploadVideosPage";
 import SuperAdminDashboard from "@/pages/SuperAdminDashboard";
+import AdminSoportePage from "@/pages/AdminSoportePage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 import { PWAUpdater } from "@/components/pwa/PWAUpdater";
@@ -168,6 +169,8 @@ const App = () => {
         return <AdminUploadVideosPage />;
       case "/super-admin":
         return <SuperAdminDashboard />;
+      case "/admin-soporte":
+        return <AdminSoportePage />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
@@ -237,6 +240,11 @@ const App = () => {
     // If not authenticated, show AuthPage
     if (!isAuthenticated || !user) {
       return <AuthPage />;
+    }
+    
+    // Allow admin-soporte for any authenticated super_admin (regardless of role)
+    if (currentPath === '/admin-soporte') {
+      return <AdminSoportePage />;
     }
     
     
