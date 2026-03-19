@@ -822,6 +822,161 @@ serve(async (req) => {
         break;
       }
 
+      case 'get_companies': {
+        // Get all refugi_lead profiles with company info, employee counts, and subscription
+        const { data: leads, error: leadsError } = await supabaseAdmin
+          .from('profiles')
+          .select('user_id, full_name, email, phone, company_name, company_website, company_role, created_at')
+          .eq('role', 'refugi_lead')
+          .order('created_at', { ascending: false });
+        
+        if (leadsError) throw leadsError;
+
+        // Get employee counts and subscriptions for each lead
+        const companies = await Promise.all((leads || []).map(async (lead) => {
+          const [
+            { count: employeeCount },
+            { data: subscription }
+          ] = await Promise.all([
+            supabaseAdmin.from('employee_assignments').select('*', { count: 'exact', head: true }).eq('refugi_lead_id', lead.user_id),
+            supabaseAdmin.from('subscriptions').select('status, employee_limit, current_period_end, product_id, stripe_subscription_id').eq('refugi_lead_id', lead.user_id).order('created_at', { ascending: false }).limit(1).maybeSingle()
+          ]);
+
+          return {
+            ...lead,
+            employee_count: employeeCount || 0,
+            subscription
+          };
+        }));
+
+        result = { companies };
+        break;
+      }
+
+      case 'get_company_details': {
+        const { userId } = params;
+        if (!userId) throw new Error('userId is required');
+
+        // Get the lead profile
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('user_id, full_name, email, phone, company_name, company_website, company_role, created_at')
+          .eq('user_id', userId)
+          .single();
+
+        // Get subscription
+        const { data: subscription } = await supabaseAdmin
+          .from('subscriptions')
+          .select('status, employee_limit, current_period_end, product_id, stripe_subscription_id')
+          .eq('refugi_lead_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        // Get assigned employees
+        const { data: assignments } = await supabaseAdmin
+          .from('employee_assignments')
+          .select('employee_id')
+          .eq('refugi_lead_id', userId);
+
+        const employeeIds = (assignments || []).map(a => a.employee_id);
+
+        let employees: any[] = [];
+        if (employeeIds.length > 0) {
+          const { data: empProfiles } = await supabaseAdmin
+            .from('profiles')
+            .select('user_id, full_name, email, phone, created_at')
+            .in('user_id', employeeIds);
+
+          employees = await Promise.all((empProfiles || []).map(async (emp) => {
+            const { data: lastMood } = await supabaseAdmin
+              .from('mood_check_ins')
+              .select('mood_level, created_at')
+              .eq('employee_id', emp.user_id)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+
+            return {
+              ...emp,
+              last_mood: lastMood?.mood_level || null,
+              last_check_in: lastMood?.created_at || null
+            };
+          }));
+        }
+
+        // Get recent alerts for this company's employees
+        let recentAlerts: any[] = [];
+        if (employeeIds.length > 0) {
+          const { data: alerts } = await supabaseAdmin
+            .from('emergency_alerts')
+            .select('id, alert_type, is_resolved, created_at, employee_id')
+            .in('employee_id', employeeIds)
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+          recentAlerts = (alerts || []).map(alert => ({
+            ...alert,
+            employee_name: employees.find(e => e.user_id === alert.employee_id)?.full_name || 'Desconocido'
+          }));
+        }
+
+        // Sessions last 30 days
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+        let totalSessions30d = 0;
+        if (employeeIds.length > 0) {
+          const { count } = await supabaseAdmin
+            .from('app_sessions')
+            .select('*', { count: 'exact', head: true })
+            .in('employee_id', employeeIds)
+            .gte('started_at', thirtyDaysAgo);
+          totalSessions30d = count || 0;
+        }
+
+        const { count: employeeCount } = await supabaseAdmin
+          .from('employee_assignments')
+          .select('*', { count: 'exact', head: true })
+          .eq('refugi_lead_id', userId);
+
+        result = {
+          company: {
+            ...profile,
+            employee_count: employeeCount || 0,
+            subscription
+          },
+          employees,
+          recentAlerts,
+          totalSessions30d
+        };
+        break;
+      }
+
+      case 'send_admin_message': {
+        const { recipientId, message } = params;
+        if (!recipientId || !message) throw new Error('recipientId and message are required');
+        
+        const { error: msgError } = await supabaseAdmin
+          .from('internal_messages')
+          .insert({
+            sender_id: user.id,
+            recipient_id: recipientId,
+            message: `[Soporte] ${message}`
+          });
+        
+        if (msgError) throw msgError;
+        
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'admin_send_message',
+          resource_type: 'message',
+          resource_id: recipientId,
+          metadata: { recipient_id: recipientId, performed_by: user.email }
+        });
+        
+        result = { success: true };
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: 'Invalid action' }), {
           status: 400,

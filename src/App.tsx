@@ -30,6 +30,7 @@ import AdminCreateRefugiLeadTest from "@/pages/AdminCreateRefugiLeadTest";
 import { EmailVerifiedPage } from "@/pages/EmailVerifiedPage";
 import { AdminUploadVideosPage } from "@/pages/AdminUploadVideosPage";
 import SuperAdminDashboard from "@/pages/SuperAdminDashboard";
+import AdminSoportePage from "@/pages/AdminSoportePage";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 import { PWAUpdater } from "@/components/pwa/PWAUpdater";
