@@ -92,6 +92,7 @@ export default function AdminSoportePage() {
             </div>
           </div>
           <div className="flex gap-2">
+            <CreateUserDialog onCreated={() => window.location.reload()} />
             <Button onClick={generatePDF} disabled={isGenerating} variant="outline" className="gap-2">
               {isGenerating ? (
                 <LoadingSpinner size="sm" />
