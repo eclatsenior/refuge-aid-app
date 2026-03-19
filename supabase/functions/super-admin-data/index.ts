@@ -977,6 +977,129 @@ serve(async (req) => {
         break;
       }
 
+      case 'create_user': {
+        const { email, fullName, password, phone, role, company_name, company_website, company_role } = params;
+        
+        // Validation
+        if (!email || !fullName || !password) throw new Error('email, fullName and password are required');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (typeof email !== 'string' || email.length > 255 || !emailRegex.test(email)) throw new Error('Invalid email format');
+        const trimmedName = String(fullName).trim();
+        if (trimmedName.length < 2 || trimmedName.length > 100) throw new Error('Name must be 2-100 characters');
+        if (typeof password !== 'string' || password.length < 8 || password.length > 128) throw new Error('Password must be 8-128 characters');
+        if (!['employee', 'refugi_lead'].includes(role)) throw new Error('Invalid role');
+
+        // Check if email exists
+        const { data: existingProfile } = await supabaseAdmin
+          .from('profiles')
+          .select('email')
+          .eq('email', email.trim().toLowerCase())
+          .single();
+        if (existingProfile) throw new Error('Email already registered');
+
+        // Create auth user
+        const userMetadata: Record<string, any> = { full_name: trimmedName, role };
+        if (role === 'refugi_lead') {
+          if (company_name) userMetadata.company_name = company_name;
+          if (company_website) userMetadata.company_website = company_website;
+          if (company_role) userMetadata.company_role = company_role;
+        }
+
+        const { data: authData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+          email: email.trim().toLowerCase(),
+          password,
+          email_confirm: true,
+          user_metadata: userMetadata
+        });
+        if (createError) throw new Error(`Auth error: ${createError.message}`);
+        if (!authData.user) throw new Error('Failed to create user');
+
+        const newUserId = authData.user.id;
+
+        // Verify/update profile
+        const { data: profileExists } = await supabaseAdmin
+          .from('profiles')
+          .select('id')
+          .eq('user_id', newUserId)
+          .single();
+
+        if (!profileExists) {
+          await supabaseAdmin.from('profiles').insert({
+            user_id: newUserId,
+            email: email.trim().toLowerCase(),
+            full_name: trimmedName,
+            phone: phone || null,
+            role,
+            company_name: role === 'refugi_lead' ? (company_name || null) : null,
+            company_website: role === 'refugi_lead' ? (company_website || null) : null,
+            company_role: role === 'refugi_lead' ? (company_role || null) : null,
+          });
+        } else {
+          const updatePayload: Record<string, any> = { phone: phone || null };
+          if (role === 'refugi_lead') {
+            updatePayload.company_name = company_name || null;
+            updatePayload.company_website = company_website || null;
+            updatePayload.company_role = company_role || null;
+          }
+          await supabaseAdmin.from('profiles').update(updatePayload).eq('user_id', newUserId);
+        }
+
+        // Create employee_status if employee
+        if (role === 'employee') {
+          const { data: statusExists } = await supabaseAdmin
+            .from('employee_status')
+            .select('id')
+            .eq('employee_id', newUserId)
+            .single();
+          if (!statusExists) {
+            await supabaseAdmin.from('employee_status').insert({
+              employee_id: newUserId,
+              mood_level: null,
+              therapy_progress: 0,
+              is_online: false,
+              emergency_alert: false
+            });
+          }
+        }
+
+        // Audit log
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'admin_create_user',
+          resource_type: 'user',
+          resource_id: newUserId,
+          metadata: { email: email.trim().toLowerCase(), role, performed_by: user.email }
+        });
+
+        console.log('User created by admin:', email, 'role:', role);
+        result = { success: true, userId: newUserId };
+        break;
+      }
+
+      case 'toggle_user_status': {
+        const { userId: targetId, disabled } = params;
+        if (!targetId) throw new Error('userId is required');
+
+        // Use admin API to ban/unban user
+        const { error: banError } = await supabaseAdmin.auth.admin.updateUserById(
+          targetId,
+          { ban_duration: disabled ? '876600h' : 'none' }
+        );
+        if (banError) throw banError;
+
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: user.id,
+          action: disabled ? 'admin_disable_user' : 'admin_enable_user',
+          resource_type: 'user',
+          resource_id: targetId,
+          metadata: { performed_by: user.email }
+        });
+
+        console.log('User', targetId, disabled ? 'disabled' : 'enabled', 'by admin:', user.email);
+        result = { success: true };
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: 'Invalid action' }), {
           status: 400,

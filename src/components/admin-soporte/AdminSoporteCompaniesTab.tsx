@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Building2, Users, CreditCard, Eye, Search, ChevronLeft, ChevronRight, Mail, UserPlus } from 'lucide-react';
+import { Building2, Users, CreditCard, Eye, Search, ChevronLeft, ChevronRight, Mail, UserPlus, Power, PowerOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { CreateUserDialog } from './CreateUserDialog';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -58,6 +60,7 @@ export function AdminSoporteCompaniesTab() {
   const [selectedCompany, setSelectedCompany] = useState<CompanyDetails | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [togglingUser, setTogglingUser] = useState<string | null>(null);
 
   useEffect(() => {
     loadCompanies();
@@ -96,6 +99,23 @@ export function AdminSoporteCompaniesTab() {
     }
   };
 
+  const handleToggleStatus = async (userId: string, disable: boolean) => {
+    setTogglingUser(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke('super-admin-data', {
+        body: { action: 'toggle_user_status', userId, disabled: disable }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(disable ? 'Empresa dada de baja' : 'Empresa dada de alta');
+      loadCompanies();
+    } catch (err: any) {
+      toast.error(err.message || 'Error al cambiar estado');
+    } finally {
+      setTogglingUser(null);
+    }
+  };
+
   const filteredCompanies = companies.filter(c => {
     if (!search) return true;
     const s = search.toLowerCase();
@@ -116,9 +136,17 @@ export function AdminSoporteCompaniesTab() {
           </h2>
           <p className="text-sm text-muted-foreground">{companies.length} empresas registradas</p>
         </div>
-        <Button variant="outline" size="sm" onClick={loadCompanies}>
-          Actualizar
-        </Button>
+        <div className="flex gap-2">
+          <CreateUserDialog defaultRole="refugi_lead" onCreated={loadCompanies} trigger={
+            <Button className="gap-2">
+              <UserPlus className="w-4 h-4" />
+              Nueva Empresa
+            </Button>
+          } />
+          <Button variant="outline" size="sm" onClick={loadCompanies}>
+            Actualizar
+          </Button>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -257,14 +285,53 @@ export function AdminSoporteCompaniesTab() {
                         {format(new Date(company.created_at), 'dd/MM/yyyy')}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleViewDetails(company.user_id)}
-                          title="Ver detalles"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleViewDetails(company.user_id)}
+                            title="Ver detalles"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                disabled={togglingUser === company.user_id}
+                                title={company.subscription?.status === 'active' ? 'Dar de baja' : 'Dar de alta'}
+                                className={company.subscription?.status === 'active' ? 'text-destructive' : 'text-primary'}
+                              >
+                                {togglingUser === company.user_id ? (
+                                  <LoadingSpinner size="sm" />
+                                ) : company.subscription?.status === 'active' ? (
+                                  <PowerOff className="w-4 h-4" />
+                                ) : (
+                                  <Power className="w-4 h-4" />
+                                )}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  {company.subscription?.status === 'active' ? 'Dar de baja' : 'Dar de alta'} - {company.full_name}
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  {company.subscription?.status === 'active'
+                                    ? 'El usuario será deshabilitado y no podrá acceder a la plataforma. ¿Continuar?'
+                                    : 'El usuario será habilitado y podrá acceder a la plataforma. ¿Continuar?'}
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleToggleStatus(company.user_id, company.subscription?.status === 'active')}>
+                                  Confirmar
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, FileDown, LogOut } from 'lucide-react';
+import { ArrowLeft, Shield, FileDown, LogOut, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,6 +16,7 @@ import { SuperAdminVideosTab } from '@/components/super-admin/SuperAdminVideosTa
 import { SuperAdminTherapyTab } from '@/components/super-admin/SuperAdminTherapyTab';
 import { AdminSoporteCompaniesTab } from '@/components/admin-soporte/AdminSoporteCompaniesTab';
 import { AdminSoporteSupportTab } from '@/components/admin-soporte/AdminSoporteSupportTab';
+import { CreateUserDialog } from '@/components/admin-soporte/CreateUserDialog';
 import { useSuperAdminReportGeneration } from '@/hooks/useSuperAdminReportGeneration';
 
 export default function AdminSoportePage() {
@@ -91,6 +92,7 @@ export default function AdminSoportePage() {
             </div>
           </div>
           <div className="flex gap-2">
+            <CreateUserDialog onCreated={() => window.location.reload()} />
             <Button onClick={generatePDF} disabled={isGenerating} variant="outline" className="gap-2">
               {isGenerating ? (
                 <LoadingSpinner size="sm" />
