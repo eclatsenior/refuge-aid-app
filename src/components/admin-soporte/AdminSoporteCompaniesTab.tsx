@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Building2, Users, CreditCard, Eye, Search, ChevronLeft, ChevronRight, Mail, UserPlus } from 'lucide-react';
+import { Building2, Users, CreditCard, Eye, Search, ChevronLeft, ChevronRight, Mail, UserPlus, Power, PowerOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { CreateUserDialog } from './CreateUserDialog';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
