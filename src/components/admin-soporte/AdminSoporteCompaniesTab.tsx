@@ -137,10 +137,10 @@ export function AdminSoporteCompaniesTab() {
           <p className="text-sm text-muted-foreground">{companies.length} empresas registradas</p>
         </div>
         <div className="flex gap-2">
-          <CreateUserDialog defaultRole="refugi_lead" onCreated={loadCompanies} trigger={
+          <CreateUserDialog onCreated={loadCompanies} trigger={
             <Button className="gap-2">
               <UserPlus className="w-4 h-4" />
-              Nueva Empresa
+              Nueva Cuenta
             </Button>
           } />
           <Button variant="outline" size="sm" onClick={loadCompanies}>
