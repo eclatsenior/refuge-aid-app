@@ -136,9 +136,17 @@ export function AdminSoporteCompaniesTab() {
           </h2>
           <p className="text-sm text-muted-foreground">{companies.length} empresas registradas</p>
         </div>
-        <Button variant="outline" size="sm" onClick={loadCompanies}>
-          Actualizar
-        </Button>
+        <div className="flex gap-2">
+          <CreateUserDialog defaultRole="refugi_lead" onCreated={loadCompanies} trigger={
+            <Button className="gap-2">
+              <UserPlus className="w-4 h-4" />
+              Nueva Empresa
+            </Button>
+          } />
+          <Button variant="outline" size="sm" onClick={loadCompanies}>
+            Actualizar
+          </Button>
+        </div>
       </div>
 
       {/* Summary Cards */}
