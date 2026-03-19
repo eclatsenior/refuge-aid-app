@@ -99,6 +99,23 @@ export function AdminSoporteCompaniesTab() {
     }
   };
 
+  const handleToggleStatus = async (userId: string, disable: boolean) => {
+    setTogglingUser(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke('super-admin-data', {
+        body: { action: 'toggle_user_status', userId, disabled: disable }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(disable ? 'Empresa dada de baja' : 'Empresa dada de alta');
+      loadCompanies();
+    } catch (err: any) {
+      toast.error(err.message || 'Error al cambiar estado');
+    } finally {
+      setTogglingUser(null);
+    }
+  };
+
   const filteredCompanies = companies.filter(c => {
     if (!search) return true;
     const s = search.toLowerCase();
