@@ -60,6 +60,7 @@ export function AdminSoporteCompaniesTab() {
   const [selectedCompany, setSelectedCompany] = useState<CompanyDetails | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [togglingUser, setTogglingUser] = useState<string | null>(null);
 
   useEffect(() => {
     loadCompanies();
