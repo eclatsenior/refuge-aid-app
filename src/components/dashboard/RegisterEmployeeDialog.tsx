@@ -34,10 +34,7 @@ const registerEmployeeSchema = z.object({
     .email()
     .max(255)
     .trim(),
-  phone: z.string()
-    .regex(/^(\+34|0034|34)?[6789]\d{8}$/)
-    .optional()
-    .or(z.literal('')),
+  phone: z.string().optional().default(''),
   password: z.string()
     .min(8)
     .max(100),
