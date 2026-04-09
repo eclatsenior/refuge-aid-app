@@ -918,7 +918,17 @@ export const useAppStore = create<AppState>()(
             },
           });
 
-          if (error) throw error;
+          if (error) {
+            // Parse the error body if it contains a JSON message
+            const errorBody = error?.message || '';
+            try {
+              const parsed = JSON.parse(errorBody.replace(/^.*?(\{)/, '$1'));
+              if (parsed?.message) throw new Error(parsed.message);
+            } catch (parseErr) {
+              // If not parseable, check if result has the message
+            }
+            throw error;
+          }
           if (!result?.success) throw new Error(result?.message || 'Error al registrar empleada');
 
           console.log('✅ Employee registered successfully:', result);

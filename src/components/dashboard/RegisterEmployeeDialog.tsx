@@ -172,9 +172,16 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
         onEmployeeRegistered();
       }
     } catch (error: any) {
+      const errorMsg = error.message || '';
+      const isDuplicate = errorMsg.includes('ya está registrado') || errorMsg.includes('already registered');
+      
       toast({
-        title: t('registerEmployee.errorRegistering'),
-        description: error.message || t('registerEmployee.errorRegisteringDesc'),
+        title: isDuplicate 
+          ? t('registerEmployee.duplicateEmail', 'Email ya registrado')
+          : t('registerEmployee.errorRegistering'),
+        description: isDuplicate
+          ? t('registerEmployee.duplicateEmailDesc', 'Este email ya existe en el sistema. Usa otro email para registrar a la empleada.')
+          : errorMsg || t('registerEmployee.errorRegisteringDesc'),
         variant: "destructive",
       });
     } finally {
