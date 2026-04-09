@@ -84,7 +84,7 @@ export function RegisterEmployeeDialog({ onEmployeeRegistered }: RegisterEmploye
           path: ['email']
         });
       }
-      if (data.phone && !/^(\+34|0034|34)?[6789]\d{8}$/.test(data.phone)) {
+      if (data.phone && data.phone.length > 0 && !/^(\+?[0-9]{7,15})$/.test(data.phone.replace(/\s/g, ''))) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: t('registerEmployee.validations.phoneInvalid'),
