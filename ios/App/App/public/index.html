@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Refugio - Tu Espacio Seguro</title>
+    <meta name="description" content="Tu espacio seguro de cuidado emocional. Camino terapéutico, diario caja fuerte y apoyo disponible 24/7." />
+    <meta name="author" content="Refugio" />
+    <meta name="theme-color" content="#1a1a2e" />
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Refugio" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <meta property="og:title" content="Refugio - Tu Espacio Seguro" />
+    <meta property="og:description" content="Tu espacio seguro de cuidado emocional y apoyo" />
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <!-- Preload critical resources for offline -->
+    <link rel="preload" href="/icon-192.png" as="image" />
+    <script type="module" crossorigin src="/assets/index-zaDHZhJ5.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Bkvqx1W8.css">
+  <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
+
+  <body>
+    <div id="root"></div>
+    <script>
+      // Evitar zoom en inputs en iOS
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        document.addEventListener('touchstart', function(event) {
+          if (event.touches.length > 1) {
+            event.preventDefault();
+          }
+        }, { passive: false });
+      }
+    </script>
+  </body>
+</html>

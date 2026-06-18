@@ -1,0 +1,3 @@
+// This is a placeholder file for the message notification sound
+// In production, replace this with an actual MP3 file
+// For development purposes, the app will gracefully handle if this file doesn't exist
