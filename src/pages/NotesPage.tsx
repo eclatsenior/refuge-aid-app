@@ -27,7 +27,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     notes, addNote, updateNote, deleteNote, toggleVaultStatus, 
     toggleTherapyFlag, quickDeleteNote, settings, showDecoyScreen, 
     activateDecoyScreen, deactivateDecoyScreen, isVaultLocked, unlockVault,
-    profile
+    profile, updateSettings
   } = useAppStore();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
@@ -404,10 +404,15 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   };
 
   const handleEmergencyHide = () => {
-    activateDecoyScreen();
+    const willActivate = !settings.isDiscreetMode;
+    updateSettings({ isDiscreetMode: willActivate });
     toast({
-      title: t('toast.emergencyHideActivated'),
-      description: t('toast.emergencyHideDescription')
+      title: willActivate
+        ? t('modeToggle.discreetActivated', { ns: 'home', defaultValue: 'Modo discreto activado' })
+        : t('modeToggle.normalActivated', { ns: 'home', defaultValue: 'Modo normal activado' }),
+      description: willActivate
+        ? t('modeToggle.discreetDescription', { ns: 'home', defaultValue: 'La aplicación ahora parece una app de notas' })
+        : t('modeToggle.normalDescription', { ns: 'home', defaultValue: 'La aplicación muestra su interfaz normal' })
     });
   };
 
