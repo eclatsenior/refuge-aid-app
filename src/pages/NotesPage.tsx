@@ -15,7 +15,7 @@ import { VaultUnlock } from "@/components/vault/VaultUnlock";
 import { VaultResetRequest } from "@/components/vault/VaultResetRequest";
 import { VaultResetComplete } from "@/components/vault/VaultResetComplete";
 import { supabase } from "@/integrations/supabase/client";
-import { encryptText, decryptText } from "@/lib/security";
+import { encryptVaultNote, decryptVaultNote, clearVaultDataKey, getVaultDataKey } from "@/lib/security";
 
 interface NotesPageProps {
   onNavigate: (path: string) => void;
@@ -47,12 +47,33 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const [showVaultResetComplete, setShowVaultResetComplete] = useState(false);
   const [resetToken, setResetToken] = useState<string | null>(null);
   const [vaultToken, setVaultToken] = useState<string | null>(null);
+  // Contenido descifrado de las notas de la caja fuerte (solo en memoria)
+  const [decryptedVault, setDecryptedVault] = useState<Record<string, string>>({});
 
   // Check if user has vault password configured and check for approved reset requests
   useEffect(() => {
     checkVaultPassword();
     checkPendingApprovedReset();
   }, []);
+
+  // Descifra en memoria las notas de la caja fuerte cuando está desbloqueada
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (isVaultLocked || !getVaultDataKey()) {
+        setDecryptedVault({});
+        return;
+      }
+      const result: Record<string, string> = {};
+      for (const note of notes.filter((n: any) => n.isSafeVault)) {
+        const plain = await decryptVaultNote(note.content, vaultToken);
+        if (plain !== null) result[note.id] = plain;
+      }
+      if (!cancelled) setDecryptedVault(result);
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [notes, isVaultLocked, vaultToken]);
 
   // Suscripción realtime a cambios en solicitudes de reset
   useEffect(() => {
@@ -217,6 +238,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
 
   const handleLockVault = () => {
     sessionStorage.removeItem('vault_token');
+    clearVaultDataKey();
+    setDecryptedVault({});
     setVaultToken(null);
     // Use the store's setState to explicitly lock the vault
     useAppStore.setState({ vaultLocked: true, isVaultLocked: true });
@@ -273,7 +296,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     setIsEditing(true);
     setEditingId(note.id);
     setTitle(note.title);
-    setContent(note.content);
+    setContent(note.isSafeVault ? (decryptedVault[note.id] ?? note.content) : note.content);
     setIsVaultMode(note.isSafeVault);
   };
 
@@ -289,13 +312,10 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
 
     let finalContent = content.trim();
 
-    // Encrypt content if it's a vault note and user has vault password
-    if (isVaultMode && vaultToken) {
+    // Cifra el contenido si es una nota de la caja fuerte
+    if (isVaultMode && getVaultDataKey()) {
       try {
-        // Get vault password from session (in real app, derive from token)
-        // For now, we'll use a simplified approach
-        const password = vaultToken.substring(0, 32); // Simplified - in production use proper key derivation
-        finalContent = await encryptText(content.trim(), password);
+        finalContent = await encryptVaultNote(content.trim());
       } catch (error) {
         console.error('Error encrypting note:', error);
         toast({
@@ -690,7 +710,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
                       </CardHeader>
                       <CardContent>
                         <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                          {note.content || "Sin contenido"}
+                          {decryptedVault[note.id] ?? (note.content ? "•••••••••••" : "Sin contenido")}
                         </p>
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-muted-foreground">

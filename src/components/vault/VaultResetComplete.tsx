@@ -64,6 +64,7 @@ export function VaultResetComplete({ open, onClose, resetToken, onSuccess }: Vau
       
       // Limpiar sessionStorage y resetear estados
       sessionStorage.removeItem('vault_token');
+      sessionStorage.removeItem('vault_data_key');
       
       onSuccess();
       onClose();

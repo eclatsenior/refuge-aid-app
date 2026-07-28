@@ -118,6 +118,65 @@ export async function decryptText(encryptedText: string, password: string): Prom
  * Genera una clave de cifrado derivada del PIN del usuario
  * En producción, usar PBKDF2 o Argon2
  */
+
+/* ------------------------------------------------------------------ *
+ * Caja Fuerte: gestión de la clave de datos (DEK)
+ * ------------------------------------------------------------------ */
+
+const VAULT_DATA_KEY_STORAGE = 'vault_data_key';
+
+/** Guarda la clave de cifrado de la caja fuerte solo durante la sesión */
+export function setVaultDataKey(key: string): void {
+  sessionStorage.setItem(VAULT_DATA_KEY_STORAGE, key);
+}
+
+/** Devuelve la clave de cifrado de la caja fuerte (si está desbloqueada) */
+export function getVaultDataKey(): string | null {
+  return sessionStorage.getItem(VAULT_DATA_KEY_STORAGE);
+}
+
+/** Elimina la clave de cifrado al bloquear la caja fuerte */
+export function clearVaultDataKey(): void {
+  sessionStorage.removeItem(VAULT_DATA_KEY_STORAGE);
+}
+
+/**
+ * Cifra el contenido de una nota de la caja fuerte con la clave de datos
+ * aleatoria de 256 bits emitida por el servidor tras validar la contraseña.
+ */
+export async function encryptVaultNote(text: string): Promise<string> {
+  const key = getVaultDataKey();
+  if (!key) throw new Error('La caja fuerte está bloqueada');
+  return encryptText(text, key);
+}
+
+/**
+ * Descifra una nota de la caja fuerte. Intenta primero con la clave de datos
+ * actual y, para notas antiguas, con el esquema heredado (token de vault).
+ * Devuelve `null` si no se puede descifrar.
+ */
+export async function decryptVaultNote(
+  encrypted: string,
+  legacyToken?: string | null
+): Promise<string | null> {
+  const key = getVaultDataKey();
+  if (key) {
+    try {
+      return await decryptText(encrypted, key);
+    } catch (_e) {
+      // continúa con el esquema heredado
+    }
+  }
+  if (legacyToken) {
+    try {
+      return await decryptText(encrypted, legacyToken.substring(0, 32));
+    } catch (_e) {
+      // no descifrable
+    }
+  }
+  return null;
+}
+
 export function deriveKeyFromPIN(pin: string, salt?: string): string {
   // Simulación - en producción usar derivación de clave robusta
   const combinedInput = pin + (salt || 'refugi-default-salt');
