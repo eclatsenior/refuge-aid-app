@@ -66,7 +66,7 @@ serve(async (req) => {
     // Obtener hash almacenado
     const { data: vaultPassword, error: fetchError } = await supabaseAdmin
       .from('vault_passwords')
-      .select('password_hash, salt')
+      .select('password_hash, salt, data_key')
       .eq('user_id', user.id)
       .single();
 
@@ -164,12 +164,30 @@ serve(async (req) => {
     const encodedSignature = btoa(String.fromCharCode(...new Uint8Array(signature))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
     const vaultToken = `${dataToSign}.${encodedSignature}`;
 
+    // Clave de datos (DEK) única por usuaria: se usa para cifrar las notas.
+    // Nunca depende del token (cuya cabecera es constante) y se conserva
+    // intacta en los restablecimientos de contraseña para no perder notas.
+    let dataKey = vaultPassword.data_key as string | null;
+    if (!dataKey) {
+      const randomBytes = crypto.getRandomValues(new Uint8Array(32));
+      dataKey = Array.from(randomBytes).map((b) => b.toString(16).padStart(2, '0')).join('');
+      const { error: dataKeyError } = await supabaseAdmin
+        .from('vault_passwords')
+        .update({ data_key: dataKey })
+        .eq('user_id', user.id);
+      if (dataKeyError) {
+        console.error('[VERIFY-VAULT-PASSWORD] Error storing data key:', dataKeyError);
+        throw new Error('No se pudo inicializar la clave de cifrado');
+      }
+    }
+
     console.log('Caja fuerte desbloqueada para usuario:', user.id);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         token: vaultToken,
+        data_key: dataKey,
         message: 'Caja fuerte desbloqueada' 
       }),
       {
