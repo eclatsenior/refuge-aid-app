@@ -56,6 +56,25 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     checkPendingApprovedReset();
   }, []);
 
+  // Descifra en memoria las notas de la caja fuerte cuando está desbloqueada
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (isVaultLocked || !getVaultDataKey()) {
+        setDecryptedVault({});
+        return;
+      }
+      const result: Record<string, string> = {};
+      for (const note of notes.filter((n: any) => n.isSafeVault)) {
+        const plain = await decryptVaultNote(note.content, vaultToken);
+        if (plain !== null) result[note.id] = plain;
+      }
+      if (!cancelled) setDecryptedVault(result);
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [notes, isVaultLocked, vaultToken]);
+
   // Suscripción realtime a cambios en solicitudes de reset
   useEffect(() => {
     let subscription: any;
@@ -219,6 +238,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
 
   const handleLockVault = () => {
     sessionStorage.removeItem('vault_token');
+    clearVaultDataKey();
+    setDecryptedVault({});
     setVaultToken(null);
     // Use the store's setState to explicitly lock the vault
     useAppStore.setState({ vaultLocked: true, isVaultLocked: true });
@@ -275,7 +296,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
     setIsEditing(true);
     setEditingId(note.id);
     setTitle(note.title);
-    setContent(note.content);
+    setContent(note.isSafeVault ? (decryptedVault[note.id] ?? note.content) : note.content);
     setIsVaultMode(note.isSafeVault);
   };
 
@@ -291,13 +312,10 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
 
     let finalContent = content.trim();
 
-    // Encrypt content if it's a vault note and user has vault password
-    if (isVaultMode && vaultToken) {
+    // Cifra el contenido si es una nota de la caja fuerte
+    if (isVaultMode && getVaultDataKey()) {
       try {
-        // Get vault password from session (in real app, derive from token)
-        // For now, we'll use a simplified approach
-        const password = vaultToken.substring(0, 32); // Simplified - in production use proper key derivation
-        finalContent = await encryptText(content.trim(), password);
+        finalContent = await encryptVaultNote(content.trim());
       } catch (error) {
         console.error('Error encrypting note:', error);
         toast({
