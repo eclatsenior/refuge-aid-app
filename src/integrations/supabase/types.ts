@@ -994,6 +994,7 @@ export type Database = {
       vault_passwords: {
         Row: {
           created_at: string
+          data_key: string | null
           id: string
           password_hash: string
           reset_approved_at: string | null
@@ -1005,6 +1006,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          data_key?: string | null
           id?: string
           password_hash: string
           reset_approved_at?: string | null
@@ -1016,6 +1018,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          data_key?: string | null
           id?: string
           password_hash?: string
           reset_approved_at?: string | null
