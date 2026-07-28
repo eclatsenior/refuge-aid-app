@@ -710,7 +710,7 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
                       </CardHeader>
                       <CardContent>
                         <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                          {note.content || "Sin contenido"}
+                          {decryptedVault[note.id] ?? (note.content ? "•••••••••••" : "Sin contenido")}
                         </p>
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-muted-foreground">
