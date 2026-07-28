@@ -17,6 +17,7 @@ serve(async (req: Request) => {
   // Allow-list of origins the verification link may redirect to
   const ALLOWED_ORIGINS = [
     'https://refuge-aid-app.lovable.app',
+    'https://app.femsecuretech.com',
     'https://app.eclatsenior.com.es',
     'https://id-preview--577d0e94-408d-4f2c-bc50-c0e9fa87b30e.lovable.app',
     'http://localhost:8080',
