@@ -12,16 +12,36 @@ serve(async (req: Request) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const url = new URL(req.url);
-    const token = url.searchParams.get('token');
-    const redirect = url.searchParams.get('redirect');
-    const buildRedirect = (pathWithQuery: string) => {
-      if (redirect && (redirect.startsWith('http://') || redirect.startsWith('https://'))) {
-        return redirect;
+  const reqUrl = new URL(req.url);
+
+  // Allow-list of origins the verification link may redirect to
+  const ALLOWED_ORIGINS = [
+    'https://refuge-aid-app.lovable.app',
+    'https://app.eclatsenior.com.es',
+    'https://id-preview--577d0e94-408d-4f2c-bc50-c0e9fa87b30e.lovable.app',
+    'http://localhost:8080',
+  ];
+
+  const rawRedirect = reqUrl.searchParams.get('redirect');
+  let safeRedirectOrigin: string | null = null;
+  if (rawRedirect) {
+    try {
+      const candidate = new URL(rawRedirect);
+      if (ALLOWED_ORIGINS.includes(candidate.origin)) {
+        safeRedirectOrigin = candidate.origin;
+      } else {
+        console.warn('Rejected redirect target:', candidate.origin);
       }
-      return `${url.origin}${pathWithQuery}`;
-    };
+    } catch (_e) {
+      console.warn('Invalid redirect parameter');
+    }
+  }
+
+  const buildRedirect = (pathWithQuery: string) =>
+    `${safeRedirectOrigin ?? reqUrl.origin}${pathWithQuery}`;
+
+  try {
+    const token = reqUrl.searchParams.get('token');
 
     if (!token) {
       console.error('No token provided');
@@ -129,7 +149,6 @@ serve(async (req: Request) => {
 
   } catch (error) {
     console.error('Error in verify-custom-email function:', error);
-    const url = new URL(req.url);
     return new Response(
       null,
       {

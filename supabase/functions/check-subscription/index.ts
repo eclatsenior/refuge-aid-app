@@ -41,17 +41,21 @@ serve(async (req) => {
     logStep("Authorization header found");
 
     const token = authHeader.replace("Bearer ", "");
-    
-    // Decode the JWT to extract user info (Supabase already validates JWT via verify_jwt=true)
-    const tokenParts = token.split('.');
-    if (tokenParts.length !== 3) throw new Error("Invalid JWT format");
-    
-    const payload = JSON.parse(atob(tokenParts[1]));
-    const userId = payload.sub;
-    const userEmail = payload.email;
-    
+
+    // Cryptographically verify the JWT (never trust the decoded payload)
+    const { data: userData, error: authError } = await supabaseClient.auth.getUser(token);
+    if (authError || !userData?.user) {
+      logStep("Auth failed", { error: authError?.message });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+      });
+    }
+
+    const userId = userData.user.id;
+    const userEmail = userData.user.email;
     if (!userId || !userEmail) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated from JWT", { userId, email: userEmail });
+    logStep("User authenticated", { userId });
 
     // Obtener perfil del usuario
     const { data: profile, error: profileError } = await supabaseClient
