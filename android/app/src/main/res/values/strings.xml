@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Refugi</string>
+    <string name="title_activity_main">Refugi</string>
+    <string name="package_name">com.eclatsenior.refugi</string>
+    <string name="custom_url_scheme">com.eclatsenior.refugi</string>
+</resources>
