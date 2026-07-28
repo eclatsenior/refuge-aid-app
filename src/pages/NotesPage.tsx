@@ -15,7 +15,7 @@ import { VaultUnlock } from "@/components/vault/VaultUnlock";
 import { VaultResetRequest } from "@/components/vault/VaultResetRequest";
 import { VaultResetComplete } from "@/components/vault/VaultResetComplete";
 import { supabase } from "@/integrations/supabase/client";
-import { encryptText, decryptText } from "@/lib/security";
+import { encryptVaultNote, decryptVaultNote, clearVaultDataKey, getVaultDataKey } from "@/lib/security";
 
 interface NotesPageProps {
   onNavigate: (path: string) => void;
@@ -47,6 +47,8 @@ export function NotesPage({ onNavigate }: NotesPageProps) {
   const [showVaultResetComplete, setShowVaultResetComplete] = useState(false);
   const [resetToken, setResetToken] = useState<string | null>(null);
   const [vaultToken, setVaultToken] = useState<string | null>(null);
+  // Contenido descifrado de las notas de la caja fuerte (solo en memoria)
+  const [decryptedVault, setDecryptedVault] = useState<Record<string, string>>({});
 
   // Check if user has vault password configured and check for approved reset requests
   useEffect(() => {
