@@ -1,13 +1,21 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
+// Live reload (desarrollo) solo si se ejecuta con CAP_LIVE_RELOAD=true.
+// Para builds de producción (Play Store / App Store) NO debe incluirse el bloque `server`.
+const useLiveReload = process.env.CAP_LIVE_RELOAD === 'true';
+
 const config: CapacitorConfig = {
-  appId: 'app.lovable.577d0e94408d4f2cbc50c0e9fa87b30e',
-  appName: 'refuge-aid-app',
+  appId: 'com.eclatsenior.refugi',
+  appName: 'Refugi',
   webDir: 'dist',
-  server: {
-    url: 'https://577d0e94-408d-4f2c-bc50-c0e9fa87b30e.lovableproject.com?forceHideBadge=true',
-    cleartext: true
-  },
+  ...(useLiveReload
+    ? {
+        server: {
+          url: 'https://577d0e94-408d-4f2c-bc50-c0e9fa87b30e.lovableproject.com?forceHideBadge=true',
+          cleartext: true,
+        },
+      }
+    : {}),
   plugins: {
     LocalNotifications: {
       smallIcon: "ic_stat_icon_config_sample",
@@ -24,7 +32,7 @@ const config: CapacitorConfig = {
   },
   android: {
     backgroundColor: '#ffffff',
-    allowMixedContent: true
+    allowMixedContent: false
   }
 };
 
