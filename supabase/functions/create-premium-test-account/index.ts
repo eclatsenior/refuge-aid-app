@@ -39,6 +39,21 @@ serve(async (req: Request) => {
       );
     }
 
+    // SECURITY: Only super admins may create premium test accounts
+    const { data: isSuperAdmin } = await supabaseAdmin
+      .from('super_admins')
+      .select('id')
+      .eq('user_id', callerUser.id)
+      .maybeSingle();
+
+    if (!isSuperAdmin) {
+      console.error('[CREATE-PREMIUM-TEST] Non-admin attempted access:', callerUser.id);
+      return new Response(
+        JSON.stringify({ error: 'Access denied' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+      );
+    }
+
     // SECURITY: Verify caller is super admin
     const { data: isSuperAdmin } = await supabaseAdmin
       .from('super_admins')
