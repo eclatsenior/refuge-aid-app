@@ -1176,6 +1176,7 @@ export type Database = {
         Args: { user_id_param: string }
         Returns: boolean
       }
+      is_my_employee: { Args: { _employee_id: string }; Returns: boolean }
       is_super_admin: { Args: { check_user_id?: string }; Returns: boolean }
     }
     Enums: {

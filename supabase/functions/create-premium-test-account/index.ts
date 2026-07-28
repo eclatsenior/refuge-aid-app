@@ -39,12 +39,12 @@ serve(async (req: Request) => {
       );
     }
 
-    // SECURITY: Verify caller is super admin
+    // SECURITY: Only super admins may create premium test accounts
     const { data: isSuperAdmin } = await supabaseAdmin
       .from('super_admins')
       .select('id')
       .eq('user_id', callerUser.id)
-      .single();
+      .maybeSingle();
 
     if (!isSuperAdmin) {
       console.error('[CREATE-PREMIUM-TEST] Non-admin attempted access:', callerUser.id);
