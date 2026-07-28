@@ -178,6 +178,9 @@ export function VaultUnlock({ open, onSuccess, onForgotPassword, onClose }: Vaul
       console.log('[VaultUnlock] Password verified successfully');
       sessionStorage.removeItem('vault_attempts');
       sessionStorage.setItem('vault_token', data.token);
+      if (data.data_key) {
+        setVaultDataKey(data.data_key);
+      }
       setAttempts(0);
       setPassword('');
       
