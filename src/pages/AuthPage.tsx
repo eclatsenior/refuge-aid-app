@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { useAppStore } from "@/store/useAppStore";
-import { FaceRecognition } from "@/components/auth/FaceRecognition";
 import { PasswordResetCodeDialog } from "@/components/auth/PasswordResetCodeDialog";
 import { EmailVerificationCodeDialog } from "@/components/auth/EmailVerificationCodeDialog";
 import { useToast } from "@/hooks/use-toast";
@@ -296,20 +295,6 @@ export function AuthPage() {
     setIsLoading(false);
   };
 
-  const handleFaceRecognition = () => {
-    setShowFaceRecognition(true);
-  };
-
-  const handleFaceRecognitionComplete = (success: boolean) => {
-    setShowFaceRecognition(false);
-    if (success) {
-      toast({
-        title: "Autenticación exitosa",
-        description: "Reconocimiento facial completado"
-      });
-    }
-  };
-
   const handleForgotPassword = async () => {
     const normalizedEmail = resetEmail.trim().toLowerCase();
     
@@ -363,15 +348,6 @@ export function AuthPage() {
     }
     setIsLoading(false);
   };
-
-  if (showFaceRecognition) {
-    return (
-      <FaceRecognition 
-        onComplete={handleFaceRecognitionComplete}
-        isRefugiLead={isRefugiLead}
-      />
-    );
-  }
 
   return (
     <>
@@ -596,25 +572,6 @@ export function AuthPage() {
                   ¿No recibiste el email de verificación? Reenviar →
                 </Button>
 
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-border" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">o</span>
-                  </div>
-                </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full border-border hover:bg-accent"
-                  onClick={handleFaceRecognition}
-                  disabled={isLoading}
-                >
-                  <Scan className="mr-2 h-4 w-4" />
-                  Reconocimiento Facial
-                </Button>
               </TabsContent>
 
               <TabsContent value="register" className="space-y-4">
