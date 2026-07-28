@@ -31,6 +31,7 @@ import { EmailVerifiedPage } from "@/pages/EmailVerifiedPage";
 import { AdminUploadVideosPage } from "@/pages/AdminUploadVideosPage";
 import SuperAdminDashboard from "@/pages/SuperAdminDashboard";
 import AdminSoportePage from "@/pages/AdminSoportePage";
+import { PrivacyPolicyPage, TermsPage, DeleteAccountPage } from "@/pages/LegalPages";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useAppStore } from "@/store/useAppStore";
 import { PWAUpdater } from "@/components/pwa/PWAUpdater";
@@ -171,6 +172,12 @@ const App = () => {
         return <SuperAdminDashboard />;
       case "/admin-soporte":
         return <AdminSoportePage />;
+      case "/privacidad":
+        return <PrivacyPolicyPage onNavigate={handleNavigate} />;
+      case "/terminos":
+        return <TermsPage onNavigate={handleNavigate} />;
+      case "/eliminar-cuenta":
+        return <DeleteAccountPage onNavigate={handleNavigate} />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
@@ -232,7 +239,7 @@ const App = () => {
     }
     
     // Special routes that don't require authentication
-    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled", "/email-verified"];
+    const publicRoutes = ["/instalar", "/stripe-test-secret", "/payment-success", "/payment-canceled", "/subscription-success", "/subscription-canceled", "/email-verified", "/privacidad", "/terminos", "/eliminar-cuenta"];
     if (publicRoutes.includes(currentPath)) {
       return renderCurrentPage();
     }
