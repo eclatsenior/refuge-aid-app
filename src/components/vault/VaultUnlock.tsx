@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Lock, AlertTriangle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { setVaultDataKey } from '@/lib/security';
 
 interface VaultUnlockProps {
   open: boolean;
